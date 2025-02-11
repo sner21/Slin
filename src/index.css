@@ -1,0 +1,67 @@
+:root {
+    margin: 0;
+    --un-preset-primary-track: #f1f1f1;
+    /* 轨道颜色 */
+    --un-preset-primary-thumb: #888;
+    /* 滑块颜色 */
+    --un-preset-primary-thumb-hover: #555;
+    /* 滑块悬停颜色 */
+}
+html,body{
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+body {
+    /* background-color: #000; */
+    background: url(https://shinoa.net/00001.png);
+    background-attachment: fixed;
+    /* font-family: 'Mono', sans-serif; */
+    font-family: 'Mono-Bold', sans-serif;
+    color: #fff !important;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+}
+
+#app {
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, .07);
+    /* height: 100vh; */
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+    /* background: transparent; */
+    border-radius: 4px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+/* 滑块hover效果 */
+::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+@font-face {
+    font-family: 'Mono';
+    src:
+        url('src\\assets\\font\\JetBrainsMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Mono-Bold';
+    src:
+        url('src\\assets\\font\\JetBrainsMono-Bold.ttf') format('truetype');
+}

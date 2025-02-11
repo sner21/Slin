@@ -1,0 +1,143 @@
+.virtual-list {
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .phantom {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    z-index: -1;
+  }
+  
+  .visible-list {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+  }
+  
+  .list-item {
+    width: 100%;
+  }
+
+
+  /* 只保留必要的动画和特殊效果 */
+  .health-bar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.health-bar-background {
+    flex: 1;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 2px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.mp-bar {
+    background-color: rgba(0, 0, 50, 0.2);
+}
+
+.health-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.health-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.1) 75%,
+        transparent 75%,
+        transparent
+    ); */
+    background-size: 20px 20px;
+    /* animation: bar-flow 1s linear infinite; */
+    mix-blend-mode: overlay;
+}
+
+@keyframes bar-flow {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 20px 0;
+    }
+}
+
+.shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    border-radius: 4px 4px 0 0;
+}
+
+.segments {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-image: repeating-linear-gradient(90deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.1) 2px,
+            transparent 2px,
+            transparent 10px); */
+}
+
+.health-text {
+    font-size: 0.75rem;
+    color: #666;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 500;
+}
+
+/* 添加悬停效果 */
+.health-bar-container:hover .health-bar {
+    filter: brightness(1.1);
+}
+
+/* 添加脉冲动画，当血量低时 */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.health-bar[style*="width: 30"] {
+    animation: pulse 2s infinite;
+}

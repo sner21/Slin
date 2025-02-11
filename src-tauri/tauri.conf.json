@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "shinoa",
+  "version": "0.1.0",
+  "identifier": "com.tauri-app.app",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "shinoa",
+        "label": "shinoa",
+        "width": 800,
+        "height": 600,
+        "maximized": true,
+        "transparent": true,
+        "alwaysOnBottom": true,
+        "closable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "android": {
+      "minSdkVersion": 21
+    },
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/favicon-96x96.png",
+      "icons/web-app-manifest-192x192.png",
+      "icons/web-app-manifest-512x512.png",
+      "icons/icon.icns",
+      "icons/favicon.ico"
+    ]
+  }
+}
