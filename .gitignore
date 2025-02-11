@@ -31,3 +31,4 @@ uno.config
 .gogocode
 folder-alias.json
 .env
+.cargo

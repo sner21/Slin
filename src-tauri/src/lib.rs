@@ -1,10 +1,15 @@
 use std::ffi::CStr;
 use std::ptr::{self, null, NonNull};
 use std::sync::Mutex;
+#[cfg(windows)]
 use tauri::menu::{Menu, MenuBuilder, MenuItem};
+#[cfg(windows)]
 use tauri::tray::{TrayIcon, TrayIconBuilder, TrayIconEvent};
+#[cfg(windows)]
 use tauri::{AppHandle, Manager, WindowEvent};
+#[cfg(windows)]
 use winapi::shared::windef::HWND;
+#[cfg(windows)]
 use winapi::um::winuser::{
     EnumWindows, FindWindowA, FindWindowExA, GetClassNameA, GetWindowLongPtrA, IsZoomed,
     SendMessageA, SetForegroundWindow, SetParent, SetWindowLongPtrA, SetWindowPos, ShowWindow,
@@ -12,8 +17,10 @@ use winapi::um::winuser::{
     WS_EX_APPWINDOW, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
 };
 
-static WALLPAPER_MODE: Mutex<bool> = Mutex::new(false);
 
+
+static WALLPAPER_MODE: Mutex<bool> = Mutex::new(false);
+#[cfg(windows)]
 fn toggle_wallpaper_mode(app: &AppHandle) {
     let window = app.get_webview_window("shinoa").expect("找不到主窗口");
     let mut is_wallpaper = WALLPAPER_MODE.lock().unwrap();
@@ -79,6 +86,16 @@ fn toggle_wallpaper_mode(app: &AppHandle) {
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
+#[cfg(mobile)]
+#[tauri::mobile_entry_point]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![greet])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
 
 #[cfg(windows)]

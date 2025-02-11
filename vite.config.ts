@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 import svgo from 'vite-plugin-svgo'
 import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
-
+import path from 'path';
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -13,7 +13,12 @@ export default defineConfig(async () => ({
   build: {
     minify: true,
     rollupOptions: {
-      external: process.env.BUILD_PLUGINS ? []: [/^\/src\/plugins\//],
+      external: (id: string) => {
+        if (!process.env.BUILD_PLUGINS) {
+          return path.normalize(id).includes('/plugins/')
+        }
+        return false;
+      }
     }
   },
   plugins: [ UnoCSS(), react(
