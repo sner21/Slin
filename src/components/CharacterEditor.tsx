@@ -60,18 +60,19 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
             children: (
               <Card>
                 {renderFormItem(CharacterSaveSchema.shape.grow._def.innerType.shape.level, handleField("grow.level"))}
+                {renderFormItem(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity, handleField("grow.rarity"))}
                 {/* <Form.Item
                   name={['grow', 'level']}
                   label="等级"
                 >
                   <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.level)} />
                 </Form.Item> */}
-                <Form.Item
+                {/* <Form.Item
                   name={['grow', 'rarity']}
                   label="稀有度"
                 >
                   <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity)} />
-                </Form.Item>
+                </Form.Item> */}
               </Card>
             )
           },
@@ -80,7 +81,10 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
             label: '基础属性',
             children: (
               <Card>
-                <Form.Item
+                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.strength, handleField("ability.strength"))}
+                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.agility, handleField("ability.agility"))}
+                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.intelligence, handleField("ability.intelligence"))}
+                {/* <Form.Item
                   name={['ability', 'strength']}
                   label="力量"
                 >
@@ -99,7 +103,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
                   label="智力"
                 >
                   <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.intelligence)} />
-                </Form.Item>
+                </Form.Item> */}
               </Card>
             )
           }
