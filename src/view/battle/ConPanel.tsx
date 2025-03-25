@@ -51,7 +51,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
   return (
     <div className='flex-1 flex flex-col gap-2'>
       <div>
-        <Segmented options={modeEnum.current} size='large' onChange={e => setMode(e)}></Segmented>
+        <Segmented size='middle'  options={modeEnum.current}onChange={e => setMode(e)}></Segmented>
         {/* {mode.current.map((item, index) => (
           <div key={index}>{item.label}</div>
         ))} */}

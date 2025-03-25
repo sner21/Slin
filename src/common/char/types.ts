@@ -25,9 +25,9 @@ export const ItemsDataSchema = z.object({
 export const RaritySchema = z.number().min(1).max(5);
 // 基础属性定义
 export const BaseStatSchema = z.object({
-  strength: z.number(),
-  agility: z.number(),
-  intelligence: z.number()
+  strength: z.number().min(0).default(0),
+  agility: z.number().min(0).default(0),
+  intelligence: z.number().min(0).default(0)
 });
 // 成长率定义
 export const GrowthRateSchema = z.object({
@@ -39,7 +39,7 @@ export const GrowthRateSchema = z.object({
 export const CharacterDisplaySchema = z.object({
   at: ActionSchema.default([]),
 });
-export const CharacterType = z.number().min(0).max(2).default(0)
+export const CharacterType = z.enum(["0","1","2"]).describe('0:人物 1:boss 2:部队').default("0")
 // 角色状态相关的Schema
 export const CharacterStatusSchema = z.object({
   target: z.any(),
@@ -56,13 +56,13 @@ export const StatusSchema = z.object({
 export const CharacterSaveSchema = z.object({
   id: z.string(),
   name: z.string(),
-  salu: z.string().optional(), //称号
+  salu: z.string().max(8).optional(), //称号
   type: CharacterType, //1 boss 0人物 2部队
-  avatar: z.string().optional(),
+  avatar: z.string().describe('( url )').optional(),
   buff: CarryBuffSchema.default({}),
   count: z.number().min(0).default(1), // 角色拥有数量
   element: ElementType,
-  gender: z.number().min(0).max(2).default(0), // 1 男 2女
+  gender: z.enum(["0", "1", "2"]).describe('0:无,1:男,2:女').default("0"), // 1 男 2女
   description: z.string().optional(),
   status: StatusSchema.optional(),
   carry: z.object({
@@ -100,15 +100,17 @@ export const CharacterSaveSchema = z.object({
   display: z.object({
     frame_type: z.enum(['item', 'equip', 'troops'])
   }).default({ frame_type: 'equip' }),
-  state: z.number().min(0).max(3).default(0), //存活状态 1为死亡 0为存活 2为休息 3为探索 4为练级
+  state: z.enum(["0", "1", '2', '3', '4']).describe('1:死亡 0:存活 2:休息 3:探索 4:练级').default('0'), 
   imm_ability: AbilitySchema.default(AbilitySchema.parse({})),
 })
-console.log(CharacterSaveSchema,'CharacterSaveSchema');
+console.log(CharacterSaveSchema, 'CharacterSaveSchema');
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
-  if(!data.status){
+
+  if (!data.status) {
     data.status = StatusSchema.parse({ ...cloneDeep(data.ability) });
     data.status.reborn = 0;
+
   }
 
   return data;

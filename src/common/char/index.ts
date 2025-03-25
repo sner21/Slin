@@ -77,7 +77,7 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
   {
     name: "煌雷龙",
     id: "0",
-    type: 1,
+    type: "1",
     avatar: huang,
     at: [],
     element: "thunder", // 角色元素属性
@@ -120,7 +120,7 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
   {
     name: "高速婆婆",
     id: "turbo_bachan",
-    type: 1,
+    type: "1",
     avatar: gaosupopo,
     at: [],
     element: "fire", // 角色元素属性
@@ -170,7 +170,7 @@ export const initialData = DataSchema.parse([
     id: "1",
     avatar: shinoa,
     salu: '帝鬼军',
-    gender: 2,
+    gender: "2",
     at: [],
     carry: {
       items: {
@@ -231,7 +231,7 @@ export const initialData = DataSchema.parse([
     salu: '',
     ac: [],
     at: [],
-    gender: 2,
+    gender: "2",
     element: "water", // 修正元素属性为水
     normal: SkillTypeMap.NORMAL_ATTACK.magic_normal.id,
     skill: [
@@ -280,7 +280,7 @@ export const initialData = DataSchema.parse([
     id: '3',
     avatar: hutao,
     salu: '往生堂堂主',
-    gender: 2,
+    gender: "2",
     element: "fire", // 修正元素属性为火
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
@@ -331,7 +331,7 @@ export const initialData = DataSchema.parse([
     id: '4',
     avatar: makima,
     salu: '支配恶魔',
-    gender: 2,
+    gender: "2",
     element: "fire", // 修正元素属性为火
     ac: [],
     at: [],
@@ -382,7 +382,7 @@ export const initialData = DataSchema.parse([
     avatar: leidian,
     salu: '尘世七执政',
     element: "thunder",
-    gender: 2,
+    gender: "2",
     at: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
@@ -431,7 +431,7 @@ export const initialData = DataSchema.parse([
     avatar: ai,
     element: "wind", // 修正元素属性为风
     at: [],
-    gender: 2,
+    gender: "2",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.ai_skill.id,
@@ -528,7 +528,7 @@ export const initialData = DataSchema.parse([
     avatar: mitsuba,
     salu: '鬼月组',
     element: "wind",
-    gender: 2,
+    gender: "2",
     at: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [

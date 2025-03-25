@@ -1,27 +1,11 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Form, Input, InputNumber, Select, Tabs, Card, Upload } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
 import { ElementType, getNumberConstraints } from '../common';
 import { CharacterSaveSchema } from '../common/char/types';
-import { renderFormItems } from '../common/zodForm';
-const ZodForm: React.FC<{
-  schema: z.ZodType<any>;
-  onFinish: (values: any) => void;
-  initialValues?: any;
-}> = ({ schema, onFinish, initialValues }) => {
-  const [form] = Form.useForm();
-
-  return (
-    <Form
-      form={form}
-      layout="vertical"
-      initialValues={initialValues}
-      onFinish={onFinish}
-    >
-      {renderFormItems(schema)}
-    </Form>
-  );
-};
+import { getFieldComponent, renderFormItem } from '../common/zodForm';
+import { CharacterTranslations } from '../translation/char';
+import { get } from 'lodash-es';
 
 interface CharacterEditorProps {
   formRef?: React.MutableRefObject<FormInstance | undefined>;
@@ -35,21 +19,94 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   initialValues
 }) => {
   const [form] = Form.useForm();
-
-
+  const handleFinish = useCallback((values: any) => {
+    onSave(values);
+  }, [onSave]);
+  const handleField = (field: string) => {
+    const i = get(CharacterTranslations, field)
+    return { field: field, label: i.label?.zh || i.zh }
+  }
   React.useEffect(() => {
     if (formRef) formRef.current = form;
   }, [form, formRef]);
-
   return (
-    <Card>
-    <ZodForm
-      schema={CharacterSaveSchema}
-      onFinish={onSave}
+    <Form
+      form={form}
+      layout="vertical"
       initialValues={initialValues}
-    />
-  </Card>
+      onFinish={handleFinish}
+    >
+      <Tabs
+        items={useMemo(() => ([
+          {
+            key: 'basic',
+            label: '基本信息',
+            children: (
+              <Card>
+                {/* TODO 提交时加ID */}
+                {renderFormItem(CharacterSaveSchema.shape.avatar, handleField("avatar"))}
+                {renderFormItem(CharacterSaveSchema.shape.name, handleField("name"))}
+                {renderFormItem(CharacterSaveSchema.shape.gender, handleField("gender"))}
+                {renderFormItem(CharacterSaveSchema.shape.type, handleField("type"))}
+                {renderFormItem(CharacterSaveSchema.shape.element, handleField("element"))}
+                {renderFormItem(CharacterSaveSchema.shape.salu, handleField("salu"))}
+                {renderFormItem(CharacterSaveSchema.shape.description, handleField("description"))}
+              </Card>
+            )
+          },
+          {
+            key: 'status',
+            label: '状态',
+            children: (
+              <Card>
+                {renderFormItem(CharacterSaveSchema.shape.grow._def.innerType.shape.level, handleField("grow.level"))}
+                {/* <Form.Item
+                  name={['grow', 'level']}
+                  label="等级"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.level)} />
+                </Form.Item> */}
+                <Form.Item
+                  name={['grow', 'rarity']}
+                  label="稀有度"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity)} />
+                </Form.Item>
+              </Card>
+            )
+          },
+          {
+            key: 'ability',
+            label: '基础属性',
+            children: (
+              <Card>
+                <Form.Item
+                  name={['ability', 'strength']}
+                  label="力量"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.strength)} />
+                </Form.Item>
+
+                <Form.Item
+                  name={['ability', 'agility']}
+                  label="敏捷"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.agility)} />
+                </Form.Item>
+
+                <Form.Item
+                  name={['ability', 'intelligence']}
+                  label="智力"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.intelligence)} />
+                </Form.Item>
+              </Card>
+            )
+          }
+        ]), [])}
+      />
+    </Form>
   );
 };
 
-export default CharacterEditor;
+export default React.memo(CharacterEditor)

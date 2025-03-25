@@ -1,27 +1,26 @@
 import { z } from "zod";
 import { Rule } from 'antd/lib/form'
+
 export const getNumberConstraints = (schema: any, constraints: any = {}) => {
     const def = schema._def;
     if (def.defaultValue) {
-
         constraints.defaultValue = typeof def.defaultValue === 'function'
             ? def.defaultValue()
             : def.defaultValue;
-        console.log(constraints.defaultValue, 11)
     }
-    if (def.typeName === 'ZodNumber') {
+    if (def.checks) {
         const checks = def.checks || [];
-
         checks.forEach((check: any) => {
             if (check.kind === 'min') constraints.min = check.value;
             if (check.kind === 'max') constraints.max = check.value;
         });
-        return constraints;
     }
-    if (def.typeName === 'ZodDefault') {
+    constraints.minLength = schema.minLength
+    constraints.maxLength = schema.maxLength
+    if (def.typeName === 'ZodDefault' || def.typeName === 'ZodOptional') {
         return getNumberConstraints(def.innerType, constraints);
     }
-    return {};
+    return constraints;
 };
 export function zodToFormRules(schema: z.ZodType<any>): Rule[] {
     const rules: Rule[] = []
@@ -32,30 +31,6 @@ export function zodToFormRules(schema: z.ZodType<any>): Rule[] {
     if (!schema?.isOptional()) {
         rules.push({ required: true, message: '此项为必填' })
     }
-    const def = (schema as any)?._def
-    if (!def) return
-    // 处理数字类型的验证
-    if (def.typeName === 'ZodNumber') {
-        const checks = def.innerType || []
-        if (checks.minLength !== null) {
-            rules.push({ min: checks.minLength, message: `最小长度为 ${checks.minLength}` })
-        }
-        if (checks.maxLength !== null) {
-            rules.push({ max: checks.maxLength, message: `最大长度为 ${checks.maxLength}` })
-        }
-    }
-
-    // 处理字符串类型的验证
-    if (def.typeName === 'ZodString') {
-        rules.push({ type: 'string' })
-        const checks = def.innerType || []
-        if (checks.minLength !== null) {
-            rules.push({ min: checks.minLength, message: `最小长度为 ${checks.minLength}` })
-        }
-        if (checks.maxLength !== null) {
-            rules.push({ max: checks.maxLength, message: `最大长度为 ${checks.maxLength}` })
-        }
-    }
 
     return rules
 }
@@ -65,7 +40,7 @@ const svg_list = {
     skill: skill_svg_list,
     item: item_svg_list
 }
-export const ElementType = z.enum(['fire', 'ice', 'thunder', 'wind', 'water', 'default', 'grass', 'dark', 'light']);
+export const ElementType = z.enum(['fire', 'ice', 'thunder', 'wind', 'water', 'default', 'grass', 'dark', 'light']).default('default');
 export const ElementColors = z.record(ElementType, z.string());
 export type ElementColors = z.infer<typeof ElementColors>;
 export const elementColors = ElementColors.parse({
