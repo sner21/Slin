@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Input, InputNumber, Select, Tabs, Card } from 'antd';
-import type { Character } from '../common/char/types';
-import type { FormInstance } from 'antd';
+import { Form, Input, InputNumber, Select, Tabs, Card, Upload } from 'antd';
+import type { FormInstance } from 'antd/lib/form';
+import { ElementType, getNumberConstraints } from '../common';
+import { CharacterSaveSchema } from '../common/char/types';
 
 interface CharacterEditorProps {
   formRef?: React.MutableRefObject<FormInstance | undefined>;
@@ -16,11 +17,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
 }) => {
   const [form] = Form.useForm();
 
-  // 将 form 实例传递给父组件
+
   React.useEffect(() => {
-    if (formRef) {
-      formRef.current = form;
-    }
+    if (formRef) formRef.current = form;
   }, [form, formRef]);
 
   return (
@@ -37,82 +36,134 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
             label: '基本信息',
             children: (
               <Card>
-                <Form.Item 
-                  label="ID" 
-                  name="id" 
-                  rules={[{ required: true, message: '请输入ID' }]}
-                >
-                  <Input />
+                <Form.Item name="avatar" label="头像">
+                  <Upload listType="picture-card">
+                    {/* <PlusOutlined /> */}
+                  </Upload>
                 </Form.Item>
+ {/* TODO 提交时加ID */}
                 <Form.Item 
-                  label="名称" 
                   name="name" 
-                  rules={[{ required: true, message: '请输入名称' }]}
+                  label="名称"
+                  rules={[{ required: true }]}
                 >
                   <Input />
                 </Form.Item>
-                <Form.Item label="称号" name="salu">
-                  <Input />
+
+                <Form.Item 
+                  name="gender" 
+                  label="性别"
+                >
+                  <Select {...getNumberConstraints(CharacterSaveSchema.shape.gender)}>
+                    <Select.Option value={0}>未知</Select.Option>
+                    <Select.Option value={1}>男</Select.Option>
+                    <Select.Option value={2}>女</Select.Option>
+                  </Select>
                 </Form.Item>
-                <Form.Item label="类型" name="type">
+
+                <Form.Item 
+                  name="type" 
+                  label="类型"
+                  rules={[{ required: true }]}
+                >
                   <Select>
                     <Select.Option value={0}>人物</Select.Option>
                     <Select.Option value={1}>BOSS</Select.Option>
                     <Select.Option value={2}>部队</Select.Option>
                   </Select>
                 </Form.Item>
-                <Form.Item label="性别" name="gender">
+
+                <Form.Item 
+                  name="element" 
+                  label="元素属性"
+                  rules={[{ required: true }]}
+                >
                   <Select>
-                    <Select.Option value={0}>未知</Select.Option>
-                    <Select.Option value={1}>男</Select.Option>
-                    <Select.Option value={2}>女</Select.Option>
+                    {Object.values(ElementType._def.values).map(element => (
+                      <Select.Option key={element} value={element}>
+                        {element}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
-                <Form.Item label="描述" name="description">
+
+                <Form.Item name="salu" label="称号">
+                  <Input />
+                </Form.Item>
+
+                <Form.Item name="description" label="描述">
                   <Input.TextArea />
                 </Form.Item>
               </Card>
-            ),
+            )
+          },
+          {
+            key: 'status',
+            label: '状态',
+            children: (
+              <Card>
+                <Form.Item 
+                  name={['grow', 'level']} 
+                  label="等级"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.level)} />
+                </Form.Item>
+
+                <Form.Item 
+                  name={['grow', 'exp']} 
+                  label="经验值"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.exp)} />
+                </Form.Item>
+
+                <Form.Item 
+                  name={['grow', 'rarity']} 
+                  label="稀有度"
+                >
+                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity)} />
+                </Form.Item>
+
+                <Form.Item 
+                  name="state" 
+                  label="状态"
+                >
+                  <Select {...getNumberConstraints(CharacterSaveSchema.shape.state)}>
+                    <Select.Option value={0}>存活</Select.Option>
+                    <Select.Option value={1}>死亡</Select.Option>
+                    <Select.Option value={2}>休息</Select.Option>
+                    <Select.Option value={3}>探索</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Card>
+            )
           },
           {
             key: 'ability',
-            label: '属性',
+            label: '基础属性',
             children: (
               <Card>
-                <Form.Item label="力量" name={['ability', 'strength']} rules={[{ required: true }]}>
-                  <InputNumber />
-                </Form.Item>
-                <Form.Item label="敏捷" name={['ability', 'agility']} rules={[{ required: true }]}>
-                  <InputNumber />
-                </Form.Item>
-                <Form.Item label="智力" name={['ability', 'intelligence']} rules={[{ required: true }]}>
-                  <InputNumber />
-                </Form.Item>
-              </Card>
-            ),
-          },
-          {
-            key: 'growth',
-            label: '成长',
-            children: (
-              <Card>
-                <Form.Item label="等级" name={['grow', 'level']}>
-                  <InputNumber min={1} />
-                </Form.Item>
-                <Form.Item label="稀有度" name={['grow', 'rarity']}>
-                  <InputNumber min={1} max={5} />
-                </Form.Item>
-                <Form.Item label="力量成长" name={['grow', 'growthRates', 'strength']}>
-                  <InputNumber step={0.1} />
-                </Form.Item>
-                <Form.Item label="敏捷成长" name={['grow', 'growthRates', 'agility']}>
-                  <InputNumber step={0.1} />
-                </Form.Item>
-                <Form.Item label="智力成长" name={['grow', 'growthRates', 'intelligence']}>
-                  <InputNumber step={0.1} />
-                </Form.Item>
-              </Card>
-            ),
+              <Form.Item 
+                name={['ability', 'strength']} 
+                label="力量"
+              >
+                <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.strength)} />
+              </Form.Item>
+              
+              <Form.Item 
+                name={['ability', 'agility']} 
+                label="敏捷"
+              >
+                <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.agility)} />
+              </Form.Item>
+              
+              <Form.Item 
+                name={['ability', 'intelligence']} 
+                label="智力"
+              >
+                <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.intelligence)} />
+              </Form.Item>
+            </Card>
+            )
           }
         ]}
       />
@@ -120,4 +171,4 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   );
 };
 
-export default CharacterEditor; 
+export default CharacterEditor;

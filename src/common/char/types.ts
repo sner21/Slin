@@ -2,9 +2,9 @@ import { number, z } from "zod";
 import { Skill, SkillType } from "../skill";
 import cloneDeep from "lodash-es/cloneDeep";
 import { AbilitySchema, CarryBuffSchema, EffectsSchema } from "./attr";
-
 import { ElementType } from "..";
 import { BattleActionSchema } from "../record/type";
+import css from "styled-jsx/css";
 // 技能效果类型
 export const EffectType = z.enum([
   'DAMAGE',            // 伤害
@@ -31,9 +31,9 @@ export const BaseStatSchema = z.object({
 });
 // 成长率定义
 export const GrowthRateSchema = z.object({
-  strength: z.number().default(0),
-  agility: z.number().default(0),
-  intelligence: z.number().default(0)
+  strength: z.number().min(0).default(0),
+  agility: z.number().min(0).default(0),
+  intelligence: z.number().min(0).default(0)
 }).optional();
 
 export const CharacterDisplaySchema = z.object({
@@ -46,10 +46,10 @@ export const CharacterStatusSchema = z.object({
 });
 
 export const StatusSchema = z.object({
-  damage: z.number().default(0),
-  hp: z.number().optional(),
-  mp: z.number().optional(),
-  reborn: z.number().default(0),
+  damage: z.number().min(0).default(0),
+  hp: z.number().min(1).optional(),
+  mp: z.number().min(0).optional(),
+  reborn: z.number().min(0).default(0),
 });
 
 // Save相关的Schema
@@ -60,7 +60,7 @@ export const CharacterSaveSchema = z.object({
   type: CharacterType, //1 boss 0人物 2部队
   avatar: z.string().optional(),
   buff: CarryBuffSchema.default({}),
-  count: z.number().default(1), // 角色拥有数量
+  count: z.number().min(0).default(1), // 角色拥有数量
   element: ElementType,
   gender: z.number().min(0).max(2).default(0), // 1 男 2女
   description: z.string().optional(),
@@ -90,11 +90,11 @@ export const CharacterSaveSchema = z.object({
   normal: z.string(),
   skill: z.array(z.string()).max(8).optional(),
   grow: z.object({
-    level: z.number().default(1),
-    exp: z.number().default(0), // 当前经验值
-    tem_exp: z.number().default(0),
+    level: z.number().min(0).max(50).default(1), // 角色等级
+    exp: z.number().min(0).default(0), // 当前经验值
+    tem_exp: z.number().min(0).default(0),
     growthRates: GrowthRateSchema, // 成长率
-    rarity: RaritySchema.default(5), // 角色稀有度
+    rarity: RaritySchema.min(0).max(5).default(5), // 角色稀有度
   }).default({}),
   //不保存的
   display: z.object({
@@ -103,7 +103,7 @@ export const CharacterSaveSchema = z.object({
   state: z.number().min(0).max(3).default(0), //存活状态 1为死亡 0为存活 2为休息 3为探索 4为练级
   imm_ability: AbilitySchema.default(AbilitySchema.parse({})),
 })
-
+console.log(CharacterSaveSchema,'CharacterSaveSchema');
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
   if(!data.status){
@@ -122,4 +122,7 @@ export type Character = z.infer<typeof CharacterSchema>;
 export type Data = z.infer<typeof DataSchema>;
 
 export type Action = z.infer<typeof ActionSchema>;
+
+
+
 
