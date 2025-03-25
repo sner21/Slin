@@ -47,7 +47,7 @@ export const CharacterStatusSchema = z.object({
 
 export const StatusSchema = z.object({
   damage: z.number().min(0).default(0),
-  hp: z.number().min(1).optional(),
+  hp: z.number().min(0).optional(),
   mp: z.number().min(0).optional(),
   reborn: z.number().min(0).default(0),
 });
