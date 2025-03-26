@@ -68,7 +68,7 @@ export const AbilitySchema = z.object({
     crit_rate: z.number().default(0), //暴击率
     crit_dmg: z.number().default(100),//暴伤
     evasion: z.number().default(0),
-    speed: z.number().default(1),
+    speed: z.number().default(50),
     shield: z.number().default(1),
     hp_re: z.number().default(1),        // 生命回复
     mp_re: z.number().default(1),    // 能量回复

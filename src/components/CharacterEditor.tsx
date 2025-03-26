@@ -1,37 +1,42 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, Input, InputNumber, Select, Tabs, Card, Upload } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
 import { ElementType, getNumberConstraints } from '../common';
 import { CharacterSaveSchema } from '../common/char/types';
 import { getFieldComponent, renderFormItem } from '../common/zodForm';
 import { CharacterTranslations } from '../translation/char';
-import { get } from 'lodash-es';
+import { assignIn, get } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 interface CharacterEditorProps {
   formRef?: React.MutableRefObject<FormInstance | undefined>;
-  onSave: (values: any) => void;
+  onSave: (values: any, id: string) => void;
   initialValues?: any
 }
 
 const CharacterEditor: React.FC<CharacterEditorProps> = ({
   formRef,
   onSave,
-  initialValues = CharacterSaveSchema.parse({id:uuidv4()})
+  initialValues = CharacterSaveSchema.parse({})
 }) => {
   const [form] = Form.useForm();
   const handleFinish = useCallback((values: any) => {
-    if (!values?.id) values.id = uuidv4();
-    
-    values = CharacterSaveSchema.parse(values);
-    console.log(values,'values')
-    onSave(values);
+ 
+    if (initialValues) {
+      values.id = initialValues.id
+      values = assignIn(initialValues, values)
+    } else {
+      values.id = uuidv4();
+      values = CharacterSaveSchema.parse(values);
+    }
+    console.log(values, 'values', initialValues)
+    onSave(values, initialValues.id);
   }, [onSave]);
   const handleField = (field: string) => {
     const i = get(CharacterTranslations, field)
     return { field: field, label: i.label?.zh || i.zh }
   }
-  React.useEffect(() => {
+  useEffect(() => {
     if (formRef) formRef.current = form;
   }, [form, formRef]);
   return (
@@ -49,7 +54,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
             children: (
               <Card>
                 {/* TODO 提交时加ID */}
-                {renderFormItem(CharacterSaveSchema.shape.avatar, handleField("avatar"))}
+                {!initialValues.avatar && renderFormItem(CharacterSaveSchema.shape.avatar, handleField("avatar"))}
                 {renderFormItem(CharacterSaveSchema.shape.name, handleField("name"))}
                 {renderFormItem(CharacterSaveSchema.shape.gender, handleField("gender"))}
                 {renderFormItem(CharacterSaveSchema.shape.type, handleField("type"))}
@@ -66,18 +71,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
               <Card>
                 {renderFormItem(CharacterSaveSchema.shape.grow._def.innerType.shape.level, handleField("grow.level"))}
                 {renderFormItem(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity, handleField("grow.rarity"))}
-                {/* <Form.Item
-                  name={['grow', 'level']}
-                  label="等级"
-                >
-                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.level)} />
-                </Form.Item> */}
-                {/* <Form.Item
-                  name={['grow', 'rarity']}
-                  label="稀有度"
-                >
-                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.grow._def.innerType.shape.rarity)} />
-                </Form.Item> */}
               </Card>
             )
           },
@@ -89,26 +82,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
                 {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.strength, handleField("ability.strength"))}
                 {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.agility, handleField("ability.agility"))}
                 {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.intelligence, handleField("ability.intelligence"))}
-                {/* <Form.Item
-                  name={['ability', 'strength']}
-                  label="力量"
-                >
-                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.strength)} />
-                </Form.Item>
-
-                <Form.Item
-                  name={['ability', 'agility']}
-                  label="敏捷"
-                >
-                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.agility)} />
-                </Form.Item>
-
-                <Form.Item
-                  name={['ability', 'intelligence']}
-                  label="智力"
-                >
-                  <InputNumber {...getNumberConstraints(CharacterSaveSchema.shape.ability.shape.intelligence)} />
-                </Form.Item> */}
               </Card>
             )
           }

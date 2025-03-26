@@ -69,7 +69,6 @@ export class BattleManager {
         this.load_plugins_init().then(() => {
             this.start_round()
         })
-        console.log(this.roles, this.enemy, 'boss');
 
         // data.current = this
         // return this
@@ -82,46 +81,51 @@ export class BattleManager {
     }
     load_plugins_role(data) {
         data.forEach(i => {
-            console.log(i, 11);
-            this.characters[i.id] = assignIn(this.characters[i.id], i)
-            switch (i.type) {
+            switch (i?.type) {
                 case "0": {
-                    this.roles[i.id] = assignIn(this.roles[i.id], i)
+                    const charIndex = this.characters.findIndex(item => item.id===i.id)
+                    if (charIndex >= 0) {
+                        this.characters[charIndex] = assignIn(this.characters[charIndex], i)
+                        // Object.keys(i).forEach(key => {
+                        //     this.characters[charIndex][key] = i[key]
+                        // })
+                    } else {
+                        this.characters.push(i)
+                    }
                     break
                 }
                 case "1": {
-                    this.enemy[i.id] = assignIn(this.enemy[i.id], i)
+                    const charIndex = this.enemy.findIndex(i => i.id)
+                    if (charIndex >= 0) {
+                        this.enemy[charIndex] = assignIn(this.enemy[charIndex], i)
+                    } {
+                        this.enemy.push(i)
+                    }
                     break
                 }
             }
 
         })
-
+        this.roles = [...this.characters, ...this.enemy]
         this.roles_group = keyBy(this.roles, "id")
     }
     async load_plugins_init() {
         import('../plugins/').then(res => {
             const data = res.plugins_data
-            this.EventManager.load_plugins_event(data.event)
-            this.BuffManage.load_plugins_buff(data.buff)
-            this.ItemsManager.load_plugins_item(data.item)
+            this.load_plugins(data)
         })
         Object.keys(localStorage).forEach(k => {
-            if (k.startsWith('plugin-')) {
+            if (k.startsWith('user-plugin-')) {
                 const data = PluginsDataSchma.parse(JSON.parse(localStorage.getItem(k)))
-                this.EventManager.load_plugins_event(data.event || [])
-                this.BuffManage.load_plugins_buff(data.buff || [])
-                this.ItemsManager.load_plugins_item(data.item || [])
-                this.load_plugins_role(data.role || [])
+                this.load_plugins(data)
             }
         })
     }
     async load_plugins(data: any) {
-
         this.EventManager.load_plugins_event(data.event || [])
         this.BuffManage.load_plugins_buff(data.buff || [])
         this.ItemsManager.load_plugins_item(data.item || [])
-        this.init_role(data.role)
+        this.load_plugins_role(data.role || [])
     }
     start_round(time = this.battle_data.time) {
         if (!this.battle_data.pause) {
@@ -230,6 +234,7 @@ export class BattleManager {
     //战斗
     battle_turn() {
         this.startTurn()
+        console.log(this.roles, 11)
         // 获取当前回合可行动的角色
         const actionOrder = this.getActionOrder(this.roles);
         const actionOrderId = actionOrder.map(i => i.id)
@@ -255,7 +260,6 @@ export class BattleManager {
                 // 标记行动完成
                 this.finishAction(i);
             }
-            console.log(444);
             //获取所有角色事件
             this.total_event(i)
         }

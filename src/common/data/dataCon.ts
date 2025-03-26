@@ -53,7 +53,24 @@ export class DataCon {
         }
         return this
     }
+    // load_plugins_role(data) {
+    //     data.forEach(i => {
+    //         switch (i.type) {
+    //             case "0": {
+    //                 const charIndex = this.roles.findIndex(i => i.id)
+    //                 this.roles[charIndex] = assignIn(this.roles[charIndex], i)
+    //                 break
+    //             }
+    //             case "1": {
+    //                 this.enemy[i.id] = assignIn(this.enemy[i.id], i)
+    //                 break
+    //             }
+    //         }
 
+    //     })
+    //     roles = [...this.characters, ...this.enemy]
+    //     this.roles_group = keyBy(this.roles, "id")
+    // }
     setPlugin(device: string, data = '{}') {
         localStorage.setItem('plugin-' + device, data)
     }

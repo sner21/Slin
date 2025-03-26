@@ -1,5 +1,5 @@
 import { Segmented, Modal, Button, message } from 'antd';
-import { useState, FC, MutableRefObject, useRef } from 'react';
+import { useState, FC, MutableRefObject, useRef, useCallback } from 'react';
 import { BattleManager } from '../../common/tatakai';
 import SaveLoadModal from './SaveLoadModal';
 import { DataCon } from '../../common/data/dataCon';
@@ -7,14 +7,17 @@ import CharacterEditor from '../../components/CharacterEditor';
 import { plugin } from 'postcss';
 import { CharacterSaveSchema } from '../../common/char/types';
 import { v4 as uuidv4 } from 'uuid';
+import { CharacterSelector } from '../../components/CharacterSelector';
+import { cloneDeep } from 'lodash-es';
 
 type props = {
   battleManager: MutableRefObject<BattleManager>,
   dataCon: MutableRefObject<DataCon>,
   mode?: string,
   startViewData: any
+  refreshBet?: () => any
 }
-const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
+const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet }) => {
   const modeEnum = useRef([
     { value: 'panel', label: '面板' },
     { value: 'shop', label: '商店' },
@@ -27,51 +30,72 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [saveData, setSaveData] = useState(dataCon.current.save_data);
   const characterFormRef = useRef<FormInstance>();
-
+  const [curRoleEdit, setCurRoleEdit] = useState({
+    visible: false,
+    data: null
+  })
   const handleCharacterSave = async (values: any, id = null, pluginId = 1) => {
+    console.log(id, 'id')
     try {
       const plugin = localStorage.getItem('user-plugin-' + pluginId)
       let info: any = {}
       try {
         info = JSON.parse(plugin || '')
       } catch { }
+      if (!info['role']) info['role'] = []
       if (id) {
         //ID 不一样
-        const roleIndex = info.role.findIndex(i => i.id === id)
+        const roleIndex = battleManager.current.characters.findIndex(i => i.id === id)
         if (roleIndex >= 0) {
-          values = CharacterSaveSchema.parse(values)
-          info.role[roleIndex] = { ...info.role[roleIndex], ...values }
+
+          // values = CharacterSaveSchema.parse(values)
+          const data = battleManager.current.characters[roleIndex]
+          data.target = null
+          data.at = null
+          info.role[roleIndex] = { ...battleManager.current.characters[roleIndex], ...values }
         } else {
-          if (!info['role']) info['role'] = []
           info['role'].push(values)
         }
       } else {
-        if (!info['role']) info['role'] = []
         info['role'].push(values)
       }
       // info = { ...info, ...values }
       localStorage.setItem('user-plugin-1', JSON.stringify(info || {}))
-      battleManager.current.load_plugins_role(info['role'])
-      console.log('保存角色数据:', info,battleManager.current);
+      // battleManager.current.load_plugins_role(info['role'])
       // message.success('保存成功');
+      refreshBet && refreshBet()
       setCharacterEditorOpen(false);
     } catch (error) {
       // message.error('保存失败');
     }
   };
-
+  const handleDeleteCharacter = (id: string) => {
+    try {
+      const plugin = localStorage.getItem('user-plugin-1');
+      const data = JSON.parse(plugin || '{}');
+      data.role = (data.role || []).filter((char: any) => char.id !== id);
+      localStorage.setItem('user-plugin-1', JSON.stringify(data));
+      battleManager.current.load_plugins_role(data.role);
+      message.success('删除成功');
+    } catch (error) {
+      message.error('删除失败');
+    }
+  };
+  const handleEditCharacter = useCallback((character: any) => {
+    const data = cloneDeep({ ...character, target: null, at: null })
+    setCurRoleEdit({
+      visible: true,
+      data: data
+    });
+  }, []);
   const handleSave = (slotId: string) => {
     dataCon.current?.save(slotId);
     setSaveData(dataCon.current.save_data)
-    // message.success(`已保存`);
-    // setSaveModalOpen(false);
   };
 
   const handleLoad = (slotId: string) => {
     dataCon.current?.load(slotId);
     battleManager.current = new BattleManager(dataCon.current);
-    // message.success(`加载完成`);
-    // setLoadModalOpen(false);
   };
   return (
     <div className='flex-1 flex flex-col gap-2'>
@@ -104,6 +128,55 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
         </div>}
         {mode == 'custom' && <div className="flex gap-4 flex-1">
           <span onClick={() => setCharacterEditorOpen(true)}>编辑角色</span>
+          <Modal
+            title="编辑角色"
+            open={characterEditorOpen}
+            onCancel={() => {
+              setCharacterEditorOpen(false);
+              setCurRoleEdit({ visible: false, data: null });
+            }}
+            width={1000}
+            footer={[
+              <Button
+                key="cancel"
+                onClick={() => {
+                  setCharacterEditorOpen(false);
+                  setCurRoleEdit({ visible: false, data: null });
+                }}
+              >
+                取消
+              </Button>,
+              <Button
+                key="save"
+                type="primary"
+                onClick={() => {
+                  characterFormRef.current?.submit();
+                }}
+              >
+                保存
+              </Button>
+            ]}
+          >
+            {!curRoleEdit.visible ? (
+              <div className="flex-1 p-4">
+                <CharacterSelector
+                  characters={battleManager.current.characters}
+                  onEdit={handleEditCharacter}
+                  onDelete={handleDeleteCharacter}
+                  onAdd={() => setCurRoleEdit({
+                    visible: true,
+                    data: null
+                  })}
+                />
+              </div>
+            ) : (
+              <CharacterEditor
+                formRef={characterFormRef}
+                initialValues={curRoleEdit.data}
+                onSave={handleCharacterSave}
+              />
+            )}
+          </Modal>
         </div>}
       </div>
       <SaveLoadModal
@@ -121,32 +194,8 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
         onConfirm={handleLoad}
         dataCon={dataCon.current}
       />
-      <Modal
-        title="编辑角色"
-        open={characterEditorOpen}
-        onCancel={() => setCharacterEditorOpen(false)}
-        width={800}
-        footer={[
-          <Button
-            key="cancel"
-            onClick={() => setCharacterEditorOpen(false)}
-          >
-            取消
-          </Button>,
-          <Button
-            key="save"
-            type="primary"
-            onClick={() => {
-              characterFormRef.current?.submit();
-            }}
-          >
-            保存
-          </Button>
-        ]}
-      >
-        <CharacterEditor formRef={characterFormRef}
-          onSave={handleCharacterSave}></CharacterEditor>
-      </Modal>
+
+
       <style>
         {
           `

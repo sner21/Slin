@@ -43,7 +43,7 @@ const StartView: FC = () => {
     const [battleVisible, setBattleVisible] = useState(false);
     // const [mode, setMode] = useState('');
     const data = useThrottledProxyRef(new DataCon())
-    const [loadMode,setLoadMode] = useState(false)
+    const [loadMode, setLoadMode] = useState(false)
     const startViewData = useThrottledProxyRef({
         mode: ''
     }).current || {}
@@ -72,9 +72,13 @@ const StartView: FC = () => {
     const load = (slotId: string) => {
         console.log(loadMode, 'loadMode.current')
         setSlotId(slotId)
-        data.current.load(slotId,loadMode)
+        data.current.load(slotId, loadMode)
         console.log(data, '加载成功')
         setMode('battle')
+    }
+    const refreshBet = () => {
+        setMode("")
+        setTimeout(() => setMode("battle"), 1)
     }
     const newData = () => {
         setLoadMode(true)
@@ -96,7 +100,7 @@ const StartView: FC = () => {
             <MenuContainer>
                 {!startViewData.mode && <MenuContent>
                     <div onClick={() => newData()}>新游戏</div>
-                    <div onClick={() => (setLoadMode(false),setMode('load'))}>继续游戏</div>
+                    <div onClick={() => (setLoadMode(false), setMode('load'))}>继续游戏</div>
                     <div>数据集</div>
                     <div onClick={() => setMode('config')}>设置</div>
                     <div onClick={() => setBattleVisible(true)}>退出</div>
@@ -106,7 +110,7 @@ const StartView: FC = () => {
                     <span onClick={() => handleAutoloadToggle()}>{data.current.globalConfig.autoload ? "关闭" : "开启"}自动读档</span>
                     <BackCon ></BackCon>
                 </MenuContent>}
-                {startViewData.mode === 'battle' && <BattleCon startViewData={startViewData} dataCon={data}>
+                {startViewData.mode === 'battle' && <BattleCon startViewData={startViewData} dataCon={data} refreshBet={refreshBet}>
                 </BattleCon>}
                 {startViewData.mode === 'load' &&
                     <div style={{ width: '20%' }}>

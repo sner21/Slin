@@ -4,7 +4,7 @@ import StartView from "./view/battle/StartView"
 
 function App() {
   return (<StartView>
-    <BattleCon></BattleCon>
+    {/* <BattleCon></BattleCon> */}
   </StartView>)
 
 }

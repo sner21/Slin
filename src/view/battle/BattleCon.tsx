@@ -18,7 +18,7 @@ import SkillForm from '../../components/SkillForm';
 import ConPanel from "./ConPanel";
 import { DataCon } from "../../common/data/dataCon";
 
-function App({ dataCon, startViewData }) {
+function App({ dataCon, startViewData,refreshBet }) {
     const coldData = useRef<Map<number, SkillCooldown[]>>();
     const data = dataCon;
     let battleManager = useThrottledProxyRef<BattleManager>(null);
@@ -26,6 +26,7 @@ function App({ dataCon, startViewData }) {
         battleManager.current = new BattleManager(data.current)
         console.log(battleManager.current, ' battleManager.current')
     }, [])
+   
     const itemsManager = useThrottledProxyRef(battleManager.current?.ItemsManager?.ItemsData);
     const logsType = useThrottledProxyRef('event');
     const inventory = useRef<any[]>(Array(28).fill(null));
@@ -104,7 +105,7 @@ function App({ dataCon, startViewData }) {
                     <div className="flex-col gap-2 h-[200px] order-2 bottom-0 w-full md:px-6 md:py-3 border-2 border-t-solid border-t-amber bg-[rgb(0 0 0 / 67%)] z-10" style={{ background: "rgb(0 0 0 / 67%)" }}>
                         {/* 日志部分 */}
                         <div className="flex justify-between">
-                            <ConPanel startViewData={startViewData} battleManager={battleManager} dataCon={data}></ConPanel>
+                            <ConPanel startViewData={startViewData} battleManager={battleManager} dataCon={data} refreshBet={refreshBet}></ConPanel>
                             <div className="flex-1 gap-2 flex pt-2" >
                                 <div className="flex flex-col gap-2 text-sm">
                                     {/* <Segmented vertical options={logsTypeEnum.current}></Segmented> */}
@@ -195,7 +196,7 @@ function App({ dataCon, startViewData }) {
                                                 {/* <div className=" gap-0.1 md:gap-0.5  scale-80   items-center text-xs text-gray-300"> */}
                                                 {Object.keys(item.buff).map((key, index) => (
                                                     <div key={index} className="text-xs text-gray-300">
-                                                        {battleManager.current?.BuffManage?.buff_default[item.buff[key].buffId]?.name} {item.buff[key].count > 1 && item.buff[key].count}
+                                                        {battleManager.current?.BuffManage?.buff_default[item.buff[key]?.buffId]?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
                                                     </div>
                                                 ))}
                                                 {/* </div> */}
