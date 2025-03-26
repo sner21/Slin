@@ -32,15 +32,18 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
 
             {/* 角色卡片列表 */}
             {characters.map((character) => (
+
                 <Card
                     key={character.id}
-                    className="relative hover:border-blue-400"
+                    className="relative hover:border-blue-400 cursor-pointer"
+                    onClick={() => onEdit(character)}
                     cover={
                         <div className="h-32 flex items-center justify-center bg-gray-100">
                             {character.avatar ? (
                                 <img
                                     src={character.avatar}
                                     alt={character.name}
+                                    style={{ objectFit: 'cover', width: '100%' }}
                                     className="max-h-full max-w-full object-cover"
                                 />
                             ) : (
@@ -51,23 +54,35 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                         </div>
                     }
                 >
+                    <div style={{ position: 'absolute', right: '0px', top: '0px' }}  onClick={e => e.stopPropagation()}>
+                        <Popconfirm
+                            title="确定要删除这个角色吗？"
+                            onConfirm={() => onDelete(character.id)}
+                            okText="确定"
+                            cancelText="取消"
+
+                        >
+                            <DeleteOutlined className="cursor-pointer text-red-500 hover:text-red-600 text-6" />
+                        </Popconfirm>
+                    </div>
+
                     <Card.Meta
                         title={
                             <div className="flex justify-between items-center">
                                 <span>{character.name || '未命名'}</span>
-                                <div className="flex gap-2">
-                                    <EditOutlined
+                                <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                                    {/* <EditOutlined
                                         className="cursor-pointer text-blue-500 hover:text-blue-600"
                                         onClick={() => onEdit(character)}
-                                    />
-                                    <Popconfirm
+                                    /> */}
+                                    {/* <Popconfirm
                                         title="确定要删除这个角色吗？"
                                         onConfirm={() => onDelete(character.id)}
                                         okText="确定"
                                         cancelText="取消"
                                     >
                                         <DeleteOutlined className="cursor-pointer text-red-500 hover:text-red-600" />
-                                    </Popconfirm>
+                                    </Popconfirm> */}
                                 </div>
                             </div>
                         }

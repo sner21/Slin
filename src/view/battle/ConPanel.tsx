@@ -131,12 +131,30 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           <Modal
             title="编辑角色"
             open={characterEditorOpen}
+            style={{ 
+              top: 20 
+            }}
+            bodyStyle={{ 
+              maxHeight: 'calc(100vh - 200px)', 
+              overflowY: 'auto',
+              paddingRight:'20px',
+              marginTop:'30px'
+            }}
             onCancel={() => {
               setCharacterEditorOpen(false);
               setCurRoleEdit({ visible: false, data: null });
             }}
             width={1000}
             footer={[
+              <Button
+              key="cancel"
+              style={{display:curRoleEdit.visible?'':'none'}}
+              onClick={() => {
+                setCurRoleEdit({ visible: false, data: null });
+              }}
+            >
+              返回
+            </Button>,
               <Button
                 key="cancel"
                 onClick={() => {
@@ -149,6 +167,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
               <Button
                 key="save"
                 type="primary"
+                style={{display:curRoleEdit.visible?'':'none'}}
                 onClick={() => {
                   characterFormRef.current?.submit();
                 }}

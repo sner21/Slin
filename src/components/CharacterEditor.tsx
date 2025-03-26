@@ -20,8 +20,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   initialValues = CharacterSaveSchema.parse({})
 }) => {
   const [form] = Form.useForm();
+  console.log( 'values', initialValues)
   const handleFinish = useCallback((values: any) => {
- 
+
     if (initialValues) {
       values.id = initialValues.id
       values = assignIn(initialValues, values)
@@ -29,11 +30,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
       values.id = uuidv4();
       values = CharacterSaveSchema.parse(values);
     }
-    console.log(values, 'values', initialValues)
+
     onSave(values, initialValues.id);
   }, [onSave]);
   const handleField = (field: string) => {
-    const i = get(CharacterTranslations, field)
+    const i = get(CharacterTranslations, field) || field
     return { field: field, label: i.label?.zh || i.zh }
   }
   useEffect(() => {
@@ -74,14 +75,13 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
               </Card>
             )
           },
+
           {
             key: 'ability',
             label: '基础属性',
             children: (
               <Card>
-                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.strength, handleField("ability.strength"))}
-                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.agility, handleField("ability.agility"))}
-                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.intelligence, handleField("ability.intelligence"))}
+                {Object.keys(CharacterSaveSchema.shape.ability._def.innerType.shape).map(key => renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape[key], handleField("ability." + key)))}
               </Card>
             )
           }
