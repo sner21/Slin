@@ -25,6 +25,7 @@ export class DataCon {
     };
     init_data = {}
     save_data = {}
+
     battleManagerGourp: Record<string, any> = {}
     constructor() {
         const globalConfig = localStorage.getItem("globalConfig")
@@ -115,6 +116,10 @@ export class DataCon {
             time: Date.now()
         })
         localStorage.setItem(`${device}:save`, data)
+        this.save_global_config({
+            autoload: device
+        })
+
         this.get_save_data()
     }
     async load(device = this.globalConfig.autoload, newData = false) {
@@ -140,6 +145,8 @@ export class DataCon {
                 cooldowns: new Map(Object.entries(save.battle_data_info[k].cooldowns)),
             })
         this.battle_data_info = battleManagerGroup
+        console.log(this.globalConfig.autoload, device, 111)
+        this.globalConfig.autoload = device
         // this.data.current.cooldownManager.updateCooldowns();
         // this.data.current.roles.forEach(i => {
         //     this.data.current.calculateFinalStats(i)

@@ -20,7 +20,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   initialValues = CharacterSaveSchema.parse({})
 }) => {
   const [form] = Form.useForm();
-  console.log( 'values', initialValues)
   const handleFinish = useCallback((values: any) => {
 
     if (initialValues) {

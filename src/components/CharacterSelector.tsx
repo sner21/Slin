@@ -21,7 +21,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {/* 添加新角色卡片 */}
             <Card
-                className="flex items-center justify-center cursor-pointer hover:border-blue-400"
+                className="flex items-center justify-center cursor-pointer hover:border-orange-400"
                 onClick={onAdd}
             >
                 <div className="flex flex-col items-center gap-2">
@@ -32,10 +32,9 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
 
             {/* 角色卡片列表 */}
             {characters.map((character) => (
-
                 <Card
                     key={character.id}
-                    className="relative hover:border-blue-400 cursor-pointer"
+                    className="relative hover:border-orange-400 cursor-pointer"
                     onClick={() => onEdit(character)}
                     cover={
                         <div className="h-32 flex items-center justify-center bg-gray-100">

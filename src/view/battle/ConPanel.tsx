@@ -9,6 +9,8 @@ import { CharacterSaveSchema } from '../../common/char/types';
 import { v4 as uuidv4 } from 'uuid';
 import { CharacterSelector } from '../../components/CharacterSelector';
 import { cloneDeep } from 'lodash-es';
+import type { DraggableData, DraggableEvent } from 'react-draggable';
+import Draggable from 'react-draggable';
 
 type props = {
   battleManager: MutableRefObject<BattleManager>,
@@ -30,12 +32,27 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [saveData, setSaveData] = useState(dataCon.current.save_data);
   const characterFormRef = useRef<FormInstance>();
+  const draggleRef = useRef<HTMLDivElement>(null!);
+  const [disabled, setDisabled] = useState(true);
+  const [bounds, setBounds] = useState({ left: 0, top: 0, bottom: 0, right: 0 });
   const [curRoleEdit, setCurRoleEdit] = useState({
     visible: false,
     data: null
   })
+  const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
+    const { clientWidth, clientHeight } = window.document.documentElement;
+    const targetRect = draggleRef.current?.getBoundingClientRect();
+    if (!targetRect) {
+      return;
+    }
+    setBounds({
+      left: -targetRect.left + uiData.x ,
+      right: clientWidth - (targetRect.right - uiData.x ),
+      top: -targetRect.top + uiData.y ,
+      bottom: clientHeight - (targetRect.bottom - uiData.y ),
+    });
+  };
   const handleCharacterSave = async (values: any, id = null, pluginId = 1) => {
-    console.log(id, 'id')
     try {
       const plugin = localStorage.getItem('user-plugin-' + pluginId)
       let info: any = {}
@@ -90,6 +107,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   }, []);
   const handleSave = (slotId: string) => {
     dataCon.current?.save(slotId);
+    console.log(888)
     setSaveData(dataCon.current.save_data)
   };
 
@@ -129,16 +147,49 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         {mode == 'custom' && <div className="flex gap-4 flex-1">
           <span onClick={() => setCharacterEditorOpen(true)}>编辑角色</span>
           <Modal
-            title="编辑角色"
+            title={
+              <div
+                style={{ width: '100%', cursor: 'move' }}
+                onMouseOver={() => {
+                  if (disabled) {
+                    setDisabled(false);
+                  }
+                }}
+                onMouseOut={() => {
+                  setDisabled(true);
+                }}
+                onFocus={() => { }}
+                onBlur={() => { }}
+              >
+                编辑角色
+              </div>
+            }
+            modalRender={(modal) => (
+              <Draggable
+                disabled={disabled}
+                bounds={bounds}
+                nodeRef={draggleRef}
+                onStart={(event, uiData) => onStart(event, uiData)}
+              >
+                <div ref={draggleRef}>{modal}</div>
+              </Draggable>
+            )}
             open={characterEditorOpen}
-            style={{ 
-              top: 20 
+            maskClosable={false}
+            mask={false}
+            style={{
+              top: 20
             }}
-            bodyStyle={{ 
-              maxHeight: 'calc(100vh - 200px)', 
-              overflowY: 'auto',
-              paddingRight:'20px',
-              marginTop:'30px'
+            styles={{
+              body: {
+                maxHeight: 'calc(100vh - 200px)',
+                overflowY: 'auto',
+                paddingRight: '20px',
+                marginTop: '30px'
+              },
+              header: {
+                cursor: 'move' // 添加拖动指示器
+              }
             }}
             onCancel={() => {
               setCharacterEditorOpen(false);
@@ -147,14 +198,14 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
             width={1000}
             footer={[
               <Button
-              key="cancel"
-              style={{display:curRoleEdit.visible?'':'none'}}
-              onClick={() => {
-                setCurRoleEdit({ visible: false, data: null });
-              }}
-            >
-              返回
-            </Button>,
+                key="back"
+                style={{ display: curRoleEdit.visible ? '' : 'none' }}
+                onClick={() => {
+                  setCurRoleEdit({ visible: false, data: null });
+                }}
+              >
+                返回
+              </Button>,
               <Button
                 key="cancel"
                 onClick={() => {
@@ -167,7 +218,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
               <Button
                 key="save"
                 type="primary"
-                style={{display:curRoleEdit.visible?'':'none'}}
+                style={{ display: curRoleEdit.visible ? '' : 'none' }}
                 onClick={() => {
                   characterFormRef.current?.submit();
                 }}
