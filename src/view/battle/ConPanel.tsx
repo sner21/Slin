@@ -4,6 +4,9 @@ import { BattleManager } from '../../common/tatakai';
 import SaveLoadModal from './SaveLoadModal';
 import { DataCon } from '../../common/data/dataCon';
 import CharacterEditor from '../../components/CharacterEditor';
+import { plugin } from 'postcss';
+import { CharacterSaveSchema } from '../../common/char/types';
+import { v4 as uuidv4 } from 'uuid';
 
 type props = {
   battleManager: MutableRefObject<BattleManager>,
@@ -25,13 +28,35 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
   const [saveData, setSaveData] = useState(dataCon.current.save_data);
   const characterFormRef = useRef<FormInstance>();
 
-  const handleCharacterSave = async (values: any) => {
+  const handleCharacterSave = async (values: any, id = null, pluginId = 1) => {
     try {
-      console.log('保存角色数据:', values);
-      message.success('保存成功');
+      const plugin = localStorage.getItem('user-plugin-' + pluginId)
+      let info: any = {}
+      try {
+        info = JSON.parse(plugin || '')
+      } catch { }
+      if (id) {
+        //ID 不一样
+        const roleIndex = info.role.findIndex(i => i.id === id)
+        if (roleIndex >= 0) {
+          values = CharacterSaveSchema.parse(values)
+          info.role[roleIndex] = { ...info.role[roleIndex], ...values }
+        } else {
+          if (!info['role']) info['role'] = []
+          info['role'].push(values)
+        }
+      } else {
+        if (!info['role']) info['role'] = []
+        info['role'].push(values)
+      }
+      // info = { ...info, ...values }
+      localStorage.setItem('user-plugin-1', JSON.stringify(info || {}))
+      battleManager.current.load_plugins_role(info['role'])
+      console.log('保存角色数据:', info,battleManager.current);
+      // message.success('保存成功');
       setCharacterEditorOpen(false);
     } catch (error) {
-      message.error('保存失败');
+      // message.error('保存失败');
     }
   };
 
@@ -51,7 +76,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
   return (
     <div className='flex-1 flex flex-col gap-2'>
       <div>
-        <Segmented size='middle'  options={modeEnum.current}onChange={e => setMode(e)}></Segmented>
+        <Segmented size='middle' options={modeEnum.current} onChange={e => setMode(e)}></Segmented>
         {/* {mode.current.map((item, index) => (
           <div key={index}>{item.label}</div>
         ))} */}
@@ -102,14 +127,14 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
         onCancel={() => setCharacterEditorOpen(false)}
         width={800}
         footer={[
-          <Button 
-            key="cancel" 
+          <Button
+            key="cancel"
             onClick={() => setCharacterEditorOpen(false)}
           >
             取消
           </Button>,
-          <Button 
-            key="save" 
+          <Button
+            key="save"
             type="primary"
             onClick={() => {
               characterFormRef.current?.submit();
@@ -119,7 +144,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData }) => {
           </Button>
         ]}
       >
-        <CharacterEditor  formRef={characterFormRef}
+        <CharacterEditor formRef={characterFormRef}
           onSave={handleCharacterSave}></CharacterEditor>
       </Modal>
       <style>

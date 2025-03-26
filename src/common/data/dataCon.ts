@@ -1,13 +1,11 @@
-import { Ref } from 'vue';
+
 import { Character, CharacterSaveSchema, CharacterSchema } from '../char/types';
 import { get_boss_hp, get_char, set_boss_hp } from '../../server';
 import { char_damage_total } from '../tatakai';
 import keyBy from 'lodash-es/keyBy';
 import cloneDeep from 'lodash-es/cloneDeep';
 import { bb, initialData } from '../char';
-
-const UPSTASH_URL = 'https://evident-whale-25926.upstash.io';
-const UPSTASH_TOKEN = 'AWVGAAIjcDFjMjFiZmY1MWRlYWY0NTYyYTViYjNjM2Y1MmU1ZDdhZHAxMA';
+import assignIn from "lodash-es/assignIn";
 
 export class DataCon {
     characters = initialData
@@ -55,6 +53,7 @@ export class DataCon {
         }
         return this
     }
+
     setPlugin(device: string, data = '{}') {
         localStorage.setItem('plugin-' + device, data)
     }
@@ -109,10 +108,10 @@ export class DataCon {
         if (!save || newData) {
             this.newData()
             save = this.init_data
-        }else{
+        } else {
             save = JSON.parse(save)
         }
-      
+
         this.characters = save.characters.map(i => CharacterSchema.parse(i))
         this.enemy = save.enemy.map(i => CharacterSchema.parse(i))
         this.roles = [...this.characters, ...this.enemy]

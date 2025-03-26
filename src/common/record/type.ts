@@ -13,12 +13,12 @@ export const LogsBasicSchema = z.object({
     logs_type: LogsType,
     description: z.string().default(''),
     target: z.object({
-        type: z.number(),
+        type: z.string(),
         name: z.string(),
         id: z.string(),
     }).optional(),
     source: z.object({
-        type: z.number(),
+        type: z.string(),
         name: z.string(),
         id: z.string(),
     }).optional(),
@@ -67,12 +67,12 @@ export const BattleActionSchema = z.object({
     effectType: EffectType,       // 效果类型（伤害/治疗/护盾等）
     isEvaded: z.boolean().default(false),        // 是否被闪避
     attacker: z.object({
-        type: z.number(),
+        type: z.string(),
         name: z.string(),
         id: z.string(),
     }),
     defender: z.object({
-        type: z.number(),
+        type: z.string(),
         name: z.string(),
         id: z.string(),
     }),

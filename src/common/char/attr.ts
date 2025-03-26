@@ -61,19 +61,19 @@ export const costTypeSchema = z.object({
 
 export const AbilitySchema = z.object({
     // 基础属性
-    hp: z.number().default(0),
-    mp: z.number().default(0),
-    attack: z.number().default(0),
-    defense: z.number().default(0),
+    hp: z.number().default(100),
+    mp: z.number().default(100),
+    attack: z.number().default(1),
+    defense: z.number().default(1),
     crit_rate: z.number().default(0), //暴击率
     crit_dmg: z.number().default(100),//暴伤
     evasion: z.number().default(0),
     speed: z.number().default(1),
-    shield: z.number().optional(),
-    hp_re: z.number().default(0),        // 生命回复
-    mp_re: z.number().default(0),    // 能量回复
+    shield: z.number().default(1),
+    hp_re: z.number().default(1),        // 生命回复
+    mp_re: z.number().default(1),    // 能量回复
     // 战斗属性
-    penetration: z.number().optional(),
+    penetration: z.number().default(0),
     lifesteal: z.number().optional(),
     cooldown_re: z.number().default(0), // 冷却缩减
     life_count: z.number().default(1),

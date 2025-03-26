@@ -1,5 +1,5 @@
 import { number, z } from "zod";
-import { Skill, SkillType } from "../skill";
+import { Skill, SkillType, SkillTypeMap } from "../skill";
 import cloneDeep from "lodash-es/cloneDeep";
 import { AbilitySchema, CarryBuffSchema, EffectsSchema } from "./attr";
 import { ElementType } from "..";
@@ -25,9 +25,9 @@ export const ItemsDataSchema = z.object({
 export const RaritySchema = z.number().min(1).max(5);
 // 基础属性定义
 export const BaseStatSchema = z.object({
-  strength: z.number().min(0).default(0),
-  agility: z.number().min(0).default(0),
-  intelligence: z.number().min(0).default(0)
+  strength: z.number().min(0).default(1),
+  agility: z.number().min(0).default(1),
+  intelligence: z.number().min(0).default(1)
 });
 // 成长率定义
 export const GrowthRateSchema = z.object({
@@ -39,23 +39,23 @@ export const GrowthRateSchema = z.object({
 export const CharacterDisplaySchema = z.object({
   at: ActionSchema.default([]),
 });
-export const CharacterType = z.enum(["0","1","2"]).describe('0:人物 1:boss 2:部队').default("0")
+export const CharacterType = z.enum(["0", "1", "2"]).describe('0:人物 1:boss 2:部队').default("0")
 // 角色状态相关的Schema
 export const CharacterStatusSchema = z.object({
-  target: z.any(),
+  target: z.any().optional(),
 });
 
 export const StatusSchema = z.object({
   damage: z.number().min(0).default(0),
-  hp: z.number().min(0).optional(),
-  mp: z.number().min(0).optional(),
+  hp: z.number().min(0).default(100),
+  mp: z.number().min(0).default(100),
   reborn: z.number().min(0).default(0),
 });
 
 // Save相关的Schema
 export const CharacterSaveSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().default(""),
   salu: z.string().max(8).optional(), //称号
   type: CharacterType, //1 boss 0人物 2部队
   avatar: z.string().describe('( url )').optional(),
@@ -86,8 +86,8 @@ export const CharacterSaveSchema = z.object({
       MISC_2: z.string().optional()
     }).default({}),
   }).default({}),
-  ability: AbilitySchema.merge(BaseStatSchema),
-  normal: z.string(),
+  ability: AbilitySchema.merge(BaseStatSchema).default({  }),
+  normal: z.string().default(SkillTypeMap.NORMAL_ATTACK.physical_normal.id),
   skill: z.array(z.string()).max(8).optional(),
   grow: z.object({
     level: z.number().min(0).max(50).default(1), // 角色等级
@@ -100,10 +100,9 @@ export const CharacterSaveSchema = z.object({
   display: z.object({
     frame_type: z.enum(['item', 'equip', 'troops'])
   }).default({ frame_type: 'equip' }),
-  state: z.enum(["0", "1", '2', '3', '4']).describe('1:死亡 0:存活 2:休息 3:探索 4:练级').default('0'), 
+  state: z.number().min(0).max(4).describe('1:死亡 0:存活 2:休息 3:探索 4:练级').default(0),
   imm_ability: AbilitySchema.default(AbilitySchema.parse({})),
 })
-console.log(CharacterSaveSchema, 'CharacterSaveSchema');
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
 

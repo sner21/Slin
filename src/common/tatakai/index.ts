@@ -18,7 +18,7 @@ import { BuffManage } from "../buff";
 import { PluginsDataSchma } from "../plugins/";
 
 
-
+import assignIn from "lodash-es/assignIn";
 // 战斗管理器
 export class BattleManager {
     round_timer: any
@@ -66,7 +66,7 @@ export class BattleManager {
         }
         this.cur_enemy = this.battle_data.cur_boss_id ? this.roles_group[this.battle_data.cur_boss_id] : this.get_boss()
         this.battle_data.cur_boss_id = this.cur_enemy.id
-        this.load_plugins().then(() => {
+        this.load_plugins_init().then(() => {
             this.start_round()
         })
         console.log(this.roles, this.enemy, 'boss');
@@ -76,12 +76,30 @@ export class BattleManager {
 
     }
     init_role() {
-        this.roles_group = this.data.roles_group
         this.enemy = this.data.enemy
         this.roles = this.data.roles
         this.roles_group = this.data.roles_group
     }
-    async load_plugins() {
+    load_plugins_role(data) {
+        data.forEach(i => {
+            console.log(i, 11);
+            this.characters[i.id] = assignIn(this.characters[i.id], i)
+            switch (i.type) {
+                case "0": {
+                    this.roles[i.id] = assignIn(this.roles[i.id], i)
+                    break
+                }
+                case "1": {
+                    this.enemy[i.id] = assignIn(this.enemy[i.id], i)
+                    break
+                }
+            }
+
+        })
+
+        this.roles_group = keyBy(this.roles, "id")
+    }
+    async load_plugins_init() {
         import('../plugins/').then(res => {
             const data = res.plugins_data
             this.EventManager.load_plugins_event(data.event)
@@ -94,8 +112,16 @@ export class BattleManager {
                 this.EventManager.load_plugins_event(data.event || [])
                 this.BuffManage.load_plugins_buff(data.buff || [])
                 this.ItemsManager.load_plugins_item(data.item || [])
+                this.load_plugins_role(data.role || [])
             }
         })
+    }
+    async load_plugins(data: any) {
+
+        this.EventManager.load_plugins_event(data.event || [])
+        this.BuffManage.load_plugins_buff(data.buff || [])
+        this.ItemsManager.load_plugins_item(data.item || [])
+        this.init_role(data.role)
     }
     start_round(time = this.battle_data.time) {
         if (!this.battle_data.pause) {
@@ -208,10 +234,13 @@ export class BattleManager {
         const actionOrder = this.getActionOrder(this.roles);
         const actionOrderId = actionOrder.map(i => i.id)
         // console.log("可以行动的角色", actionOrderId)
+
         for (const key in actionOrder) {
             const i = actionOrder[key]
+
             //计算角色属性
             if (actionOrderId.includes(i.id)) {
+
                 if (i.type === 1) { // boss
                     this.get_target(i, this.characters)
                     this.useSkill(i, i.target, i.normal)
@@ -226,6 +255,7 @@ export class BattleManager {
                 // 标记行动完成
                 this.finishAction(i);
             }
+            console.log(444);
             //获取所有角色事件
             this.total_event(i)
         }
@@ -238,6 +268,7 @@ export class BattleManager {
         // 更新所有角色的行动条
         this.actionGauge.updateGauges(characters);
         // 获取可以行动的角色
+
         const readyCharacters = this.actionGauge.getReadyCharacters(characters);
         // 按速度排序
         return readyCharacters.sort((a, b) => b.imm_ability.speed - a.imm_ability.speed);

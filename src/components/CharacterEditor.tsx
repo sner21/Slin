@@ -6,20 +6,25 @@ import { CharacterSaveSchema } from '../common/char/types';
 import { getFieldComponent, renderFormItem } from '../common/zodForm';
 import { CharacterTranslations } from '../translation/char';
 import { get } from 'lodash-es';
+import { v4 as uuidv4 } from 'uuid';
 
 interface CharacterEditorProps {
   formRef?: React.MutableRefObject<FormInstance | undefined>;
   onSave: (values: any) => void;
-  initialValues?: any;
+  initialValues?: any
 }
 
 const CharacterEditor: React.FC<CharacterEditorProps> = ({
   formRef,
   onSave,
-  initialValues
+  initialValues = CharacterSaveSchema.parse({id:uuidv4()})
 }) => {
   const [form] = Form.useForm();
   const handleFinish = useCallback((values: any) => {
+    if (!values?.id) values.id = uuidv4();
+    
+    values = CharacterSaveSchema.parse(values);
+    console.log(values,'values')
     onSave(values);
   }, [onSave]);
   const handleField = (field: string) => {
@@ -81,9 +86,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
             label: '基础属性',
             children: (
               <Card>
-                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.strength, handleField("ability.strength"))}
-                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.agility, handleField("ability.agility"))}
-                  {renderFormItem(CharacterSaveSchema.shape.ability.shape.intelligence, handleField("ability.intelligence"))}
+                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.strength, handleField("ability.strength"))}
+                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.agility, handleField("ability.agility"))}
+                {renderFormItem(CharacterSaveSchema.shape.ability._def.innerType.shape.intelligence, handleField("ability.intelligence"))}
                 {/* <Form.Item
                   name={['ability', 'strength']}
                   label="力量"

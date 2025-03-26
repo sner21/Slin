@@ -159,15 +159,15 @@ function App({ dataCon, startViewData }) {
                                     shapeOutside: 'circle(50%)',
                                     float: "right",
                                 }}
-                            max={battleManager.current.cur_enemy.imm_ability.hp || battleManager.current.cur_enemy?.ability.hp}
-                            src={battleManager.current.cur_enemy.avatar}
+                                max={battleManager.current.cur_enemy.imm_ability.hp || battleManager.current.cur_enemy?.ability.hp}
+                                src={battleManager.current.cur_enemy.avatar}
                                 alt=""
                             />
                             <b className="text-center text-red text-lg">{battleManager.current.cur_enemy?.name}</b>
                             <HealthBar
-                            current={battleManager.current.cur_enemy.status?.hp || 0}
-                            max={battleManager.current.cur_enemy.imm_ability.hp || battleManager.current.cur_enemy?.ability.hp}
-                            height="12px" >
+                                current={battleManager.current.cur_enemy.status?.hp || 0}
+                                max={battleManager.current.cur_enemy.imm_ability.hp || battleManager.current.cur_enemy?.ability.hp}
+                                height="12px" >
                             </HealthBar>
                         </div>
                         {/* 角色列表部分 */}
@@ -326,7 +326,7 @@ function App({ dataCon, startViewData }) {
                                                     {/* 角色攻击记录 VList */}
                                                     <VList
                                                         className="flex-1 px-4 w-full"
-                                                        data={item.at}
+                                                        data={item.at || []}
                                                         height={180}
                                                         estimatedItemHeight={20}
                                                         bufferSize={10}
