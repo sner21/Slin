@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { Card, Form, Input, InputNumber, Select } from 'antd';
-import React from 'react';
 import { getNumberConstraints, zodToFormRules } from '.';
 import { get } from 'lodash-es';
 
@@ -35,7 +34,7 @@ export const getFieldComponent = (schema: z.ZodType<any>, type?: string) => {
 const convertFieldPath = (path: string): string[] => {
     return path.includes('.') ? path.split('.') : [path];
 };
-export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, label?: string, type?: string, parentPath?: string[] }) => {
+export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, label?: string, type?: string, parentPath?: string[] }, props = {}) => {
     if (!info.field) return null;
     const def = schema._def;
 
@@ -60,7 +59,7 @@ export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, la
                 rules={zodToFormRules(schema)}
                 key={info.field}
             >
-                <Component {...constraints}/>
+                <Component {...constraints} {...props} />
             </Form.Item>
         );
     }

@@ -72,7 +72,6 @@ type ArrayHolder = {
     [key: string]: any[];
 } | any[];
 
-let id = 0
 export const fixedPush = <T extends ArrayHolder>(
     obj: T,
     path: keyof T,
