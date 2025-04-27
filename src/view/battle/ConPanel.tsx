@@ -11,8 +11,9 @@ import { CharacterSelector } from '../../components/CharacterSelector';
 import { cloneDeep } from 'lodash-es';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Draggable from 'react-draggable';
-import { CustomP } from '../../com/ConPanel/CustomP';
+import { CustomP } from '../../components/ConPanel/CustomP';
 import { useThrottledProxyRef } from '../../hook';
+import HelpModal from './HelpModal';
 
 
 type props = {
@@ -35,6 +36,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   const [characterEditorOpen, setCharacterEditorOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [loadModalOpen, setLoadModalOpen] = useState(false);
+  const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [saveData, setSaveData] = useState(dataCon.current.save_data);
   const characterFormRef = useRef<FormInstance>();
   const draggleRef = useRef<HTMLDivElement>(null!);
@@ -134,12 +136,13 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           {/* 战斗管理器控制部分 */}
           {/* <div>{battleManager.current.battle_data.round}</div> */}
           <span onClick={() => battleManager.current.pause_round()}>暂停</span>
-          <span onClick={() => battleManager.current.forward_round()}>前进1回合</span>
+          <span onClick={() => battleManager.current.forward_round()}>前进回合</span>
           <span onClick={() =>
             !battleManager.current.round_timer ||
             (battleManager.current.battle_data.pause = false) ||
             battleManager.current.start_round(battleManager.current.battle_data.cur_time)
           }>恢复</span>
+          <span onClick={() => setHelpModalOpen(true)}>帮助</span>
         </div>}
         {mode == 'setting' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
@@ -257,14 +260,20 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           </Modal>
         </div>}
       </div>
-     <SaveLoadModal
+      <SaveLoadModal
         open={saveModalOpen}
         onClose={() => setSaveModalOpen(false)}
         mode="save"
         onConfirm={handleSave}
         dataCon={dataCon}
       />
-
+      <HelpModal
+        open={helpModalOpen}
+        onClose={() => setHelpModalOpen(false)}
+        mode="help"
+        onConfirm={handleSave}
+        dataCon={dataCon}
+      />
       <SaveLoadModal
         open={loadModalOpen}
         onClose={() => setLoadModalOpen(false)}

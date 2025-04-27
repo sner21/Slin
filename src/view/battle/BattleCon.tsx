@@ -9,10 +9,10 @@ import template from "lodash-es/template";
 import { LogsType } from "../../common/record/type";
 import { z } from "zod";
 import { useThrottledProxyRef } from "../../hook";
-import VList from "../../com/VList";
+import VList from "../../components/VList";
 import { SkillCooldown } from "../../common/skill/cooldown";
-import HealthBar from "../../com/HealthBar";
-import SkillItem from "../../com/SkillItem";
+import HealthBar from "../../components/HealthBar";
+import SkillItem from "../../components/SkillItem";
 import { ConfigProvider, Popover, Segmented, theme } from "antd"
 import SkillForm from '../../components/SkillForm';
 import ConPanel from "./ConPanel";

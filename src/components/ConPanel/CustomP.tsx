@@ -3,7 +3,7 @@ import React, { MutableRefObject, useCallback, useRef, useState } from 'react';
 import { Button, Form, message, Modal } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
-import ItemEditor from '../../components/ItemEditor';
+import ItemEditor from '../ItemEditor';
 import { BattleManager } from '../../common/tatakai';
 import { cloneDeep } from 'lodash-es';
 interface ShopEditorProps {

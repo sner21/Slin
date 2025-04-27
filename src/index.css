@@ -1,11 +1,9 @@
 :root {
     margin: 0;
     --un-preset-primary-track: #f1f1f1;
-    /* 轨道颜色 */
     --un-preset-primary-thumb: #888;
-    /* 滑块颜色 */
     --un-preset-primary-thumb-hover: #555;
-    /* 滑块悬停颜色 */
+
 }
 
 html,
@@ -40,20 +38,20 @@ body {
     height: 4px;
 }
 
-/* 滚动条轨道 */
+
 ::-webkit-scrollbar-track {
     /* background: transparent; */
     border-radius: 0px;
 }
 
-/* 滚动条滑块 */
+
 ::-webkit-scrollbar-thumb {
     background: #999;
     /* border-radius: 4px; */
     transition: background-color 0.2s;
 }
 
-/* 滑块hover效果 */
+
 ::-webkit-scrollbar-thumb:hover {
     background: rgb(251 191 36);
 
@@ -69,4 +67,11 @@ body {
     font-family: 'Mono-Bold';
     src:
         url('src\\assets\\font\\JetBrainsMono-Bold.ttf') format('truetype');
+}
+
+table,
+thead,
+tr,
+th {
+    background: transparent !important;
 }

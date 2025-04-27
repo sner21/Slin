@@ -460,83 +460,83 @@ export class BattleManager {
         }
         const ElementalRelations = {
             fire: {
-                ice: 1.5,    // 火克冰
-                wind: 1.2,   // 火增强风
-                water: 0.7,  // 火被水克制
-                grass: 1.5,  // 火克草
-                thunder: 1,  // 普通
-                dark: 1,     // 普通
-                light: 1,    // 普通
-                default: 1   // 普通
+                ice: 1.5,    
+                wind: 1.2,   
+                water: 0.7,  
+                grass: 1.5,  
+                thunder: 1,  
+                dark: 1,     
+                light: 1,    
+                default: 1  
             },
             ice: {
-                water: 1.2,  // 冰增强水
-                thunder: 0.7,// 冰被雷克制
-                wind: 1.5,   // 冰克风
-                fire: 0.7,   // 冰被火克制
-                grass: 1.2,  // 冰增强草
-                dark: 1,     // 普通
-                light: 1,    // 普通
+                water: 1.2,  
+                thunder: 0.7,
+                wind: 1.5,  
+                fire: 0.7,  
+                grass: 1.2, 
+                dark: 1,    
+                light: 1,    
                 default: 1
             },
             thunder: {
-                water: 1.5,  // 雷克水
-                ice: 1.5,    // 雷克冰
-                wind: 0.7,   // 雷被风克制
-                fire: 1,     // 普通
-                grass: 0.7,  // 雷被草克制
-                dark: 1.2,   // 雷增强暗
-                light: 0.7,  // 雷被光克制
+                water: 1.5,  
+                ice: 1.5,    
+                wind: 0.7,   
+                fire: 1,     
+                grass: 0.7,  
+                dark: 1.2,   
+                light: 0.7,  
                 default: 1
             },
             wind: {
-                thunder: 1.5,// 风克雷
-                fire: 0.7,   // 风被火克制
-                ice: 0.7,    // 风被冰克制
-                water: 1.2,  // 风增强水
-                grass: 1.2,  // 风增强草
-                dark: 1,     // 普通
-                light: 1,    // 普通
+                thunder: 1.5,
+                fire: 0.7,  
+                ice: 0.7,    
+                water: 1.2,  
+                grass: 1.2,  
+                dark: 1,    
+                light: 1,  
                 default: 1
             },
             water: {
-                fire: 1.5,   // 水克火
-                thunder: 0.7,// 水被雷克制
-                ice: 1,      // 普通
-                wind: 1,     // 普通
-                grass: 0.7,  // 水被草克制
-                dark: 1,     // 普通
-                light: 1.2,  // 水增强光
+                fire: 1.5,   
+                thunder: 0.7,
+                ice: 1,     
+                wind: 1,    
+                grass: 0.7, 
+                dark: 1,   
+                light: 1.2, 
                 default: 1
             },
             grass: {
-                water: 1.5,  // 草克水
-                thunder: 1.5,// 草克雷
-                fire: 0.7,   // 草被火克制
-                ice: 0.7,    // 草被冰克制
-                wind: 1,     // 普通
-                dark: 0.7,   // 草被暗克制
-                light: 1.2,  // 草增强光
+                water: 1.5,  
+                thunder: 1.5,
+                fire: 0.7,  
+                ice: 0.7,    
+                wind: 1,     
+                dark: 0.7,   
+                light: 1.2,  
                 default: 1
             },
             dark: {
-                light: 1.5,  // 暗克光
-                grass: 1.5,  // 暗克草
-                thunder: 0.7,// 暗被雷克制
-                fire: 1,     // 普通
-                ice: 1,      // 普通
-                wind: 1,     // 普通
-                water: 1,    // 普通
+                light: 1.5, 
+                grass: 1.5, 
+                thunder: 0.7,
+                fire: 1,    
+                ice: 1,     
+                wind: 1,     
+                water: 1,    
                 default: 1
             },
             light: {
-                dark: 1.5,   // 光克暗
-                thunder: 1.5,// 光克雷
-                water: 0.7,  // 光被水克制
-                grass: 0.7,  // 光被草克制
-                fire: 1,     // 普通
-                ice: 1,      // 普通
-                wind: 1,     // 普通
+                dark: 1.5,   
+                thunder: 1.5,
+                water: 0.7,  
+                grass: 0.7,  
+                fire: 1,     
+                ice: 1,      
+                wind: 1,     
                 default: 1
             },
             default: {
@@ -578,8 +578,8 @@ export class BattleManager {
             skillId: skill.id,
             skillType: skill.type,
             skillName: skill.name,
-            sourceId: attacker.id,          // 攻击方ID
-            targetId: defender.id,          // 目标ID
+            sourceId: attacker.id,          
+            targetId: defender.id,        
             round: this.battle_data.round,
             damage: {
                 hp: damage,
@@ -701,7 +701,6 @@ export function settle_attack_boss(damage: number, boss: { blood: number }) {
 export function char_attack_physical(attacker: Character, defender: Character | BB, damage: number) {
     // 护甲穿透
     const effectiveDefense = Math.max(0, defender.imm_ability.defense * (1 - attacker.imm_ability.penetration / 100));
-    // 防御计算 (常见公式：实际伤害 = 原始伤害 * (1 - 防御系数))
     // 防御系数 = 防御力 / (防御力 + 等级系数)
     const defense = defender.imm_ability.defense - effectiveDefense
     const defenseRatio = defense / (defense + 100);
