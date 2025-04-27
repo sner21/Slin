@@ -7,7 +7,7 @@ import { ActionGauge } from "./action";
 import { ref, Ref } from "vue";
 import { DataCon } from "../data/dataCon";
 import { effectsSchema, EffectsSchema } from '../char/attr';
-import { fixedPush, randomInt } from "..";
+import { fixedPush, getMirrorPosition, randomInt } from "..";
 import { EventManager } from "../event";
 import { BattleActionSchema } from "../record/type";
 import get from "lodash-es/get";
@@ -42,9 +42,9 @@ export class BattleManager {
     characters: Character[];
     cur_characters: Character[];
     roles: Character[] = [];
-    cur_roles: Character[] = [];
     data: Ref<Character[]>;
     globalConfig: any = {};
+    roleAarry: {}
     init_battle_data: any = {
         cur_time: 0,
         pause: false,
@@ -60,6 +60,7 @@ export class BattleManager {
     constructor(data: DataCon) {
         this.data = data
         this.characters = data.characters
+
         //TODO 改为从ID
         this.init_role()
         this.RecordManager = RecordManager(this)
@@ -70,18 +71,18 @@ export class BattleManager {
         this.ItemsManager = ItemsManager(this);
         this.globalConfig = data.globalConfig;
         this.data.battleManagerGourp[this.battle_id] = this
+        this.roleAarry = {}
         const info = data.battle_data_info && data.battle_data_info[this.battle_id]
         if (info) {
             this.battle_data = info.battle_data
             this.cooldownManager.cooldowns = info.cooldowns
-       
+
         } else {
             this.battle_data = { ...this.init_battle_data }
         }
-        //TODO
-        this.cur_enemy = info?.cur_enemy || data.enemy
-        this.cur_roles = this.roles
-        this.cur_characters = this.characters.slice(0, 6)
+        this.update_array()
+        this.update_cur()
+
         // this.battle_data.cur_boss_id = this.cur_enemy[0].id
         // this.load_plugins_init().then(() => {
         //     this.start_round()
@@ -100,9 +101,7 @@ export class BattleManager {
             clearInterval(this.time_timer);
             this.time_timer = null;
         }
-        // 清理其他引用
         this.roles = [];
-        this.cur_roles = [];
         this.characters = [];
         this.cur_characters = [];
         this.enemy = [];
@@ -144,10 +143,20 @@ export class BattleManager {
         this.roles_group = keyBy(this.roles, "id")
     }
     async load_plugins_init() {
-        import('../plugins/').then(res => {
-            const data = PluginsDataSchma.parse(res.plugins_data)
-            this.load_plugins(data)
+        if(!import.meta.env.BUILD_PLUGINS) return
+        const plugins = await import.meta.glob('../plugins/*');
+        const add_plugins = await import.meta.glob('./plugins/*');
+        Object.keys({...plugins, ...add_plugins}).forEach(k => {
+            import(k).then(res => {
+                const data = PluginsDataSchma.parse(res.default)
+                this.load_plugins(data)
+            })
         })
+
+        // import('../plugins/*').then(res => {
+        //     const data = PluginsDataSchma.parse(res.plugins_data)
+        //     this.load_plugins(data)
+        // })
         Object.keys(localStorage).forEach(k => {
             if (k.startsWith('user-plugin-')) {
                 const data = PluginsDataSchma.parse(JSON.parse(localStorage.getItem(k)))
@@ -227,22 +236,22 @@ export class BattleManager {
                 char.status.hp = char.imm_ability.hp
                 char.state = 0
             }
-            if (char.type === "1") {
-                //TODO 
-                this.enemy.forEach(enemy => {
-                    enemy.status.hp = char.imm_ability.hp
-                    enemy.state = 0
-                })
-                // this.cur_enemy = this.get_boss(this.cur_enemy.id)
-                // this.cur_enemy.status.hp = char.imm_ability.hp
-                // this.cur_enemy.state = 0
-            }
+            // if (char.type === "1") {
+            //     //TODO 
+            //     this.enemy.forEach(enemy => {
+            //         enemy.status.hp = char.imm_ability.hp
+            //         enemy.state = 0
+            //     })
+            // }
         }
         //判断HP是否归0
-        if (!char.ability.reborn && char.status.hp <= 0) {
-            char.status.hp = 0
+        if (char.status.hp <= 1) {
+            console.log(char.name, '死亡', char.state, char.status.reborn)
+            char.status.hp = 1
             char.state = 1
-            char.status.reborn = char.ability.reborn
+            if (!char.status.reborn || char.status?.reborn <= 0) {
+                char.status.reborn = 10
+            }
         }
         if (char.state === 0) {
             // 处理所有角色的回复
@@ -266,10 +275,69 @@ export class BattleManager {
         }
         return t
     }
-    //随机搜寻目标
-    get_target(role: Character, enmey: Character[]) {
-        const e = enmey[randomInt(0, enmey.length - 1)]
-        role.target = e
+    get_target(role: Character, enemy: Character[]) {
+        const aliveEnemies = enemy.filter(e => e.state !== 1);
+        if (aliveEnemies.length === 0) return;
+        const attackerPos = role.position?.index || 0;
+        let target;
+        // 前排优先攻击对方前排，中排优先中排，后排优先后排
+        const attackerRow = Math.floor(attackerPos / 3);
+        // 按照优先级对敌人进行排序
+        const sortedEnemies = aliveEnemies.sort((a, b) => {
+            const posA = a.position?.index || 0;
+            const posB = b.position?.index || 0;
+            const rowA = Math.floor(posA / 3);
+            const rowB = Math.floor(posB / 3);
+            // 计算与攻击者所在排的距离
+            const distA = Math.abs(rowA - attackerRow);
+            const distB = Math.abs(rowB - attackerRow);
+            // 优先选择同排的目标，其次是距离最近的排
+            if (distA !== distB) {
+                return distA - distB;
+            }
+            return Math.random() - 0.5;
+        });
+        target = sortedEnemies[0];
+        //前排有30%概率直接攻击后排
+        if (attackerRow === 0 && Math.random() < 0.3) {
+            const backlineEnemies = aliveEnemies.filter(e =>
+                Math.floor((e.position?.index || 0) / 3) === 2
+            );
+            if (backlineEnemies.length > 0) {
+                target = backlineEnemies[randomInt(0, backlineEnemies.length - 1)];
+            }
+        }
+        role.target = target;
+    }
+    update_cur() {
+        this.cur_enemy = this.enemy.filter(i => i.position?.index)
+        this.cur_characters = this.characters.filter(i => i.position?.index)
+        // this.update_array()
+    }
+    update_roles() {
+        this.roles = [...this.characters, ...this.enemy]
+        this.roles_group = keyBy(this.roles, "id")
+    }
+    update_array(value = null) {
+        if (value) return this.roleAarry = value
+        this.roleAarry = {}
+        const list = [this.characters, this.enemy]
+        list.forEach((i, k) => {
+            i.forEach(role => {
+                if (!this.roleAarry[k]) this.roleAarry[k] = {}
+                if (role.position?.index) {
+                    const index = k === 1 ? getMirrorPosition(role.position.index) : role.position.index
+                    this.roleAarry[k][index] = {
+                        id: role.id,
+                        type: k,
+                        avatar: role.avatar,
+                        data: role.data,
+                        index: index,
+                    }
+                }
+            })
+        });
+        console.log(this.roleAarry, 'this.roleAarr')
     }
     //战斗
     battle_turn() {
@@ -460,83 +528,83 @@ export class BattleManager {
         }
         const ElementalRelations = {
             fire: {
-                ice: 1.5,    
-                wind: 1.2,   
-                water: 0.7,  
-                grass: 1.5,  
-                thunder: 1,  
-                dark: 1,     
-                light: 1,    
-                default: 1  
+                ice: 1.5,
+                wind: 1.2,
+                water: 0.7,
+                grass: 1.5,
+                thunder: 1,
+                dark: 1,
+                light: 1,
+                default: 1
             },
             ice: {
-                water: 1.2,  
+                water: 1.2,
                 thunder: 0.7,
-                wind: 1.5,  
-                fire: 0.7,  
-                grass: 1.2, 
-                dark: 1,    
-                light: 1,    
+                wind: 1.5,
+                fire: 0.7,
+                grass: 1.2,
+                dark: 1,
+                light: 1,
                 default: 1
             },
             thunder: {
-                water: 1.5,  
-                ice: 1.5,    
-                wind: 0.7,   
-                fire: 1,     
-                grass: 0.7,  
-                dark: 1.2,   
-                light: 0.7,  
+                water: 1.5,
+                ice: 1.5,
+                wind: 0.7,
+                fire: 1,
+                grass: 0.7,
+                dark: 1.2,
+                light: 0.7,
                 default: 1
             },
             wind: {
                 thunder: 1.5,
-                fire: 0.7,  
-                ice: 0.7,    
-                water: 1.2,  
-                grass: 1.2,  
-                dark: 1,    
-                light: 1,  
+                fire: 0.7,
+                ice: 0.7,
+                water: 1.2,
+                grass: 1.2,
+                dark: 1,
+                light: 1,
                 default: 1
             },
             water: {
-                fire: 1.5,   
+                fire: 1.5,
                 thunder: 0.7,
-                ice: 1,     
-                wind: 1,    
-                grass: 0.7, 
-                dark: 1,   
-                light: 1.2, 
+                ice: 1,
+                wind: 1,
+                grass: 0.7,
+                dark: 1,
+                light: 1.2,
                 default: 1
             },
             grass: {
-                water: 1.5,  
+                water: 1.5,
                 thunder: 1.5,
-                fire: 0.7,  
-                ice: 0.7,    
-                wind: 1,     
-                dark: 0.7,   
-                light: 1.2,  
+                fire: 0.7,
+                ice: 0.7,
+                wind: 1,
+                dark: 0.7,
+                light: 1.2,
                 default: 1
             },
             dark: {
-                light: 1.5, 
-                grass: 1.5, 
+                light: 1.5,
+                grass: 1.5,
                 thunder: 0.7,
-                fire: 1,    
-                ice: 1,     
-                wind: 1,     
-                water: 1,    
+                fire: 1,
+                ice: 1,
+                wind: 1,
+                water: 1,
                 default: 1
             },
             light: {
-                dark: 1.5,   
+                dark: 1.5,
                 thunder: 1.5,
-                water: 0.7,  
-                grass: 0.7,  
-                fire: 1,     
-                ice: 1,      
-                wind: 1,     
+                water: 0.7,
+                grass: 0.7,
+                fire: 1,
+                ice: 1,
+                wind: 1,
                 default: 1
             },
             default: {
@@ -578,8 +646,8 @@ export class BattleManager {
             skillId: skill.id,
             skillType: skill.type,
             skillName: skill.name,
-            sourceId: attacker.id,          
-            targetId: defender.id,        
+            sourceId: attacker.id,
+            targetId: defender.id,
             round: this.battle_data.round,
             damage: {
                 hp: damage,
@@ -614,7 +682,6 @@ export class BattleManager {
     }
     //使用技能 
     useSkill(character: Character, bb: Character, skillId: string) {
-        if (character.state === 1) return
         const skill: Skill = SkillMap[skillId];
 
         if (!skill) {
@@ -643,15 +710,15 @@ export class BattleManager {
     }
     //回合开始
     startTurn() {
-        
+
         this.cooldownManager.updateCooldowns();
         this.roles.forEach(i => {
             this.calculateFinalStats(i)
             // this.set_role_status(i)
         })
-    
+
         this.trim_attr(this.roles)
-  
+
     }
     // 回合结束
     endTurn() {
@@ -663,9 +730,10 @@ export class BattleManager {
             this.set_role_status(char)
         })
         this.trim_attr(this.roles)
+        this.update_cur()
         this.globalConfig.autosave && this.data.save()
         this.battle_data.round++
-     
+
     }
     //修整所有的溢出属性
     trim_attr(roles: Character[]) {

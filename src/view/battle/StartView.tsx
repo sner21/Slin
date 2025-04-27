@@ -8,6 +8,7 @@ import { useThrottledProxyRef } from "../../hook";
 import { BattleManager } from "../../common/tatakai";
 import ConPanel from "./ConPanel";
 import AarryCon from "../../components/battle/AarryCon";
+import { getMirrorPosition } from "../../common";
 
 const MenuContainer = styled.div`
   ${tw`w-full h-[100vh] flex items-center justify-center`}
@@ -47,7 +48,7 @@ const StartView: FC = () => {
     const data = useRef(new DataCon())
     let battleManager = useRef<BattleManager>(null);
 
-
+    const [arrConOpen, setArrConOpen] = useState(false)
     const [loadMode, setLoadMode] = useState(false)
     const startViewData = useThrottledProxyRef({
         mode: ''
@@ -82,7 +83,6 @@ const StartView: FC = () => {
         }
         if (loadMode) {
             data.current = new DataCon()
-            console.log('321321321')
         }
         data.current.load(slotId, loadMode)
         console.log(data, '加载成功', slotId)
@@ -101,10 +101,37 @@ const StartView: FC = () => {
     const setMode = (v) => {
         startViewData.mode = v
     }
+
+    const confirmArr = (v1, v2) => {
+        if (battleManager.current) {
+            // battleManager.current.characters = v1[0]
+            // battleManager.current.enemy = v1[1]
+            // battleManager.current.update_roles()
+            Object.keys(v2).forEach(type => {
+                Object.keys(v2[type]).forEach(k => {
+                    const role = v2[type][k]
+                    if (!role.id) return
+                    if (!battleManager.current.roles_group[role.id].position) battleManager.current.roles_group[role.id].position = {}
+                    const index = type == "1" ? getMirrorPosition(role.index) : role.index
+                    battleManager.current.roles_group[role.id].position.index = index
+                    // if (type == "1") {
+                    //     battleManager.current.enemy.find(i => i.id === role.id).position.index = index
+                    // } else {
+                    //     battleManager.current.characters.find(i => i.id === role.id).position.index = index
+                    // }
+                })
+            })
+          
+            battleManager.current.update_cur()
+            battleManager.current.update_array()
+            setArrConOpen(false)
+        }
+    }
     // battle_data_info
     useEffect(() => {
         if (data.current?.globalConfig.autoload) {
             load(data.current?.globalConfig.autoload)
+
             // battleManager.current = new BattleManager(data.current)
             setMode('battle')
         }
@@ -128,13 +155,20 @@ const StartView: FC = () => {
                 </MenuContent>}
                 {startViewData.mode === 'battle' &&
                     <BattleCon
-                        AarryCon={<AarryCon roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>}
+                        AarryCon={
+                            arrConOpen && <AarryCon roleAarryData={battleManager.current?.roleAarry} onConfirm={confirmArr} roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>
+                        }
+                        arrConOpen={arrConOpen}
                         battleManageData={battleManager}
                         controlPanel={
                             <ConPanel
+                                AarryCon={
+                                    <AarryCon onConfirm={confirmArr} roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>
+                                }
                                 battleManager={battleManager}
                                 startViewData={startViewData}
                                 dataCon={data}
+                                setArrConOpen={setArrConOpen}
                                 refreshBet={refreshBet}></ConPanel>
                         }
                         startViewData={startViewData}

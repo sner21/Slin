@@ -101,7 +101,6 @@ export class DataCon {
                 } catch { }
             }
         })
-        console.log(this.save_data, '获取存档数据123')
     }
     save_global_config(config: Record<keyof typeof this.globalConfig, any> | null = null) {
         if (config) {

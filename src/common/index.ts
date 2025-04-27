@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { Rule } from 'antd/lib/form'
-
+export const getMirrorPosition = (index: number): number => {
+    const row = Math.floor(index / 3);
+    const col = index % 3;
+    return row * 3 + (2 - col);
+}
 export const getNumberConstraints = (schema: any, constraints: any = {}) => {
     const def = schema._def;
     if (def.defaultValue) {

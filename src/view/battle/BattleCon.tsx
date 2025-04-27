@@ -19,7 +19,7 @@ import ConPanel from "./ConPanel";
 import { DataCon } from "../../common/data/dataCon";
 import AarryCon from "../../components/battle/AarryCon";
 
-function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageData, AarryCon }) {
+function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageData, AarryCon, arrConOpen }) {
     const coldData = useRef<Map<number, SkillCooldown[]>>();
     const data = useThrottledProxyRef(dataCon.current);
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
@@ -110,8 +110,19 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                         {/* 日志部分 */}
                         <div className="flex justify-between ">
                             {controlPanel}
-                            <div className="flex-1/4 gap-2 flex  border-2 border-l-solid border-l-amber p-3"  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
-                                <div className="flex flex-col gap-2 text-sm">
+                            <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
+                                <div className="w-160 flex gap-6 border-r-amber border-2 border-r-solid">
+                                    {[battleManager.current.characters, battleManager.current.enemy].map((item, key) => (<div className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
+                                        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                            <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className=' flex justify-center hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
+                                            >
+                                                {battleManager.current.roleAarry[key] && battleManager.current.roleAarry[key][i] && battleManager.current.roleAarry[key][i].id &&
+                                                    <img style={{ ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black) ${battleManager.current?.roles_group[battleManager.current.roleAarry[key][i].id].state === 1 ? 'saturate(0.2)' : ''}`, }} src={battleManager.current.roleAarry[key][i].avatar} draggable={false} className='w-full h-full  rd-full' />}
+                                            </div>
+                                        ))}
+                                    </div>))}
+                                </div>
+                                <div className="flex flex-col gap-2 text-sm p-3">
                                     {logsTypeEnum.current.map(type => (
                                         <div key={type.value} className="cursor-pointer hover:color-amber" style={{ writingMode: 'vertical-lr' }} onClick={() => {
                                             logsType.current = type.value;
@@ -120,7 +131,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                         </div>
                                     ))}
                                 </div>
-                                <div className="text-sm text-gray-300 h-50  flex-col gap-2 items-center w-full ">
+                                <div className="text-sm text-gray-300 h-50  flex-col gap-2 items-center w-full p-3">
                                     {/* 战斗日志 VList */}
                                     <VList
                                         className="flex-1 px-4 w-full"
@@ -151,13 +162,16 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                             </div>
                         </div>
                     </div>
-                    <div className="overflow-y-hidden overflow-x-hidden  w-full relative">
+                    {arrConOpen && <div className="  flex-1 bg-gray z-6 w-full relativ overflow-x-hiddene">
                         {AarryCon}
+                    </div>}
+                    <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>
+
                         <div className="flex flex-col gap-4 flex-1 overflow-y-auto overflow-x-hidden p-4  w-full relative">
                             <div className="w-96% flex items-center justify-center gap-6 ">
                                 <div>回合：{battleManager.current.battle_data.round}</div>
                                 <div>轮数：{battleManager.current.battle_data.battle_round}</div>
-                                <div className="relative flex items-center h-10 flex-1" style={{ filter: `drop-shadow(2px 4px 4px black) ` }}>
+                                <div className="relative flex items-center h-10 flex-1 overflow-hidden" style={{ filter: `drop-shadow(2px 4px 4px black) ` }}>
                                     <div className="w-full h-0.5 bg-amber"></div>
                                     {[...battleManager.current?.cur_characters, ...battleManager.current?.cur_enemy].map((role, roleType) => {
                                         return (

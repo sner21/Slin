@@ -91,7 +91,7 @@ export const AbilitySchema = z.object({
     shield_strength: z.number().default(0),
     healing_bonus: z.number().default(0),
     //隐藏
-    reborn: z.number().default(10), //复活轮数
+    reborn: z.number().default(0), //复活轮数
 
 });
 export const CarryBuffSchema = z.record(z.object({

@@ -18,6 +18,7 @@ export class ActionGauge {
     updateGauges(characters: Character[]) {
         const gauges: number[] = []
         characters.forEach(char => {
+            if (char.state === 1) return
             gauges.push(char.imm_ability.speed)
             const currentGauge = this.gauges.get(char.id) || 0;
             const increment = char.imm_ability.speed;
