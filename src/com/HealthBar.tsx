@@ -27,7 +27,7 @@ const HealthBar: FC<HealthBarProps> = ({
         <div ref={ref} className="health-bar-container w-full flex flex-col">
             <div className="mb-2 w-full">
                 {/* 文字显示 */}
-                <div className="text-xs w-full absolute top-0 z-20 text-center text-gray-700">
+                <div className="text-xs w-full absolute top-0 z-4 text-center text-gray-700">
                     <b >
                         {type === 'mp' ? 'MP' : 'HP'}: {Math.min(Math.round(current), max)} / {max}
                     </b>

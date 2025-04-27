@@ -1,8 +1,8 @@
 import { Character } from "../char/types";
 
 export class ActionGauge {
-    private readonly MAX_GAUGE = 10000; // 行动条最大值
-    private gauges: Map<number, number>; // 记录每个角色的行动条进度
+    public MAX_GAUGE = 200; // 行动条最大值
+    public gauges: Map<number, number>; // 记录每个角色的行动条进度
 
     constructor() {
         this.gauges = new Map();
@@ -10,20 +10,23 @@ export class ActionGauge {
 
     // 初始化角色行动条
     initCharacter(characterId: number, speed: number) {
-        // 初始进度基于速度值
-        const initialGauge = speed * 100;
+        const initialGauge = speed;
         this.gauges.set(characterId, initialGauge);
     }
 
     // 更新所有角色的行动条
     updateGauges(characters: Character[]) {
+        const gauges: number[] = []
         characters.forEach(char => {
+            gauges.push(char.imm_ability.speed)
             const currentGauge = this.gauges.get(char.id) || 0;
-            const increment = char.imm_ability.speed * 100;
-            const newGauge = Math.min(currentGauge + increment, this.MAX_GAUGE);
+            const increment = char.imm_ability.speed;
+            const newGauge = currentGauge + increment;
             this.gauges.set(char.id, newGauge);
         });
+        this.MAX_GAUGE = Math.max(...gauges) * 2;
     }
+
 
     // 获取当前可以行动的角色
     getReadyCharacters(characters: Character[]): Character[] {
@@ -38,6 +41,7 @@ export class ActionGauge {
     }
     // 角色行动后重置其行动条
     resetGauge(characterId: number) {
-        this.gauges.set(characterId, 0);
+        const currentGauge = this.gauges.get(characterId) || 0;
+        this.gauges.set(characterId, currentGauge - this.MAX_GAUGE);
     }
 }

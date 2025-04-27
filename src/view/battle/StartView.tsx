@@ -5,6 +5,9 @@ import { DataCon } from "../../common/data/dataCon";
 import SaveMenu from "../../components/SaveMenu";
 import { ConfigProvider, theme } from "antd";
 import { useThrottledProxyRef } from "../../hook";
+import { BattleManager } from "../../common/tatakai";
+import ConPanel from "./ConPanel";
+import AarryCon from "../../components/battle/AarryCon";
 
 const MenuContainer = styled.div`
   ${tw`w-full h-[100vh] flex items-center justify-center`}
@@ -35,14 +38,16 @@ const MenuContent = styled.div`
     }
   }
 `;
-const globalConfig: any = {
-    autosave: false
-};
+
 
 const StartView: FC = () => {
     const [battleVisible, setBattleVisible] = useState(false);
+
     // const [mode, setMode] = useState('');
-    const data = useThrottledProxyRef(new DataCon())
+    const data = useRef(new DataCon())
+    let battleManager = useRef<BattleManager>(null);
+
+
     const [loadMode, setLoadMode] = useState(false)
     const startViewData = useThrottledProxyRef({
         mode: ''
@@ -70,10 +75,19 @@ const StartView: FC = () => {
     const [config, setConfig] = useState(data.current?.globalConfig || {});
     const [slotId, setSlotId] = useState('')
     const load = (slotId: string) => {
-        console.log(loadMode, 'loadMode.current')
         setSlotId(slotId)
+        if (battleManager.current) {
+            battleManager.current.destroy();
+            battleManager.current = null;
+        }
+        if (loadMode) {
+            data.current = new DataCon()
+            console.log('321321321')
+        }
         data.current.load(slotId, loadMode)
-        console.log(data, '加载成功')
+        console.log(data, '加载成功', slotId)
+        battleManager.current = new BattleManager(data.current)
+        setLoadMode(false)
         setMode('battle')
     }
     const refreshBet = () => {
@@ -87,9 +101,11 @@ const StartView: FC = () => {
     const setMode = (v) => {
         startViewData.mode = v
     }
+    // battle_data_info
     useEffect(() => {
         if (data.current?.globalConfig.autoload) {
             load(data.current?.globalConfig.autoload)
+            // battleManager.current = new BattleManager(data.current)
             setMode('battle')
         }
     }, [])
@@ -106,15 +122,28 @@ const StartView: FC = () => {
                     <div onClick={() => setBattleVisible(true)}>退出</div>
                 </MenuContent>}
                 {startViewData.mode === 'config' && <MenuContent>
-                    <span onClick={() => handleAutosaveToggle()}>{data.current.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
-                    <span onClick={() => handleAutoloadToggle()}>{data.current.globalConfig.autoload ? "关闭" : "开启"}自动读档</span>
+                    <span onClick={() => handleAutosaveToggle()}>{data.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
+                    <span onClick={() => handleAutoloadToggle()}>{data.globalConfig.autoload ? "关闭" : "开启"}自动读档</span>
                     <BackCon ></BackCon>
                 </MenuContent>}
-                {startViewData.mode === 'battle' && <BattleCon startViewData={startViewData} dataCon={data} refreshBet={refreshBet}>
-                </BattleCon>}
+                {startViewData.mode === 'battle' &&
+                    <BattleCon
+                        AarryCon={<AarryCon roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>}
+                        battleManageData={battleManager}
+                        controlPanel={
+                            <ConPanel
+                                battleManager={battleManager}
+                                startViewData={startViewData}
+                                dataCon={data}
+                                refreshBet={refreshBet}></ConPanel>
+                        }
+                        startViewData={startViewData}
+                        dataCon={data}
+                        refreshBet={refreshBet}>
+                    </BattleCon>}
                 {startViewData.mode === 'load' &&
                     <div style={{ width: '20%' }}>
-                        <SaveMenu dataCon={data.current} onConfirm={load}></SaveMenu>
+                        <SaveMenu dataCon={data} onConfirm={load}></SaveMenu>
                         <BackCon></BackCon>
                     </div>
                 }

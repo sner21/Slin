@@ -4,7 +4,7 @@ import cloneDeep from "lodash-es/cloneDeep";
 import { AbilitySchema, CarryBuffSchema, EffectsSchema } from "./attr";
 import { ElementType } from "..";
 import { BattleActionSchema } from "../record/type";
-import css from "styled-jsx/css";
+
 // 技能效果类型
 export const EffectType = z.enum([
   'DAMAGE',            // 伤害
@@ -86,7 +86,7 @@ export const CharacterSaveSchema = z.object({
       MISC_2: z.string().optional()
     }).default({}),
   }).default({}),
-  ability: AbilitySchema.merge(BaseStatSchema).default({  }),
+  ability: AbilitySchema.merge(BaseStatSchema).default({}),
   normal: z.string().default(SkillTypeMap.NORMAL_ATTACK.physical_normal.id),
   skill: z.array(z.string()).max(8).optional(),
   grow: z.object({
@@ -98,14 +98,14 @@ export const CharacterSaveSchema = z.object({
   }).default({}),
   //不保存的
   display: z.object({
-    frame_type: z.enum(['item', 'equip', 'troops'])
-  }).default({ frame_type: 'equip' }),
+    frame_type: z.enum(['equip', 'item', 'troops', 'skill', 'state', 'logs'])
+  }).default({ frame_type: 'skill' }),
   state: z.number().min(0).max(4).describe('1:死亡 0:存活 2:休息 3:探索 4:练级').default(0),
   imm_ability: AbilitySchema.default(AbilitySchema.parse({})),
 })
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
-
+  (data.type === "1" && (data.display.frame_type = "logs"))
   if (!data.status) {
     data.status = StatusSchema.parse({ ...cloneDeep(data.ability) });
     data.status.reborn = 0;

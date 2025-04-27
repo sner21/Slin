@@ -3,12 +3,14 @@ import StartView from "./view/battle/StartView"
 import themeConfig from "./config/theme";
 
 function App() {
+
   return (
     <ConfigProvider theme={{
       algorithm: theme.darkAlgorithm,
       token: {
         colorPrimary: themeConfig.globalAcColor,
         colorBorder: themeConfig.globalAcColor,
+        borderRadius:0,
       },
       components: {
         Segmented: {

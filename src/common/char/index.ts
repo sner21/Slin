@@ -261,9 +261,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 0,
       healing_bonus: 25,
       shield_strength: 15,
-      strength: 6,     // 较低力量
-      agility: 8,      // 中等敏捷
-      intelligence: 16, // 高智力(法师型)
+      strength: 6,     
+      agility: 8,     
+      intelligence: 16, 
     },
     blood: 100,
     ee: 0,
@@ -310,9 +310,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,    // 高力量
-      agility: 12,     // 较高敏捷
-      intelligence: 8,  // 中等智力
+      strength: 14,   
+      agility: 12,     
+      intelligence: 8, 
     },
     ac: [],
     at: [],
@@ -332,7 +332,7 @@ export const initialData = DataSchema.parse([
     avatar: makima,
     salu: '支配恶魔',
     gender: "2",
-    element: "fire", // 修正元素属性为火
+    element: "fire", 
     ac: [],
     at: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
@@ -362,9 +362,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 10,
       shield_strength: 25,
-      strength: 10,     // 中等力量
-      agility: 6,       // 较低敏捷
-      intelligence: 14,  // 高智力
+      strength: 10,   
+      agility: 6,       
+      intelligence: 14,  
     },
     blood: 100,
     ee: 0,
@@ -411,9 +411,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 10,
-      strength: 12,     // 较高力量
-      agility: 10,      // 中等敏捷
-      intelligence: 12,  // 较高智力
+      strength: 12,    
+      agility: 10,     
+      intelligence: 12,  
     },
     blood: 100,
     ee: 0,
@@ -429,7 +429,7 @@ export const initialData = DataSchema.parse([
     name: "早坂爱",
     id: '6',
     avatar: ai,
-    element: "wind", // 修正元素属性为风
+    element: "wind", 
     at: [],
     gender: "2",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
@@ -459,9 +459,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 10,
       healing_bonus: 15,
       shield_strength: 5,
-      strength: 8,      // 中等力量
-      agility: 16,      // 高敏捷
-      intelligence: 10,  // 中等智力
+      strength: 8,      
+      agility: 16,      
+      intelligence: 10,  
     },
     blood: 100,
     ee: 0,
@@ -508,9 +508,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 20,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,     // 高力量
-      agility: 10,      // 中等敏捷
-      intelligence: 8,   // 中等智力
+      strength: 14,    
+      agility: 10,     
+      intelligence: 8,  
     },
     blood: 100,
     ee: 0,
@@ -557,9 +557,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 10,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 6,      // 较低力量
-      agility: 16,      // 高敏捷
-      intelligence: 10,  // 中等智力
+      strength: 6,     
+      agility: 16,     
+      intelligence: 10,  
     },
     blood: 100,
     ee: 0,
@@ -606,9 +606,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 8,      // 中等力量
-      agility: 8,       // 中等敏捷
-      intelligence: 14,  // 高智力(法师型)
+      strength: 8,     
+      agility: 8,     
+      intelligence: 14, 
     },
     blood: 100,
     ee: 0,

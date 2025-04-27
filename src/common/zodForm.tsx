@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Card, Form, Input, InputNumber, Select } from 'antd';
 import { getNumberConstraints, zodToFormRules } from '.';
 import { get } from 'lodash-es';
+import { Component } from 'react';
 
 export const getFieldComponent = (schema: z.ZodType<any>, type?: string) => {
     const def = schema._def;
@@ -12,6 +13,17 @@ export const getFieldComponent = (schema: z.ZodType<any>, type?: string) => {
 
     if (type) def.typeName = type
     switch (def.typeName) {
+        case 'ZodBoolean':
+            return (props: any) => (
+                <Select {...props} >
+                    <Select.Option value={true}>
+                        true
+                    </Select.Option>
+                    <Select.Option value={false}>
+                        false
+                    </Select.Option>
+                </Select>
+            );
         case 'ZodNumber':
             return InputNumber;
         case 'ZodEnum':
@@ -34,7 +46,7 @@ export const getFieldComponent = (schema: z.ZodType<any>, type?: string) => {
 const convertFieldPath = (path: string): string[] => {
     return path.includes('.') ? path.split('.') : [path];
 };
-export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, label?: string, type?: string, parentPath?: string[] }, props = {}) => {
+export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, label?: string, type?: string, parentPath?: string[], slot?: Component }, props = {}) => {
     if (!info.field) return null;
     const def = schema._def;
 
@@ -47,7 +59,7 @@ export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, la
             })}</Card>);
         });
     } else {
-        const Component = getFieldComponent(schema, info.type);
+        const Component = info.slot || getFieldComponent(schema, info.type);
         const constraints = getNumberConstraints(schema);
         const description = schema._def?.description || '';
 

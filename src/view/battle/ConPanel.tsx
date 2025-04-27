@@ -11,6 +11,9 @@ import { CharacterSelector } from '../../components/CharacterSelector';
 import { cloneDeep } from 'lodash-es';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Draggable from 'react-draggable';
+import { CustomP } from '../../com/ConPanel/CustomP';
+import { useThrottledProxyRef } from '../../hook';
+
 
 type props = {
   battleManager: MutableRefObject<BattleManager>,
@@ -19,14 +22,16 @@ type props = {
   startViewData: any
   refreshBet?: () => any
 }
+
 const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet }) => {
   const modeEnum = useRef([
     { value: 'panel', label: '面板' },
-    { value: 'shop', label: '商店' },
+    // { value: 'shop', label: '商店' },
     { value: 'custom', label: '自定义' },
     { value: 'setting', label: '设置' }
   ])
   const [mode, setMode] = useState('panel')
+  const [update, setUpdate] = useState(0)
   const [characterEditorOpen, setCharacterEditorOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [loadModalOpen, setLoadModalOpen] = useState(false);
@@ -46,13 +51,13 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
       return;
     }
     setBounds({
-      left: -targetRect.left + uiData.x ,
-      right: clientWidth - (targetRect.right - uiData.x ),
-      top: -targetRect.top + uiData.y ,
-      bottom: clientHeight - (targetRect.bottom - uiData.y ),
+      left: -targetRect.left + uiData.x,
+      right: clientWidth - (targetRect.right - uiData.x),
+      top: -targetRect.top + uiData.y,
+      bottom: clientHeight - (targetRect.bottom - uiData.y),
     });
   };
-  const handleCharacterSave = async (values: any, id = null, pluginId = 1) => {
+  const handleCharacterSave = useCallback(async (values: any, id = null, pluginId = 1) => {
     try {
       const plugin = localStorage.getItem('user-plugin-' + pluginId)
       let info: any = {}
@@ -77,7 +82,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         info['role'].push(values)
       }
       // info = { ...info, ...values }
-      localStorage.setItem('user-plugin-1', JSON.stringify(info || {}))
+      localStorage.setItem('user-plugin-' + pluginId, JSON.stringify(info || {}))
       // battleManager.current.load_plugins_role(info['role'])
       // message.success('保存成功');
       refreshBet && refreshBet()
@@ -85,7 +90,8 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
     } catch (error) {
       // message.error('保存失败');
     }
-  };
+  })
+
   const handleDeleteCharacter = (id: string) => {
     try {
       const plugin = localStorage.getItem('user-plugin-1');
@@ -98,6 +104,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
       message.error('删除失败');
     }
   };
+
   const handleEditCharacter = useCallback((character: any) => {
     const data = cloneDeep({ ...character, target: null, at: null })
     setCurRoleEdit({
@@ -107,26 +114,25 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   }, []);
   const handleSave = (slotId: string) => {
     dataCon.current?.save(slotId);
-    console.log(888)
     setSaveData(dataCon.current.save_data)
   };
 
   const handleLoad = (slotId: string) => {
     dataCon.current?.load(slotId);
-    battleManager.current = new BattleManager(dataCon.current);
+    // battleManager.current = new BattleManager(dataCon.current);
   };
   return (
-    <div className='flex-1 flex flex-col gap-2'>
+    <div className='flex-1 flex flex-col gap-2 py-3'>
       <div>
         <Segmented size='middle' options={modeEnum.current} onChange={e => setMode(e)}></Segmented>
         {/* {mode.current.map((item, index) => (
           <div key={index}>{item.label}</div>
         ))} */}
       </div>
-      <div className='px-4 py-1 panel'>
+      <div className='px-1 py-1 panel'>
         {mode == 'panel' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
-          <div>{battleManager.current.battle_data.round}</div>
+          {/* <div>{battleManager.current.battle_data.round}</div> */}
           <span onClick={() => battleManager.current.pause_round()}>暂停</span>
           <span onClick={() => battleManager.current.forward_round()}>前进1回合</span>
           <span onClick={() =>
@@ -141,11 +147,13 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           <span onClick={() => setLoadModalOpen(true)}>读档</span>
           <span onClick={() => (dataCon.current.save_global_config({
             autosave: !dataCon.current.globalConfig.autosave
-          }))}>{dataCon.current.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
+          }), setUpdate(update + 1))}>{dataCon.current.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
           <span onClick={() => startViewData.mode = ''}>主菜单</span>
         </div>}
         {mode == 'custom' && <div className="flex gap-4 flex-1">
+
           <span onClick={() => setCharacterEditorOpen(true)}>编辑角色</span>
+          <CustomP battleManager={battleManager}></CustomP>
           <Modal
             title={
               <div
@@ -230,7 +238,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
             {!curRoleEdit.visible ? (
               <div className="flex-1 p-4">
                 <CharacterSelector
-                  characters={battleManager.current.characters}
+                  characters={battleManager.current.roles}
                   onEdit={handleEditCharacter}
                   onDelete={handleDeleteCharacter}
                   onAdd={() => setCurRoleEdit({
@@ -249,12 +257,12 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           </Modal>
         </div>}
       </div>
-      <SaveLoadModal
+     <SaveLoadModal
         open={saveModalOpen}
         onClose={() => setSaveModalOpen(false)}
         mode="save"
         onConfirm={handleSave}
-        dataCon={dataCon.current}
+        dataCon={dataCon}
       />
 
       <SaveLoadModal
@@ -262,7 +270,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         onClose={() => setLoadModalOpen(false)}
         mode="load"
         onConfirm={handleLoad}
-        dataCon={dataCon.current}
+        dataCon={dataCon}
       />
 
 

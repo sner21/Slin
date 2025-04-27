@@ -15,10 +15,17 @@ import keyBy from "lodash-es/keyBy";
 import { RecordManager } from "../record/record";
 import { ItemsManager } from "../items";
 import { BuffManage } from "../buff";
-import { PluginsDataSchma } from "../plugins/";
-
-
+import { z } from "zod";
+const PluginsDataSchma = z.object({
+    buff: z.any().optional(),
+    role: z.any().optional(),
+    event: z.any().optional(),
+    skill: z.any().optional(),
+    equip: z.any().optional(),
+    item: z.any().optional(),
+})
 import assignIn from "lodash-es/assignIn";
+
 // 战斗管理器
 export class BattleManager {
     round_timer: any
@@ -31,17 +38,22 @@ export class BattleManager {
     RecordManager
     ItemsManager
     enemy: Character[]
-    cur_enemy: Character
+    cur_enemy: Character[]
     characters: Character[];
+    cur_characters: Character[];
     roles: Character[] = [];
+    cur_roles: Character[] = [];
     data: Ref<Character[]>;
     globalConfig: any = {};
-    battle_data: any = {
+    init_battle_data: any = {
         cur_time: 0,
         pause: false,
         round: 0,
         time: 5000,
         cur_boss_id: '',
+        battle_round: 1,
+    };
+    battle_data: any = {
     };
     battle_id = 'init'
 
@@ -62,17 +74,39 @@ export class BattleManager {
         if (info) {
             this.battle_data = info.battle_data
             this.cooldownManager.cooldowns = info.cooldowns
-            this.cur_enemy = info.cur_enemy || data.enemy[0]
+       
+        } else {
+            this.battle_data = { ...this.init_battle_data }
         }
-        this.cur_enemy = this.battle_data.cur_boss_id ? this.roles_group[this.battle_data.cur_boss_id] : this.get_boss()
-        this.battle_data.cur_boss_id = this.cur_enemy.id
-        this.load_plugins_init().then(() => {
-            this.start_round()
-        })
+        //TODO
+        this.cur_enemy = info?.cur_enemy || data.enemy
+        this.cur_roles = this.roles
+        this.cur_characters = this.characters.slice(0, 6)
+        // this.battle_data.cur_boss_id = this.cur_enemy[0].id
+        // this.load_plugins_init().then(() => {
+        //     this.start_round()
+        // })
 
         // data.current = this
         // return this
 
+    }
+    destroy() {
+        if (this.round_timer) {
+            clearInterval(this.round_timer);
+            this.round_timer = null;
+        }
+        if (this.time_timer) {
+            clearInterval(this.time_timer);
+            this.time_timer = null;
+        }
+        // 清理其他引用
+        this.roles = [];
+        this.cur_roles = [];
+        this.characters = [];
+        this.cur_characters = [];
+        this.enemy = [];
+        this.cur_enemy = [];
     }
     init_role() {
         this.enemy = this.data.enemy
@@ -83,7 +117,7 @@ export class BattleManager {
         data.forEach(i => {
             switch (i?.type) {
                 case "0": {
-                    const charIndex = this.characters.findIndex(item => item.id===i.id)
+                    const charIndex = this.characters.findIndex(item => item.id === i.id)
                     if (charIndex >= 0) {
                         this.characters[charIndex] = assignIn(this.characters[charIndex], i)
                         // Object.keys(i).forEach(key => {
@@ -111,7 +145,7 @@ export class BattleManager {
     }
     async load_plugins_init() {
         import('../plugins/').then(res => {
-            const data = res.plugins_data
+            const data = PluginsDataSchma.parse(res.plugins_data)
             this.load_plugins(data)
         })
         Object.keys(localStorage).forEach(k => {
@@ -149,7 +183,8 @@ export class BattleManager {
     get_boss(filterId: string = '') {
         const ne = this.enemy.filter((i: { id: string; }) => i.id !== filterId)
         const index = randomInt(0, ne.length - 1)
-        return ne[index] || this.enemy[0]
+        // return ne[index] || this.enemy[0]
+        return this.enemy
     }
     forward_round() {
         this.battle_turn()
@@ -159,11 +194,11 @@ export class BattleManager {
             this.battle_data.cur_time += 100
         }, 100)
     }
-    destroy() {
-        this.pause_round()
-        this.round_timer = null
-        this.time_timer = null
-    }
+    // destroy() {
+    //     this.pause_round()
+    //     this.round_timer = null
+    //     this.time_timer = null
+    // }
     pause_round() {
         this.battle_data.pause = true
         clearTimeout(this.round_timer)
@@ -192,10 +227,15 @@ export class BattleManager {
                 char.status.hp = char.imm_ability.hp
                 char.state = 0
             }
-            if (char.type === 1) {
-                this.cur_enemy = this.get_boss(this.cur_enemy.id)
-                this.cur_enemy.status.hp = char.imm_ability.hp
-                this.cur_enemy.state = 0
+            if (char.type === "1") {
+                //TODO 
+                this.enemy.forEach(enemy => {
+                    enemy.status.hp = char.imm_ability.hp
+                    enemy.state = 0
+                })
+                // this.cur_enemy = this.get_boss(this.cur_enemy.id)
+                // this.cur_enemy.status.hp = char.imm_ability.hp
+                // this.cur_enemy.state = 0
             }
         }
         //判断HP是否归0
@@ -234,9 +274,8 @@ export class BattleManager {
     //战斗
     battle_turn() {
         this.startTurn()
-        console.log(this.roles, 11)
         // 获取当前回合可行动的角色
-        const actionOrder = this.getActionOrder(this.roles);
+        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy]);
         const actionOrderId = actionOrder.map(i => i.id)
         // console.log("可以行动的角色", actionOrderId)
 
@@ -245,13 +284,12 @@ export class BattleManager {
 
             //计算角色属性
             if (actionOrderId.includes(i.id)) {
-
-                if (i.type === 1) { // boss
-                    this.get_target(i, this.characters)
+                if (i.type === "1") { // boss
+                    this.get_target(i, this.cur_characters)
                     this.useSkill(i, i.target, i.normal)
                 } else {
-                    if (bb.state === 1) break
-                    this.get_target(i, this.enemy)
+                    // if (bb.state === 1) break
+                    this.get_target(i, this.cur_enemy)
                     //普攻
                     this.useSkill(i, i.target, i.normal)
                     //释放技能
@@ -605,18 +643,20 @@ export class BattleManager {
     }
     //回合开始
     startTurn() {
-        this.battle_data.round++
+        
         this.cooldownManager.updateCooldowns();
         this.roles.forEach(i => {
             this.calculateFinalStats(i)
             // this.set_role_status(i)
         })
+    
         this.trim_attr(this.roles)
+  
     }
     // 回合结束
     endTurn() {
         //裁剪日志
-        this.EventManager.trigger_random_event()
+        this.EventManager.trigger_random_event(this.battle_data.round)
         // 结算人物数据
         this.roles.forEach(char => {
             //结算status
@@ -624,6 +664,8 @@ export class BattleManager {
         })
         this.trim_attr(this.roles)
         this.globalConfig.autosave && this.data.save()
+        this.battle_data.round++
+     
     }
     //修整所有的溢出属性
     trim_attr(roles: Character[]) {

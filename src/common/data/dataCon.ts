@@ -11,13 +11,13 @@ export class DataCon {
     characters = initialData
     enemy = bb
     roles = [...this.characters, ...this.enemy]
-    roles_group = keyBy(this.roles, "id")
-    battle_data: any = {
-        cur_time: 0,
-        pause: false,
-        round: 0,
-        time: 5000,
-    };
+    roles_group = keyBy(this.roles, "id") 
+    // battle_data: any = {
+    //     cur_time: 0, 
+    //     pause: false,
+    //     round: 0,
+    //     time: 5000,
+    // };
     battle_data_info: any
     globalConfig = {
         autosave: true,
@@ -39,20 +39,24 @@ export class DataCon {
         this.get_save_data()
         !localStorage.getItem('default') && this.setPlugin('default')
 
-        const battleManagerGroup: Record<string, any> = {}
-        Object.keys(this.battleManagerGourp).map(k =>
-            battleManagerGroup[k] = {
-                battle_data: this.battleManagerGourp['init'].battle_data,
-                cooldowns: Object.fromEntries(this.battleManagerGourp['init'].cooldownManager.cooldowns),
-            })
+
+        this.handleInitData()
+        return this
+    }
+    handleInitData() {
+        // const battleManagerGroup: Record<string, any> = {}
+        // Object.keys(this.battleManagerGourp).map(k =>
+        //     battleManagerGroup[k] = {
+        //         battle_data: this.battleManagerGourp['init'].battle_data,
+        //         cooldowns: Object.fromEntries(this.battleManagerGourp['init'].cooldownManager.cooldowns),
+        //     })
         this.init_data = {
             characters: this.characters.map(i => CharacterSaveSchema.parse(i)),
             enemy: this.enemy.map(i => CharacterSaveSchema.parse(i)),
             roles: this.roles.map(i => CharacterSaveSchema.parse(i)),
-            battle_data_info: battleManagerGroup,
+            battle_data_info: {},
             time: Date.now()
         }
-        return this
     }
     // load_plugins_role(data) {
     //     data.forEach(i => {
@@ -85,15 +89,19 @@ export class DataCon {
             }
         } catch { }
         this.get_save_data()
+        this.handleInitData()
     }
     get_save_data() {
+        this.save_data = {}
         Object.keys(localStorage).forEach(k => {
+
             if (k.endsWith(":save")) {
                 try {
                     this.save_data[k] = JSON.parse(localStorage[k])
                 } catch { }
             }
         })
+        console.log(this.save_data, '获取存档数据123')
     }
     save_global_config(config: Record<keyof typeof this.globalConfig, any> | null = null) {
         if (config) {
@@ -116,22 +124,31 @@ export class DataCon {
             time: Date.now()
         })
         localStorage.setItem(`${device}:save`, data)
+        // console.log('存档成功', {
+        //     characters: this.characters.map(i => CharacterSaveSchema.parse(i)),
+        //     enemy: this.enemy.map(i => CharacterSaveSchema.parse(i)),
+        //     roles: this.roles.map(i => CharacterSaveSchema.parse(i)),
+        //     battle_data_info: battleManagerGroup,
+        //     time: Date.now()
+        // },device,this.battleManagerGourp,battleManagerGroup.init.battle_data.battle_round)
         this.save_global_config({
             autoload: device
         })
 
         this.get_save_data()
     }
-    async load(device = this.globalConfig.autoload, newData = false) {
+    async load(device = this.globalConfig.autoload, loadMode = false) {
         let save = localStorage.getItem(`${device}:save`) || ""
         this.save_global_config({
             autoload: device,
         });
-        if (!save || newData) {
+        if (!save || loadMode) {
             this.newData()
             save = this.init_data
+            console.log(this.init_data,'this.init_data')
         } else {
             save = JSON.parse(save)
+            console.log(this.init_data,'123')
         }
 
         this.characters = save.characters.map(i => CharacterSchema.parse(i))
@@ -144,8 +161,8 @@ export class DataCon {
                 battle_data: save.battle_data_info[k].battle_data,
                 cooldowns: new Map(Object.entries(save.battle_data_info[k].cooldowns)),
             })
+
         this.battle_data_info = battleManagerGroup
-        console.log(this.globalConfig.autoload, device, 111)
         this.globalConfig.autoload = device
         // this.data.current.cooldownManager.updateCooldowns();
         // this.data.current.roles.forEach(i => {

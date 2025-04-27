@@ -3,12 +3,17 @@ import { fixedPush, randomInt } from "..";
 import { effectsSchema } from "../char/attr";
 import { Character } from "../char/types";
 import { EventSchema } from "../record/type";
-import { BATTLE_EVENTS } from "./data";
+import { BATTLE_EVENTS, events } from './data';
 import { checkCondition, EventData, CheckCondition } from "./types";
 import get from 'lodash-es/get'
 import set from 'lodash-es/set'
 import assignIn from "lodash-es/assignIn";
 export function EventManager(dataCon) {
+    const event_info = {
+        round: 0,
+        gap: 3,
+        fluc: 2,
+    }
     const events = BATTLE_EVENTS
     let event_list = Object.values(events)
     // const roles = dataCon.roles
@@ -22,9 +27,9 @@ export function EventManager(dataCon) {
         return event
     }
     //随机事件
-    const trigger_random_event = () => {
+    const trigger_random_event = (round: number) => {
         const event = get_random_event()
-        cheak_event(event)
+        cheak_event(event, round)
     }
     const load_plugins_event = (data: any[]) => {
         data.forEach(i => {
@@ -32,11 +37,23 @@ export function EventManager(dataCon) {
         })
         event_list = Object.values(events)
     }
+    const cheak_gap = (round: number) => {
+        if (round <= event_info.gap) {
+            return false
+        } else {
+            event_info.gap = round + event_info.gap + randomInt(0, event_info.fluc)
+            return true
+        }
+    }
     //执行事件
-    const cheak_event = (event: EventData, target: Character | null = null) => {
+    const cheak_event = (event: EventData, round: number, target: Character | null = null) => {
+        if (!cheak_gap(round)) {
+            return
+        }
+        const targets = [...dataCon.cur_characters, ...dataCon.cur_enemy].filter(i => i.type === "0")
         if (!target) {
-            const index = randomInt(0, dataCon.characters.length - 1)
-            target = dataCon.characters[index]
+            const index = randomInt(0, targets.length - 1)
+            target = targets[index]
         }
         let trigger = true
 
@@ -65,7 +82,7 @@ export function EventManager(dataCon) {
             //事件日志记录
             const a = EventSchema.parse({
                 timestamp: Date.now(),
-                round: dataCon.battle_data.round  ,  //回合数
+                round: dataCon.battle_data.round,  //回合数
                 logs_type: 'event',
                 description: event.description,
                 eventId: event.id,
@@ -130,6 +147,7 @@ export function EventManager(dataCon) {
         cheak_condition_global,
         cheak_condition_role,
         cheak_event,
-        load_plugins_event
+        load_plugins_event,
+        events
     }
 }

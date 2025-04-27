@@ -44,9 +44,9 @@ const SkillItem: React.FC<SkillItemProps> = ({
     return (
         <div
             className={`
-                flex items-center w-40 gap-2 py-1.2 px-3 box-border relative rd-xl overflow-hidden
+                flex items-center w-full   gap-2  p-1 box-border relative rd-md overflow-hidden
                 border-solid border-1 border-[rgba(165,164,164,0.1)]
-                hover:bg-white/20
+                hover:bg-white/20 h-full
                 bg-[rgba(165,164,164,0.1)]
                 cursor-pointer
             `}
@@ -63,9 +63,10 @@ const SkillItem: React.FC<SkillItemProps> = ({
                 className="w-8"
                 src={skill.uri}
                 alt={skill.name}
+                style={{ filter: `drop-shadow(2px 4px 6px black) ` }}
             />
             <b
-                className="text-xs"
+                className="text-xs indent-0 break-all"
                 style={{ color: elementColors[skill.element] }}
             >
                 {skill?.name || ''}

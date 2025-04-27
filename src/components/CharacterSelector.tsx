@@ -21,7 +21,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {/* 添加新角色卡片 */}
             <Card
-                className="flex items-center justify-center cursor-pointer hover:border-orange-400"
+                className="flex items-center justify-center cursor-pointer hover:border-amber-500"
                 onClick={onAdd}
             >
                 <div className="flex flex-col items-center gap-2">
@@ -34,7 +34,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             {characters.map((character) => (
                 <Card
                     key={character.id}
-                    className="relative hover:border-orange-400 cursor-pointer"
+                    className="relative hover:border-amber-500 cursor-pointer"
                     onClick={() => onEdit(character)}
                     cover={
                         <div className="h-32 flex items-center justify-center bg-gray-100">
@@ -46,7 +46,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                                     className="max-h-full max-w-full object-cover"
                                 />
                             ) : (
-                                <div className="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
+                                <div className="w-full h-full  bg-gray-300 flex items-center justify-center">
                                     {character.name?.[0] || '?'}
                                 </div>
                             )}
@@ -61,7 +61,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                             cancelText="取消"
 
                         >
-                            <DeleteOutlined className="cursor-pointer text-red-500 hover:text-red-600 text-6" />
+                            <DeleteOutlined className="cursor-pointer text-amber-500 hover:text-amber-600 text-6" />
                         </Popconfirm>
                     </div>
 
