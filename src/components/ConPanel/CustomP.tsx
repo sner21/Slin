@@ -6,6 +6,7 @@ import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 import ItemEditor from '../ItemEditor';
 import { BattleManager } from '../../common/tatakai';
 import { cloneDeep } from 'lodash-es';
+
 interface ShopEditorProps {
     formRef?: React.MutableRefObject<FormInstance | undefined>;
     onSave?: (values: any) => void;
@@ -91,9 +92,9 @@ export const CustomP: React.FC<ShopEditorProps> = ({
     return (
         <>
             <span onClick={() => (modalInfo.current.title = '编辑物品', setCharacterEditorOpen(true))}>编辑物品</span>
-            <span onClick={() => (modalInfo.current.title = '编辑事件', setCharacterEditorOpen(true))}>编辑事件</span>
-            <span onClick={() => (modalInfo.current.title = '编辑技能', setCharacterEditorOpen(true))}>编辑技能</span>
-            <span onClick={() => (modalInfo.current.title = '编辑装备', setCharacterEditorOpen(true))}>编辑装备</span>
+            <span onClick={() => (modalInfo.current.title = '编辑事件', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑事件</span>
+            <span onClick={() => (modalInfo.current.title = '编辑技能', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑技能</span>
+            <span onClick={() => (modalInfo.current.title = '编辑装备', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑装备</span>
 
             <Modal
                 title={

@@ -3,7 +3,7 @@ import tw, { styled } from "twin.macro";
 import BattleCon from "./BattleCon";
 import { DataCon } from "../../common/data/dataCon";
 import SaveMenu from "../../components/SaveMenu";
-import { ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme, InputNumber } from 'antd';
 import { useThrottledProxyRef } from "../../hook";
 import { BattleManager } from "../../common/tatakai";
 import ConPanel from "./ConPanel";
@@ -47,7 +47,7 @@ const StartView: FC = () => {
     // const [mode, setMode] = useState('');
     const data = useRef(new DataCon())
     let battleManager = useRef<BattleManager>(null);
-
+    const [update, setUpdate] = useState(0)
     const [arrConOpen, setArrConOpen] = useState(false)
     const [loadMode, setLoadMode] = useState(false)
     const startViewData = useThrottledProxyRef({
@@ -67,11 +67,13 @@ const StartView: FC = () => {
         data.current?.save_global_config({
             autosave: !data.current.globalConfig.autosave,
         });
+        setUpdate(update + 1)
     }
     const handleAutoloadToggle = () => {
         data.current?.save_global_config({
             autoload: !data.current.globalConfig.autoload,
         });
+        setUpdate(update + 1)
     }
     const [config, setConfig] = useState(data.current?.globalConfig || {});
     const [slotId, setSlotId] = useState('')
@@ -121,11 +123,15 @@ const StartView: FC = () => {
                     // }
                 })
             })
-          
+
             battleManager.current.update_cur()
             battleManager.current.update_array()
             setArrConOpen(false)
         }
+    }
+    const changeTime = (v: number | null) => {
+        data.current.globalConfig.time = v || 5000
+        setUpdate(update + 1)
     }
     // battle_data_info
     useEffect(() => {
@@ -149,8 +155,13 @@ const StartView: FC = () => {
                     <div onClick={() => setBattleVisible(true)}>退出</div>
                 </MenuContent>}
                 {startViewData.mode === 'config' && <MenuContent>
-                    <span onClick={() => handleAutosaveToggle()}>{data.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
-                    <span onClick={() => handleAutoloadToggle()}>{data.globalConfig.autoload ? "关闭" : "开启"}自动读档</span>
+                    <span onClick={() => handleAutosaveToggle()}>{data.current.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
+                    <span onClick={() => handleAutoloadToggle()}>{data.current.globalConfig.autoload ? "关闭" : "开启"}自动读档</span>
+                    <div className="flex items-center gap-6">
+                        <span>初始回合时间 </span>
+                        <InputNumber size="large" style={{ background: 'transparent' }} value={data.current.globalConfig.time} onChange={v => changeTime(v)}></InputNumber>
+                    </div>
+
                     <BackCon ></BackCon>
                 </MenuContent>}
                 {startViewData.mode === 'battle' &&

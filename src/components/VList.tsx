@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import './v.css'
+import { throttle } from 'lodash-es';
 interface Position {
     index: number;
     top: number;
@@ -15,6 +16,7 @@ interface VListProps {
     bufferSize?: number;
     rowKey?: string;
     children: (props: { at: any }) => React.ReactNode;
+    gap?: number
 }
 
 const VList: React.FC<VListProps> = ({
@@ -23,7 +25,8 @@ const VList: React.FC<VListProps> = ({
     estimatedItemHeight = 50,
     bufferSize = 5,
     rowKey = 'id',
-    children
+    children,
+    gap = 5000
 }) => {
     const listRef = useRef<HTMLDivElement>(null);
     const positionsRef = useRef<Position[]>([]);
@@ -48,9 +51,9 @@ const VList: React.FC<VListProps> = ({
 
     // 当数据变化时重新初始化
     useEffect(() => {
-        initPositions();
-        handleScroll();
-    }, [data,data.at(0)?.id]);
+        throttle(initPositions, gap)();
+        throttle(handleScroll, gap)();
+    }, [data, data.at(0)?.id]);
 
     // 初始化位置信息
     const initPositions = useCallback(() => {
@@ -139,7 +142,7 @@ const VList: React.FC<VListProps> = ({
     // 计算总高度 - 使用 calculateTotalHeight
     const totalHeight = useMemo(() => {
         return calculateTotalHeight();
-    }, [calculateTotalHeight, data.length, version]);
+    }, [data.length]);
 
     // 可见数据 - 添加 version 依赖
     const visibleData = useMemo(() => {
@@ -168,7 +171,7 @@ const VList: React.FC<VListProps> = ({
         initPositions();
         handleScroll();
         batchUpdate();
-    }, [data, estimatedItemHeight, initPositions, handleScroll, batchUpdate]);
+    }, [data, estimatedItemHeight, initPositions, handleScroll]);
 
     // 处理元素高度变化
     const handleItemResize = useCallback((item: any, el: HTMLElement | null) => {
@@ -215,7 +218,7 @@ const VList: React.FC<VListProps> = ({
 
             <div
                 className="absolute left-0 right-0 top-0"
-                style={{ transform: `translateY(${startOffset}px)` }}
+                style={{ transform: `translateY(${startOffset}px)`, paddingBottom: "40px" }}
             >
                 {visibleData.map((item) => (
                     <div

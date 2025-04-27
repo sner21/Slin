@@ -83,7 +83,7 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
     element: "thunder", // 角色元素属性
     ability: {
       // 基础属性
-      hp: 100000, // 生命上限
+      hp: 220, // 生命上限
       shield: 0,  // 护盾
       attack: 20,    // 攻击力
       defense: 2,  // 防御力
@@ -114,8 +114,11 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       index: 4
     },
     grow: {
-      level: 50,
-      rarity: 5, // 角色稀有度
+      level: 1,
+      rarity: 5, 
+      strength: 1,
+      agility: 1,
+      intelligence: 1,
     },
     skill: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
@@ -129,7 +132,7 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
     element: "fire", // 角色元素属性
     ability: {
       // 基础属性
-      hp: 100000, // 生命上限
+      hp: 120, // 生命上限
       shield: 0,  // 护盾
       attack: 20,    // 攻击力
       defense: 2,  // 防御力
@@ -157,8 +160,11 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       intelligence: 10, // 
     },
     grow: {
-      level: 50,
-      rarity: 5, // 角色稀有度
+      level: 1,
+      rarity: 5, 
+      strength: 1,
+      agility: 1,
+      intelligence: 1,
     },
     skill: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,

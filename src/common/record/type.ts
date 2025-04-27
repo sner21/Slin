@@ -49,8 +49,8 @@ export const GlobalSchema = z.object({
 // 定义战斗行为记录结构
 export const BattleActionSchema = z.object({
     // 基础信息
-    skillId: z.string().optional(),          // 使用的技能ID
-    skillName: z.string().default("未知"),          // 使用的技能ID
+    skillId: z.string().optional(),          
+    skillName: z.string().default("未知"),          
     skillType: SkillType.optional(),         // 技能类型
     elementalBonus: z.number().default(1),      // 元素克制倍率
     // 伤害相关
@@ -63,8 +63,8 @@ export const BattleActionSchema = z.object({
         mp: z.number().default(0),
     }),
     isCrit: z.boolean().default(false),          // 是否暴击
-    element: ElementType,         // 元素类型
-    effectType: EffectType,       // 效果类型（伤害/治疗/护盾等）
+    element: ElementType,         
+    effectType: EffectType,       
     isEvaded: z.boolean().default(false),        // 是否被闪避
     attacker: z.object({
         type: z.string(),

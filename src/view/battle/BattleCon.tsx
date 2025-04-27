@@ -14,10 +14,24 @@ import { SkillCooldown } from "../../common/skill/cooldown";
 import HealthBar from "../../components/HealthBar";
 import SkillItem from "../../components/SkillItem";
 import { ConfigProvider, Popover, Segmented, theme } from "antd"
-import SkillForm from '../../components/SkillForm';
-import ConPanel from "./ConPanel";
-import { DataCon } from "../../common/data/dataCon";
-import AarryCon from "../../components/battle/AarryCon";
+import tw, { styled } from 'twin.macro';
+const BreatheDiv = styled.div`
+${tw`flex justify-center flex-col items-center`}
+animation: breathe 2s ease-in-out infinite;
+/* transition: ease 0.8s all; */
+@keyframes breathe {
+  0%, 100% {
+    border-color: rgb(247 53 53  / 0.2);
+    box-shadow:  0 0 100px rgb(247 53 53 / 0.1);
+  }
+  50% {
+    border-color: rgb(251 191 36);
+    box-shadow: 0 0 20px rgb(247 53 53  / 0.4),
+                inset 0 0 100px rgb(2247 53 53 / 0.4);
+  }
+}
+`;
+
 
 function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageData, AarryCon, arrConOpen }) {
     const coldData = useRef<Map<number, SkillCooldown[]>>();
@@ -112,14 +126,22 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                             {controlPanel}
                             <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
                                 <div className="w-160 flex gap-6 border-r-amber border-2 border-r-solid">
+                                    {/* 战斗阵型图 */}
                                     {[battleManager.current.characters, battleManager.current.enemy].map((item, key) => (<div className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
-                                        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                                            <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className=' flex justify-center hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
-                                            >
-                                                {battleManager.current.roleAarry[key] && battleManager.current.roleAarry[key][i] && battleManager.current.roleAarry[key][i].id &&
-                                                    <img style={{ ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black) ${battleManager.current?.roles_group[battleManager.current.roleAarry[key][i].id].state === 1 ? 'saturate(0.2)' : ''}`, }} src={battleManager.current.roleAarry[key][i].avatar} draggable={false} className='w-full h-full  rd-full' />}
-                                            </div>
-                                        ))}
+                                        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
+                                            const role = battleManager.current?.roles_group[battleManager.current.roleAarry[key][i]?.id || ""]
+                                            return (
+                                                <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className='overflow-hidden flex justify-center relative hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
+                                                >
+                                                    <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-2" style={{ display: role?.status?.reborn && role.type === "0" ? "" : "none" }}>
+                                                        <b className="absolute  left-50% top-50% text-2xl  -translate-y-50% -translate-x-50%  color-black">{role?.status?.reborn}</b>
+                                                    </div>
+                                                    <BreatheDiv className="absolute w-full h-full z-2" style={{ display: battleManager.current.targetArray[key].includes(i) && role?.state !== 1 ? "" : "none" }}></BreatheDiv>
+                                                    {role && battleManager.current.roleAarry[key] && battleManager.current.roleAarry[key][i] && battleManager.current.roleAarry[key][i].id &&
+                                                        <img style={{ ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black) ${role.state === 1 ? 'saturate(0.2)' : ''}`, }} src={role.avatar} draggable={false} className='w-full h-full  rd-full' />}
+                                                </div>
+                                            )
+                                        })}
                                     </div>))}
                                 </div>
                                 <div className="flex flex-col gap-2 text-sm p-3">
@@ -140,12 +162,16 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                         estimatedItemHeight={20}
                                         bufferSize={10}
                                         rowKey="id"
+                                        gap={battleManager.current.battle_data.time}
                                     >
                                         {({ at }) => (
                                             <>
                                                 {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
                                                     <span className="text-base">
-                                                        {at.attacker.name} -&gt; {at.defender.name} -&gt; <span>{SkillMap[at.skillId]?.name || ""}</span> -&gt; {at.damage.hp}点
+                                                        {at.attacker.name} -&gt; {at.defender.name} -&gt;
+                                                         <span style={{ color: elementColors[at.element] }}> {SkillMap[at.skillId]?.name || ""}</span>   
+                                                         {<span style={{display:at.elementalBonus!==1?"":"none"}}> * {at.elementalBonus}</span>} -&gt;  
+                                                        <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded?"被闪避":at.damage.hp}</span> 
                                                     </span>
                                                 )}
                                                 {(logsType.current === 'event' || at.logs_type === 'event') && (
@@ -169,6 +195,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
 
                         <div className="flex flex-col gap-4 flex-1 overflow-y-auto overflow-x-hidden p-4  w-full relative">
                             <div className="w-96% flex items-center justify-center gap-6 ">
+                                {/* 行动条 */}
                                 <div>回合：{battleManager.current.battle_data.round}</div>
                                 <div>轮数：{battleManager.current.battle_data.battle_round}</div>
                                 <div className="relative flex items-center h-10 flex-1 overflow-hidden" style={{ filter: `drop-shadow(2px 4px 4px black) ` }}>
@@ -176,7 +203,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                     {[...battleManager.current?.cur_characters, ...battleManager.current?.cur_enemy].map((role, roleType) => {
                                         return (
                                             <>
-                                                {<div className="w-12 h-12 rounded-md inline-block absolute top-0 right-0 transition-all-1000" key={role.id} style={{ left: ((1 - battleManager.current?.actionGauge.gauges.get(role.id) / battleManager.current?.actionGauge.MAX_GAUGE) * 100) + '%' }}>
+                                                {<div className="w-12 h-12 rounded-md inline-block absolute top-0 right-0 transition-all-1000" key={role.id} style={{ left: ((1 - battleManager.current?.actionGauge.gauges.get(role.id) / battleManager.current?.actionGauge.MAX_GAUGE) * 100) + '%', display: role.state === 1 ? "none" : "" }}>
                                                     <img
                                                         className="w-10 h-10  rounded-full box-border"
                                                         style={{
@@ -213,8 +240,8 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             border: `4px solid ${elementColors[item.element]}`,
                                                             shapeOutside: 'circle(50%)',
                                                             float: "right",
-                                                            filter: `drop-shadow(2px 4px 12px black) ${item.state ? 'saturate(0.2)' : ''}`
-
+                                                            filter: `drop-shadow(2px 4px 12px black) ${item.state ? 'saturate(0.2)' : ''}`,
+                                                            boxShadow: `0 0 10px ${elementColors[item.element]}, inset 0 0 10px ${elementColors[item.element]} `
                                                         }}
                                                         src={item.avatar}
                                                         alt=""

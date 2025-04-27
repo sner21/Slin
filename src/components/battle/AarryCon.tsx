@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import tw, { styled } from "twin.macro";
 import ReactMarkdown from 'react-markdown';
-import { getMirrorPosition } from '../../common';
+import { elementColors, getMirrorPosition } from '../../common';
 import cloneDeep from 'lodash-es/cloneDeep';
 
 
@@ -24,15 +24,19 @@ ${tw`flex justify-center flex-col items-center p-4`}
 `;
 const BreatheImg = styled.img`
 ${tw`flex justify-center flex-col items-center`}
-
+box-sizing:border-box;
 @keyframes breatheFit {
     0%, 100% {
-        border-color: rgb(251 191 36);
+        /* border:0px; */
+        /* border-color:transparent; */
+        /* border-color: rgb(251 191 36); */
     box-shadow: 0 0 20px rgb(251 191 36 / 0.8),
                 inset 0 0 10px rgb(251 191 36 / 0.5);
   }
   50% {
-    border-color: rgb(251 191 36);
+    /* border:0px; */
+    /* border-color:transparent; */
+    /* border-color: rgb(251 191 36); */
     box-shadow: 0 0 20px rgb(251 191 36 / 0.8),
                 inset 0 0 10px rgb(251 191 36 / 0.5);
   }
@@ -141,7 +145,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         if (type !== curRole.type) {
             const list = [...roleData]
             list[curRole.type].splice(curRole.device, 1)
-            list[type].push({ ...curRole.data, type: type+"" })
+            list[type].push({ ...curRole.data, type: type + "" })
             setRoleData(list)
             const a = {}
             Object.keys(roleAarry[curRole.type]).forEach((key) => {
@@ -181,14 +185,14 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                 {
                     roleData.map((item, key) => (
                         <div className='flex gap-4 h-full flex-1 items-center justify-around' style={{ flexDirection: key ? "row-reverse" : "" }}>
-                            <BreatheDiv className='flex flex-col gap-2 ' style={{ "animation": curRole.id && curRole.type !== key ? "breathe 2s ease-in-out infinite" : "" }}>
+                            <BreatheDiv className='flex flex-col gap-2 rd-md' style={{ "animation": curRole.id && curRole.type !== key ? "breathe 2s ease-in-out infinite" : "" }}>
                                 <span>角色数： {item.length}</span>
                                 <div className='grid grid-cols-4 grid-rows-6 w-80 h-120 gap-0' onClick={(e) => switchRole(e, key)}>
                                     {item?.map((role, index) => (
                                         <div className='flex justify-center items-center aspect-square rd-full  border-box p-2 cursor-pointer border-1 border-solid border-transparent'
                                             onClick={(e) => (e.stopPropagation(), selectRole(role, key, index))} >
                                             <BreatheImg style={{
-                                                ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black)`, animation: curRole.id === role.id ? "breatheFit 2s ease-in-out infinite" : ""
+                                                ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black)`, border: `${elementColors[role.element]} 1px solid`,  boxShadow: curRole.id === role.id ?  `0 0 20px ${elementColors[role.element]}, inset 0 0 10px ${elementColors[role.element]} `: ""
                                             }}
                                                 src={role.avatar} draggable={false} className='w-full h-full  rd-full' />
                                         </div>
@@ -196,7 +200,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                                 </div>
                             </BreatheDiv>
                             <div>
-                                <div className='grid grid-cols-3 grid-rows-3 w-90 h-90 gap-4 p-4' onClick={(e) => (e.stopPropagation())} style={{ "animation": curRole.id && curRole.type === key ? "breathe 2s ease-in-out infinite" : "" }}>
+                                <div className='grid grid-cols-3 grid-rows-3 w-90 h-90 gap-4 p-8 rd-xl' onClick={(e) => (e.stopPropagation())} style={{ "animation": curRole.id && curRole.type === key ? "breathe 2s ease-in-out infinite" : "" }}>
                                     {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                                         <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className=' flex justify-center hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
                                             onClick={(e) => (e.stopPropagation(), setPo(curRole.id ? curRole : roleAarry[key][i], i, key))} >
@@ -209,8 +213,8 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                     ))
                 }
             </div>
-            <div className='text-center h-20'>
-                <span className='text-lg cursor-pointer ' onClick={() => handleConfirm()}>确定阵容</span>
+            <div className='text-center h-16'>
+                <span className='text-lg cursor-pointer hover:color-amber' onClick={() => handleConfirm()}>确定阵容</span>
             </div>
 
 

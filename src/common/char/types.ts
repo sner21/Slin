@@ -31,10 +31,10 @@ export const BaseStatSchema = z.object({
 });
 // 成长率定义
 export const GrowthRateSchema = z.object({
-  strength: z.number().min(0).default(0),
-  agility: z.number().min(0).default(0),
-  intelligence: z.number().min(0).default(0)
-}).optional();
+  strength: z.number().min(0).default(0.2),
+  agility: z.number().min(0).default(0.2),
+  intelligence: z.number().min(0).default(0.2)
+}).default({});
 
 export const CharacterDisplaySchema = z.object({
   at: ActionSchema.default([]),

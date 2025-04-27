@@ -56,7 +56,10 @@ export class BattleManager {
     battle_data: any = {
     };
     battle_id = 'init'
-
+    targetArray = {
+        "0": [],
+        "1": []
+    }
     constructor(data: DataCon) {
         this.data = data
         this.characters = data.characters
@@ -72,6 +75,7 @@ export class BattleManager {
         this.globalConfig = data.globalConfig;
         this.data.battleManagerGourp[this.battle_id] = this
         this.roleAarry = {}
+        this.init_battle_data.time = this.globalConfig.time
         const info = data.battle_data_info && data.battle_data_info[this.battle_id]
         if (info) {
             this.battle_data = info.battle_data
@@ -106,6 +110,12 @@ export class BattleManager {
         this.cur_characters = [];
         this.enemy = [];
         this.cur_enemy = [];
+    }
+    init_target_array() {
+        this.targetArray = {
+            "0": [],
+            "1": []
+        }
     }
     init_role() {
         this.enemy = this.data.enemy
@@ -143,10 +153,10 @@ export class BattleManager {
         this.roles_group = keyBy(this.roles, "id")
     }
     async load_plugins_init() {
-        if(!import.meta.env.BUILD_PLUGINS) return
+        if (!import.meta.env.BUILD_PLUGINS) return
         const plugins = await import.meta.glob('../plugins/*');
         const add_plugins = await import.meta.glob('./plugins/*');
-        Object.keys({...plugins, ...add_plugins}).forEach(k => {
+        Object.keys({ ...plugins, ...add_plugins }).forEach(k => {
             import(k).then(res => {
                 const data = PluginsDataSchma.parse(res.default)
                 this.load_plugins(data)
@@ -226,29 +236,30 @@ export class BattleManager {
             this.cooldownManager.initCharacter(char.id);
         });
     }
+    char_reborn(char: Character) {
+        char.status!.hp = char.imm_ability.hp
+        char.status!.mp = char.imm_ability.mp
+        char.state = 0
+        char.description = ""
+    }
     //结算角色当前数据
     set_role_status(char: Character) {
         if (!char.status) return
-        //判断HP是否死亡
-        if (char.state === 1) {
+        //判断HP是否死亡 
+        //TODO 另一个模式不判断char.type
+        if (char.state === 1 && char.type !== "1") {
             char.status.reborn -= 1
+            //复活
             if (char.status.reborn <= 0) {
-                char.status.hp = char.imm_ability.hp
-                char.state = 0
+                this.char_reborn(char)
             }
-            // if (char.type === "1") {
-            //     //TODO 
-            //     this.enemy.forEach(enemy => {
-            //         enemy.status.hp = char.imm_ability.hp
-            //         enemy.state = 0
-            //     })
-            // }
         }
         //判断HP是否归0
         if (char.status.hp <= 1) {
-            console.log(char.name, '死亡', char.state, char.status.reborn)
-            char.status.hp = 1
+            char.status.hp = 0
+            char.status.mp = 0
             char.state = 1
+            char.description = "正在休息"
             if (!char.status.reborn || char.status?.reborn <= 0) {
                 char.status.reborn = 10
             }
@@ -278,35 +289,84 @@ export class BattleManager {
     get_target(role: Character, enemy: Character[]) {
         const aliveEnemies = enemy.filter(e => e.state !== 1);
         if (aliveEnemies.length === 0) return;
+
         const attackerPos = role.position?.index || 0;
-        let target;
-        // 前排优先攻击对方前排，中排优先中排，后排优先后排
-        const attackerRow = Math.floor(attackerPos / 3);
-        // 按照优先级对敌人进行排序
-        const sortedEnemies = aliveEnemies.sort((a, b) => {
-            const posA = a.position?.index || 0;
-            const posB = b.position?.index || 0;
-            const rowA = Math.floor(posA / 3);
-            const rowB = Math.floor(posB / 3);
-            // 计算与攻击者所在排的距离
-            const distA = Math.abs(rowA - attackerRow);
-            const distB = Math.abs(rowB - attackerRow);
-            // 优先选择同排的目标，其次是距离最近的排
-            if (distA !== distB) {
-                return distA - distB;
-            }
-            return Math.random() - 0.5;
+        const attackerRow = Math.floor(attackerPos / 3);  // 0:前排, 1:中排, 2:后排
+
+        // 获取敌方各排的存活单位
+        const enemyRows = {
+            front: aliveEnemies.filter(e => Math.floor((e.position?.index || 0) / 3) === 0),
+            middle: aliveEnemies.filter(e => Math.floor((e.position?.index || 0) / 3) === 1),
+            back: aliveEnemies.filter(e => Math.floor((e.position?.index || 0) / 3) === 2)
+        };
+
+        // 计算每列的保护情况
+        const columnProtection = [0, 1, 2].map(col => {
+            const hasProtection = {
+                front: enemyRows.front.some(e => (e.position?.index || 0) % 3 === col),
+                middle: enemyRows.middle.some(e => (e.position?.index || 0) % 3 === col),
+                back: enemyRows.back.some(e => (e.position?.index || 0) % 3 === col)
+            };
+            return hasProtection;
         });
-        target = sortedEnemies[0];
-        //前排有30%概率直接攻击后排
-        if (attackerRow === 0 && Math.random() < 0.3) {
-            const backlineEnemies = aliveEnemies.filter(e =>
-                Math.floor((e.position?.index || 0) / 3) === 2
-            );
-            if (backlineEnemies.length > 0) {
-                target = backlineEnemies[randomInt(0, backlineEnemies.length - 1)];
+
+        let targetPool: Character[] = [];
+        let weights: number[] = [];
+
+        // 为每个存活的敌人计算权重
+        aliveEnemies.forEach(enemy => {
+            const enemyPos = enemy.position?.index || 0;
+            const enemyRow = Math.floor(enemyPos / 3);  // 0:前排, 1:中排, 2:后排
+            const enemyCol = enemyPos % 3;
+            const protection = columnProtection[enemyCol];
+
+            let weight = 0;
+
+            // 基础权重设置
+            if (enemyRow === attackerRow) {
+                weight = 60; // 同排基础权重
+            } else if (Math.abs(enemyRow - attackerRow) === 1) {
+                weight = 30; // 相邻排基础权重
+            } else {
+                weight = 10; // 远排基础权重
+            }
+
+            // 根据保护情况调整权重
+            if (enemyRow === 2) { // 后排
+                if (!protection.front && !protection.middle) {
+                    weight *= 3; // 无保护，大幅提高权重
+                } else if (!protection.front || !protection.middle) {
+                    weight *= 2; // 部分保护，适度提高权重
+                }
+            } else if (enemyRow === 1) { // 中排
+                if (!protection.front) {
+                    weight *= 2; // 无前排保护，提高权重
+                }
+            }
+
+            // 如果是前排，保持原有权重
+            targetPool.push(enemy);
+            weights.push(weight);
+        });
+
+        // 根据权重随机选择目标
+        const totalWeight = weights.reduce((a, b) => a + b, 0);
+        let random = Math.random() * totalWeight;
+        let target: Character | undefined;
+
+        for (let i = 0; i < weights.length; i++) {
+            random -= weights[i];
+            if (random <= 0) {
+                target = targetPool[i];
+                break;
             }
         }
+
+        // 保底选择
+        if (!target) {
+            target = aliveEnemies[0];
+        }
+
         role.target = target;
     }
     update_cur() {
@@ -337,7 +397,6 @@ export class BattleManager {
                 }
             })
         });
-        console.log(this.roleAarry, 'this.roleAarr')
     }
     //战斗
     battle_turn() {
@@ -352,17 +411,16 @@ export class BattleManager {
 
             //计算角色属性
             if (actionOrderId.includes(i.id)) {
-                if (i.type === "1") { // boss
+                if (i.type === "1") {
                     this.get_target(i, this.cur_characters)
-                    this.useSkill(i, i.target, i.normal)
                 } else {
-                    // if (bb.state === 1) break
                     this.get_target(i, this.cur_enemy)
-                    //普攻
-                    this.useSkill(i, i.target, i.normal)
-                    //释放技能
-                    this.get_round_ack(i, i.target)
                 }
+                if (!i.target) {
+                    continue
+                }
+                this.useSkill(i, i.target, i.normal)
+                this.get_round_ack(i, i.target)
                 // 标记行动完成
                 this.finishAction(i);
             }
@@ -450,10 +508,12 @@ export class BattleManager {
         // 基础属性
         let stats: Character['ability'] = { ...character.ability };
         const { level, rarity, growthRates } = character.grow
+
         // 先计算基础三维属性影响的派生属性
         growthRates && Object.keys(growthRates).forEach(k => {
-            stats[k] += level * rarity / 50 * (growthRates && growthRates[k] || 0)
+            stats[k] += level * rarity * 100 * (growthRates && growthRates[k] || 0)
         })
+
         // 计算派生属性
         stats = {
             ...stats,
@@ -710,15 +770,28 @@ export class BattleManager {
     }
     //回合开始
     startTurn() {
-
         this.cooldownManager.updateCooldowns();
+        this.init_target_array()
         this.roles.forEach(i => {
             this.calculateFinalStats(i)
+            i.target?.position?.index && this.targetArray[i.target?.type]?.push(i.target.type === "1" ? getMirrorPosition(i.target.position.index) : i.target.position.index)
             // this.set_role_status(i)
         })
-
         this.trim_attr(this.roles)
 
+    }
+    check_enemy() {
+        const check = this.cur_enemy.every(enemy => {
+            console.log(enemy.state, 'check')
+            return enemy.state === 1
+        })
+        if (check) {
+            this.enemy.forEach(enemy => {
+                enemy.grow.level++
+                this.char_reborn(enemy)
+            })
+            this.battle_data.battle_round++
+        }
     }
     // 回合结束
     endTurn() {
@@ -730,6 +803,7 @@ export class BattleManager {
             this.set_role_status(char)
         })
         this.trim_attr(this.roles)
+        this.check_enemy()
         this.update_cur()
         this.globalConfig.autosave && this.data.save()
         this.battle_data.round++

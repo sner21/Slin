@@ -11,7 +11,7 @@ export class DataCon {
     characters = initialData
     enemy = bb
     roles = [...this.characters, ...this.enemy]
-    roles_group = keyBy(this.roles, "id") 
+    roles_group = keyBy(this.roles, "id")
     // battle_data: any = {
     //     cur_time: 0, 
     //     pause: false,
@@ -22,6 +22,7 @@ export class DataCon {
     globalConfig = {
         autosave: true,
         autoload: 'auto',
+        time: 5000,
     };
     init_data = {}
     save_data = {}
@@ -144,10 +145,10 @@ export class DataCon {
         if (!save || loadMode) {
             this.newData()
             save = this.init_data
-            console.log(this.init_data,'this.init_data')
+            console.log(this.init_data, 'this.init_data')
         } else {
             save = JSON.parse(save)
-            console.log(this.init_data,'123')
+            console.log(this.init_data, '123')
         }
 
         this.characters = save.characters.map(i => CharacterSchema.parse(i))
