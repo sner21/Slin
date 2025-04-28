@@ -1,7 +1,8 @@
+import { z } from 'zod';
 import { Equipment } from '../index';
 
 // 饰品类装备数据
-export const accessories: Equipment[] = [
+export const accessories: Equipment[]= [
     {
         id: 'ancient_necklace_01',
         name: '远古项链',

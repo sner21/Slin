@@ -44,12 +44,12 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   const [isAvatarLocal, setIsAvatarLocal] = useState(false);
   const handleFinish = useCallback((values: any) => {
     if (initialValues?.id) {
-      values.itemId = initialValues.itemId
+      values.id = initialValues.id
       values = assignIn(initialValues, values)
     } else {
-      values.itemId = uuidv4();
+      values.id = uuidv4();
     }
-    onSave(ItemBaseSchema.parse(values), values.itemId);
+    onSave(ItemBaseSchema.parse(values), values.id);
   }, [onSave]);
   const [avatars, setAvatars] = useState<string[]>([]);
   useEffect(() => {

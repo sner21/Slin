@@ -3,8 +3,9 @@ import { ItemBaseSchema } from "../type";
 
 export const items_medic = [
     {
-        itemId: "1",
+        id: "1",
         name: "生命药水",
+        cost: 50,
         effects: [{
             target: 'attacker',
             path: 'status',
@@ -20,8 +21,9 @@ export const items_medic = [
         description: "生命药水",
     },
     {
-        itemId: "4",
+        id: "4",
         name: "全能药剂",
+        cost: 50,
         effects: [
             {
                 target: 'attacker',
@@ -46,8 +48,9 @@ export const items_medic = [
         description: "恢复大量生命值和魔法值，并提升攻击力",
     },
     {
-        itemId: "med_001",
+        id: "med_001",
         name: "小型生命药水",
+        cost: 50,
         effects: [{
             target: 'attacker',
             path: 'status',
@@ -60,8 +63,9 @@ export const items_medic = [
         description: "恢复50点生命值",
     },
     {
-        itemId: "med_002",
+        id: "med_002",
         name: "中型生命药水",
+        cost: 50,
         effects: [{
             target: 'attacker',
             path: 'status',
@@ -78,8 +82,9 @@ export const items_medic = [
         description: "恢复150点生命值，并获得持续回复效果",
     },
     {
-        itemId: "med_003",
+        id: "med_003",
         name: "魔力恢复药剂",
+        cost: 50,
         effects: [{
             target: 'attacker',
             path: 'status',
@@ -96,8 +101,9 @@ export const items_medic = [
         description: "恢复80点魔法值，并获得魔力回复效果",
     },
     {
-        itemId: "med_005",
+        id: "med_005",
         name: "战斗药剂",
+        cost: 50,
         effects: [{
             target: 'attacker',
             path: 'status',

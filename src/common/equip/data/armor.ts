@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Equipment } from '../index';
 
 // 防具类装备数据

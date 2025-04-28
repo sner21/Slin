@@ -91,6 +91,7 @@ export function EventManager(dataCon) {
                     name: target!.name,
                     id: target!.id.toString(),
                 },
+                hidden: event.hidden
             })
             dataCon.RecordManager.fixedPush(dataCon.RecordManager.logsDataSchma, 'event', a)
             // const at = {

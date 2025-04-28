@@ -37,7 +37,7 @@ const SkillItem: React.FC<SkillItemProps> = ({
     if (!skill?.id) return null;
 
     const handleClick = () => {
-        onUseSkill(item, bb, skill?.id);
+        onUseSkill && onUseSkill(item, bb, skill?.id);
         updateRemaining();
     };
 

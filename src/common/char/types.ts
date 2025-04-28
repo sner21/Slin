@@ -47,9 +47,10 @@ export const CharacterStatusSchema = z.object({
 
 export const StatusSchema = z.object({
   damage: z.number().min(0).default(0),
-  hp: z.number().min(0).default(100),
-  mp: z.number().min(0).default(100),
-  reborn: z.number().min(0).default(0),
+  hp: z.number().min(0).optional(),
+  mp: z.number().min(0).optional(),
+  reborn: z.number().min(0).optional(),
+  find_gap: z.number().min(0).optional(),
 });
 
 // Save相关的Schema
@@ -63,8 +64,8 @@ export const CharacterSaveSchema = z.object({
   count: z.number().min(0).default(1), // 角色拥有数量
   element: ElementType,
   gender: z.enum(["0", "1", "2"]).describe('0:无,1:男,2:女').default("0"), // 1 男 2女
-  position:z.object({
-    index:z.number().optional(),//阵型
+  position:z.object({ //阵型
+    index:z.number().optional(),
   }).default({}),
   description: z.string().optional(),
   status: StatusSchema.optional(),
@@ -95,9 +96,9 @@ export const CharacterSaveSchema = z.object({
   grow: z.object({
     level: z.number().min(0).max(50).default(1), // 角色等级
     exp: z.number().min(0).default(0), // 当前经验值
-    tem_exp: z.number().min(0).default(0),
+    // tem_exp: z.number().min(0).default(0),
     growthRates: GrowthRateSchema, // 成长率
-    rarity: RaritySchema.min(0).max(5).default(5), // 角色稀有度
+    rarity: RaritySchema.min(0).max(5).default(1), // 角色稀有度
   }).default({}),
   //不保存的
   display: z.object({
@@ -108,7 +109,7 @@ export const CharacterSaveSchema = z.object({
 })
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
-  (data.type === "1" && (data.display.frame_type = "logs"))
+  (data.type === "1"  && (data.display.frame_type = "logs"))
   if (!data.status) {
     data.status = StatusSchema.parse({ ...cloneDeep(data.ability) });
     data.status.reborn = 0;

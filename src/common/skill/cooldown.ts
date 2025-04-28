@@ -6,22 +6,22 @@ export interface SkillCooldown {
 
 // 角色技能冷却状态
 export interface CharacterCooldowns {
-    characterId: number;
+    characterId: string;
     cooldowns: SkillCooldown[];
 }
 
 export class CooldownManager {
-    public cooldowns: Map<number, SkillCooldown[]> = new Map();
+    public cooldowns: Map<string, SkillCooldown[]> = new Map();
 
     // 初始化角色的冷却管理
-    initCharacter(characterId: number) {
+    initCharacter(characterId: string) {
         if (!this.cooldowns.has(characterId)) {
             this.cooldowns.set(characterId, []);
         }
     }
 
     // 使用技能时添加冷却
-    startCooldown(characterId: number, skillId: string, duration: number) {
+    startCooldown(characterId: string, skillId: string, duration: number) {
         const charCooldowns = this.cooldowns.get(characterId) || [];
         charCooldowns.push({
             skillId,
@@ -31,13 +31,13 @@ export class CooldownManager {
     }
 
     // 检查技能是否在冷却中
-    isOnCooldown(characterId: number, skillId: string): boolean {
+    isOnCooldown(characterId: string, skillId: string): boolean {
         const charCooldowns = this.cooldowns.get(characterId) || [];
         return charCooldowns.some(cd => cd.skillId === skillId && cd.remainingTurns > 0);
     }
 
     // 获取技能剩余冷却回合
-    getRemainingCooldown(characterId: number, skillId: string): number {
+    getRemainingCooldown(characterId: string, skillId: string): number {
         const charCooldowns = this.cooldowns?.get(characterId) || [];
         const cooldown = charCooldowns.find(cd => cd.skillId === skillId);
         return cooldown?.remainingTurns || 0;
@@ -59,7 +59,7 @@ export class CooldownManager {
     }
 
     // 重置指定角色的所有冷却
-    resetCharacterCooldowns(characterId: number) {
+    resetCharacterCooldowns(characterId: string) {
         this.cooldowns.set(characterId, []);
     }
 

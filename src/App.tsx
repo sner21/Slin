@@ -1,6 +1,7 @@
 import { ConfigProvider, theme } from "antd"
 import StartView from "./view/battle/StartView"
 import themeConfig from "./config/theme";
+import { DialogProvider } from './components/DialogManager';
 
 function App() {
 
@@ -23,8 +24,11 @@ function App() {
         },
       }
     }}>
-      <StartView>
-      </StartView></ConfigProvider>
+      
+      <DialogProvider>
+        <StartView />
+      </DialogProvider>
+      </ConfigProvider>
   )
 
 }

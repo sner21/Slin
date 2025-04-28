@@ -24,7 +24,7 @@ type props = {
   refreshBet?: () => any
 }
 
-const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet ,setArrConOpen}) => {
+const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet, setArrConOpen }) => {
   const modeEnum = useRef([
     { value: 'panel', label: '面板' },
     // { value: 'shop', label: '商店' },
@@ -37,6 +37,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [loadModalOpen, setLoadModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const [pause, setPause] = useState(false);
   const [saveData, setSaveData] = useState(dataCon.current.save_data);
   const characterFormRef = useRef<FormInstance>();
   const draggleRef = useRef<HTMLDivElement>(null!);
@@ -125,25 +126,25 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
   };
   return (
     <div className='flex-1 flex flex-col gap-2 py-3'>
-      <div>
+      <div className='flex items-center'>
         <Segmented size='middle' options={modeEnum.current} onChange={e => setMode(e)}></Segmented>
         {/* {mode.current.map((item, index) => (
           <div key={index}>{item.label}</div>
         ))} */}
+        <span onClick={() => setHelpModalOpen(true)} className='ml-auto mr-4 cursor-pointer text-sm'>游戏说明</span>
       </div>
       <div className='px-1 py-1 panel'>
         {mode == 'panel' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
           {/* <div>{battleManager.current.battle_data.round}</div> */}
           <span onClick={() => setArrConOpen(true)}>队伍</span>
-          <span onClick={() => battleManager.current.pause_round()}>暂停</span>
-          <span onClick={() => battleManager.current.forward_round()}>前进回合</span>
-          <span onClick={() =>
+          {!pause ? <span onClick={() => (battleManager.current.pause_round(), setPause(true))}>暂停</span> : <span onClick={() =>
             !battleManager.current.round_timer ||
             (battleManager.current.battle_data.pause = false) ||
-            battleManager.current.start_round(battleManager.current.battle_data.cur_time)
-          }>恢复</span>
-          <span onClick={() => setHelpModalOpen(true)}>帮助</span>
+            (battleManager.current.start_round(battleManager.current.battle_data.cur_time), setPause(false))
+          }>恢复</span>}
+          <span onClick={() => battleManager.current.forward_round()}>前进回合</span>
+
         </div>}
         {mode == 'setting' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
@@ -155,7 +156,6 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           <span onClick={() => startViewData.mode = ''}>主菜单</span>
         </div>}
         {mode == 'custom' && <div className="flex gap-4 flex-1">
-
           <span onClick={() => setCharacterEditorOpen(true)}>编辑角色</span>
           <CustomP battleManager={battleManager}></CustomP>
           <Modal

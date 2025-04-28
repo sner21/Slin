@@ -15,6 +15,9 @@ import HealthBar from "../../components/HealthBar";
 import SkillItem from "../../components/SkillItem";
 import { ConfigProvider, Popover, Segmented, theme } from "antd"
 import tw, { styled } from 'twin.macro';
+import ItemShop from "../../components/ShopContent";
+import { useDialog } from "../../components/DialogManager";
+import { v4 as uuidv4 } from 'uuid';
 const BreatheDiv = styled.div`
 ${tw`flex justify-center flex-col items-center`}
 animation: breathe 2s ease-in-out infinite;
@@ -77,6 +80,14 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     useEffect(() => {
         coldData.current = battleManager.current?.cooldownManager.cooldowns;
         getRemainingCooldown.current = battleManager.current?.cooldownManager;
+
+         openDialog({
+            id: `item-${uuidv4()}`,
+            title: "123",
+            initialSize: { width: 320, height: 400 },
+            content: (<div>12311111111111111111111111111111111111111111111111111</div>),
+        })
+
     }, []);
     // 鼠标位置追踪
     useEffect(() => {
@@ -112,7 +123,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         showTooltipContent.current = false;
         currentItem.current = null;
     };
-
+    const { openDialog } = useDialog();
 
     return (
         <ConfigProvider theme={{
@@ -127,13 +138,13 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                             <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
                                 <div className="w-160 flex gap-6 border-r-amber border-2 border-r-solid">
                                     {/* 战斗阵型图 */}
-                                    {[battleManager.current.characters, battleManager.current.enemy].map((item, key) => (<div className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
+                                    {[battleManager.current.cur_characters, battleManager.current.cur_enemy].map((item, key) => (<div className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
                                         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
                                             const role = battleManager.current?.roles_group[battleManager.current.roleAarry[key][i]?.id || ""]
                                             return (
                                                 <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className='overflow-hidden flex justify-center relative hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
                                                 >
-                                                    <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-2" style={{ display: role?.status?.reborn && role.type === "0" ? "" : "none" }}>
+                                                    <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-2" style={{ display: role?.status?.reborn && role.type !== "1" && battleManager.current.battle_data.game_mode === "0" ? "" : "none" }}>
                                                         <b className="absolute  left-50% top-50% text-2xl  -translate-y-50% -translate-x-50%  color-black">{role?.status?.reborn}</b>
                                                     </div>
                                                     <BreatheDiv className="absolute w-full h-full z-2" style={{ display: battleManager.current.targetArray[key].includes(i) && role?.state !== 1 ? "" : "none" }}></BreatheDiv>
@@ -164,25 +175,25 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                         rowKey="id"
                                         gap={battleManager.current.battle_data.time}
                                     >
-                                        {({ at }) => (
+                                        {({ at }) => (!at.hidden && (
                                             <>
                                                 {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
-                                                    <span className="text-base">
+                                                    <span className="text-sm">
                                                         {at.attacker.name} -&gt; {at.defender.name} -&gt;
-                                                         <span style={{ color: elementColors[at.element] }}> {SkillMap[at.skillId]?.name || ""}</span>   
-                                                         {<span style={{display:at.elementalBonus!==1?"":"none"}}> * {at.elementalBonus}</span>} -&gt;  
-                                                        <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded?"被闪避":at.damage.hp}</span> 
+                                                        <span style={{ color: elementColors[at.element] }}> {SkillMap[at.skillId]?.name || ""}</span>
+                                                        {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>} -&gt;
+                                                        <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : at.damage.hp}</span>
                                                     </span>
                                                 )}
                                                 {(logsType.current === 'event' || at.logs_type === 'event') && (
                                                     <div>
-                                                        <span className="text-base">
+                                                        <span className="text-sm">
                                                             {at.round} 回合 -&gt; {template(at.description)(at)}
                                                         </span>
                                                     </div>
                                                 )}
                                             </>
-                                        )}
+                                        ))}
                                     </VList>
                                 </div>
                             </div>
@@ -378,6 +389,9 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             </div>
                                                             {/* 物品栏部分-&gt;转换样式 */}
                                                             <div className="p-2 bg-[#1a1a1aad] rounded-lg w-fit" style={{ display: item.display.frame_type === "item" ? "" : "none" }}>
+                                                                <div className="pb-1 flex items-center">
+                                                                    <span className="ml-auto mr-2 text-xs"> Currency：{item.carry.currency.toFixed(0) || 0}</span>
+                                                                </div>
                                                                 <div className="grid grid-cols-7 gap-2 w-fit">
                                                                     {inventory.current.map((i, index) => {
                                                                         const ii = item.carry.items[index] || null

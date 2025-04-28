@@ -2,14 +2,14 @@ import { Character } from "../char/types";
 
 export class ActionGauge {
     public MAX_GAUGE = 200; // 行动条最大值
-    public gauges: Map<number, number>; // 记录每个角色的行动条进度
+    public gauges: Map<string, number>; // 记录每个角色的行动条进度
 
     constructor() {
         this.gauges = new Map();
     }
 
     // 初始化角色行动条
-    initCharacter(characterId: number, speed: number) {
+    initCharacter(characterId: string, speed: number) {
         const initialGauge = speed;
         this.gauges.set(characterId, initialGauge);
     }
@@ -41,7 +41,7 @@ export class ActionGauge {
         return this.getReadyCharacters(characters).map(i => i.id)
     }
     // 角色行动后重置其行动条
-    resetGauge(characterId: number) {
+    resetGauge(characterId: string) {
         const currentGauge = this.gauges.get(characterId) || 0;
         this.gauges.set(characterId, currentGauge - this.MAX_GAUGE);
     }

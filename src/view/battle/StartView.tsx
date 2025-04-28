@@ -112,6 +112,7 @@ const StartView: FC = () => {
             Object.keys(v2).forEach(type => {
                 Object.keys(v2[type]).forEach(k => {
                     const role = v2[type][k]
+                    console.log('role.id',role.id)
                     if (!role.id) return
                     if (!battleManager.current.roles_group[role.id].position) battleManager.current.roles_group[role.id].position = {}
                     const index = type == "1" ? getMirrorPosition(role.index) : role.index

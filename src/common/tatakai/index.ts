@@ -15,7 +15,7 @@ import keyBy from "lodash-es/keyBy";
 import { RecordManager } from "../record/record";
 import { ItemsManager } from "../items";
 import { BuffManage } from "../buff";
-import { z } from "zod";
+import { z, number } from 'zod';
 const PluginsDataSchma = z.object({
     buff: z.any().optional(),
     role: z.any().optional(),
@@ -25,26 +25,27 @@ const PluginsDataSchma = z.object({
     item: z.any().optional(),
 })
 import assignIn from "lodash-es/assignIn";
+import { isNumber } from "lodash-es";
 
 // 战斗管理器
 export class BattleManager {
     round_timer: any
     time_timer: any
-    roles_group;
+    roles_group: Record<string, Character> = {};
     cooldownManager: CooldownManager;
     actionGauge: ActionGauge;
     EventManager
     BuffManage
     RecordManager
     ItemsManager
-    enemy: Character[]
-    cur_enemy: Character[]
+    enemy: Character[] = []
+    cur_enemy: Character[] = []
     characters: Character[];
-    cur_characters: Character[];
+    cur_characters: Character[] = [];
     roles: Character[] = [];
     data: Ref<Character[]>;
     globalConfig: any = {};
-    roleAarry: {}
+    roleAarry: any = {}
     init_battle_data: any = {
         cur_time: 0,
         pause: false,
@@ -52,6 +53,7 @@ export class BattleManager {
         time: 5000,
         cur_boss_id: '',
         battle_round: 1,
+        game_mode: "0"
     };
     battle_data: any = {
     };
@@ -122,7 +124,7 @@ export class BattleManager {
         this.roles = this.data.roles
         this.roles_group = this.data.roles_group
     }
-    load_plugins_role(data) {
+    load_plugins_role(data: Character[]) {
         data.forEach(i => {
             switch (i?.type) {
                 case "0": {
@@ -169,7 +171,7 @@ export class BattleManager {
         // })
         Object.keys(localStorage).forEach(k => {
             if (k.startsWith('user-plugin-')) {
-                const data = PluginsDataSchma.parse(JSON.parse(localStorage.getItem(k)))
+                const data = PluginsDataSchma.parse(JSON.parse(localStorage.getItem(k) || ""))
                 this.load_plugins(data)
             }
         })
@@ -242,39 +244,122 @@ export class BattleManager {
         char.state = 0
         char.description = ""
     }
+    settle_exp(char: Character) {
+        const baseExp = char.grow.level * 20
+        const rarityBonus = char.grow.rarity * 0.2 + 0.8
+        const exp = Math.floor(baseExp * rarityBonus)
+
+        const team = char.type === "0" ? this.cur_characters : this.cur_enemy
+        const teamSizeModifier = 1 + Math.log10(team.length)
+        const average_exp = Math.floor(exp / teamSizeModifier)
+
+        team.forEach(role => {
+            this.gain_exp(role, average_exp)
+        })
+
+        // 同时触发金钱获取
+        this.settle_currency(char, team)
+    }
+
+    /**
+     * 角色获得经验并处理升级
+     */
+    private gain_exp(role: Character, exp: number) {
+        role.grow.exp += exp
+
+        while (true) {
+            const baseExpNeed = role.grow.level * role.grow.level * 50
+            const rarityModifier = role.grow.rarity * 0.15 + 0.85
+            const exp_need = Math.floor(baseExpNeed * rarityModifier)
+
+            if (role.grow.exp >= exp_need) {
+                role.grow.exp = role.grow.exp - exp_need
+                role.grow.level += 1
+            } else {
+                break
+            }
+        }
+    }
+
+    /**
+     * 计算并分配金钱
+     */
+    private settle_currency(char: Character, team: Character[]) {
+        const baseCurrency = char.grow.level * 5
+        const currencyRarityBonus = char.grow.rarity * 0.1 + 0.9
+        const teamSizeModifier = 1 + Math.log10(team.length)
+        const currency = Math.floor(baseCurrency * currencyRarityBonus / teamSizeModifier)
+
+        team.forEach(role => {
+            role.carry.currency = Math.floor((role.carry.currency || 0) + currency)
+        })
+    }
+
+    auto_gain_exp(role: Character) {
+        if (role.state !== 1) {
+            const baseExp = 2
+            const rarityBonus = role.grow.rarity * 0.1 + 0.9
+            const gainExp = Math.floor(baseExp * rarityBonus)
+
+            role.grow.exp += gainExp
+
+            while (true) {
+                const baseExpNeed = role.grow.level * role.grow.level * 50
+                const rarityModifier = role.grow.rarity * 0.15 + 0.85
+                const exp_need = Math.floor(baseExpNeed * rarityModifier)
+
+                if (role.grow.exp >= exp_need) {
+                    role.grow.exp = role.grow.exp - exp_need
+                    role.grow.level += 1
+                } else {
+                    break
+                }
+            }
+        }
+
+    }
+
     //结算角色当前数据
     set_role_status(char: Character) {
         if (!char.status) return
         //判断HP是否死亡 
         //TODO 另一个模式不判断char.type
-        if (char.state === 1 && char.type !== "1") {
-            char.status.reborn -= 1
+        if (char.state === 1 && char.type !== "1" && this.battle_data.game_mode === "0" && this.battle_data.game_mode === "0") {
+            char.status.reborn! -= 1
             //复活
-            if (char.status.reborn <= 0) {
+            if (char.status.reborn! <= 0) {
                 this.char_reborn(char)
             }
         }
-        //判断HP是否归0
-        if (char.status.hp <= 1) {
+        //死亡
+        if (char.status.hp! <= 1) {
+            if (char.state === 0) {
+                //结算经验
+                if (!(this.battle_data.game_mode === "0" && char.type === "1")) {
+                    this.settle_exp(char)
+                }
+            }
             char.status.hp = 0
             char.status.mp = 0
             char.state = 1
             char.description = "正在休息"
             if (!char.status.reborn || char.status?.reborn <= 0) {
-                char.status.reborn = 10
+                char.status.reborn = char.ability.reborn || 10
             }
+
+
         }
         if (char.state === 0) {
             // 处理所有角色的回复
-            char.status.hp = Math.min(char.status.hp + char.imm_ability.hp_re, char.imm_ability.hp)
-            char.status.mp = Math.min(char.status.mp + char.imm_ability.mp_re, char.imm_ability.mp)
+            char.status.hp = Math.min(char.status.hp! + char.imm_ability.hp_re, char.imm_ability.hp)
+            char.status.mp = Math.min(char.status.mp! + char.imm_ability.mp_re, char.imm_ability.mp)
         }
     }
     //随机选择1个攻击目标
     random_attack_select(data: any[], count = 0) {
         const index = randomInt(0, data.length - 1);
         const t = this.characters[index];
-        while (t.status.hp <= 0) {
+        while (t.status!.hp! <= 0) {
             count += 1
             if (count >= data.length) {
                 return {
@@ -291,7 +376,7 @@ export class BattleManager {
         if (aliveEnemies.length === 0) return;
 
         const attackerPos = role.position?.index || 0;
-        const attackerRow = Math.floor(attackerPos / 3);  // 0:前排, 1:中排, 2:后排
+        const attackerRow = Math.floor(attackerPos / 3);  // 0 前排, 1 中排, 2 后排
 
         // 获取敌方各排的存活单位
         const enemyRows = {
@@ -391,7 +476,6 @@ export class BattleManager {
                         id: role.id,
                         type: k,
                         avatar: role.avatar,
-                        data: role.data,
                         index: index,
                     }
                 }
@@ -408,20 +492,25 @@ export class BattleManager {
 
         for (const key in actionOrder) {
             const i = actionOrder[key]
-
             //计算角色属性
-            if (actionOrderId.includes(i.id)) {
-                if (i.type === "1") {
-                    this.get_target(i, this.cur_characters)
+            if (isNumber(i.status?.find_gap) && actionOrderId.includes(i.id)) {
+                //索敌
+                if (i.ability.find_gap === i.status.find_gap || Number(i.target?.state) === 1) {
+                    if (i.type === "1") {
+                        this.get_target(i, this.cur_characters)
+                    } else {
+                        this.get_target(i, this.cur_enemy)
+                    }
+                    // i.status.find_gap = i.ability.find_gap
+                    i.status.find_gap = 0
                 } else {
-                    this.get_target(i, this.cur_enemy)
+                    i.status.find_gap += 1
                 }
                 if (!i.target) {
                     continue
                 }
                 this.useSkill(i, i.target, i.normal)
                 this.get_round_ack(i, i.target)
-                // 标记行动完成
                 this.finishAction(i);
             }
             //获取所有角色事件
@@ -492,13 +581,13 @@ export class BattleManager {
                 break
             }
         }
-        if (effect.attr === 'hp' && effect.target === 'defender' && sourceId && targetId && target !== 'global') {
+        if (effect.attr === 'hp' && effect.target === 'defender' && sourceId && targetId /* && target !== 'global' */) {
             this.compute_damage(sourceId, targetId, value)
         }
     }
     //计算贡献
     compute_damage(sourceId: string | number, targetId: string | number, value: number) {
-        this.roles_group[sourceId].status.damage += value
+        this.roles_group[sourceId].status && (this.roles_group[sourceId].status.damage += value)
         this.roles_group[sourceId].carry.currency += (value * this.roles_group[targetId].grow.rarity * this.roles_group[targetId].grow.level / 1000000)
         //TODO ? 临时经验
         // this.roles_group[sourceId].grow.tem_exp += (value * this.roles_group[targetId].grow.rarity)
@@ -511,7 +600,7 @@ export class BattleManager {
 
         // 先计算基础三维属性影响的派生属性
         growthRates && Object.keys(growthRates).forEach(k => {
-            stats[k] += level * rarity * 100 * (growthRates && growthRates[k] || 0)
+            stats[k as keyof typeof stats] += level * rarity * 50 * (growthRates && growthRates[k as keyof typeof growthRates] || 0)
         })
 
         // 计算派生属性
@@ -546,8 +635,8 @@ export class BattleManager {
                 if (equipId && EquipmentMap[equipId]) {
                     const equip = EquipmentMap[equipId];
                     // 叠加装备属性
-                    Object.entries(equip.stats).forEach(([key, value]) => {
-                        stats[key] = Math.round((stats[key] || 0) + value);
+                    (Object.entries(equip.stats) as [keyof typeof stats, string][]).forEach(([key, value]) => {
+                        stats[key] = Math.round((stats[key] || 0) + Number(value));
                     });
                 }
             });
@@ -782,7 +871,6 @@ export class BattleManager {
     }
     check_enemy() {
         const check = this.cur_enemy.every(enemy => {
-            console.log(enemy.state, 'check')
             return enemy.state === 1
         })
         if (check) {
@@ -799,6 +887,7 @@ export class BattleManager {
         this.EventManager.trigger_random_event(this.battle_data.round)
         // 结算人物数据
         this.roles.forEach(char => {
+            this.auto_gain_exp(char)
             //结算status
             this.set_role_status(char)
         })

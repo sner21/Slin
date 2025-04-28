@@ -8,7 +8,7 @@ import { Character } from "../char/types";
 import assignIn from "lodash-es/assignIn";
 export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
     //读取预设
-    const ItemsData = z.record(ItemBaseSchema).parse(keyBy(items_data, 'itemId'))
+    const ItemsData = z.record(ItemBaseSchema).parse(keyBy(items_data, 'id'))
     const use_item = (role: Character, id: string, index: string) => {
         const item = ItemsData[id]
         item.effects.forEach(effect => {
@@ -25,7 +25,7 @@ export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
     }
     const load_plugins_item = (data: ItemBaseSchema[]) => {
         data.forEach(i => {
-            ItemsData[i.itemId] = assignIn(ItemsData[i.itemId], i)
+            ItemsData[i.id] = assignIn(ItemsData[i.id], i)
         })
     }
     return {

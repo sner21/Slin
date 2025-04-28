@@ -92,7 +92,7 @@ export const AbilitySchema = z.object({
     healing_bonus: z.number().default(0),
     //隐藏
     reborn: z.number().default(0), //复活轮数
-
+    find_gap: z.number().default(3), //索敌间隔
 });
 export const CarryBuffSchema = z.record(z.object({
     buffId: z.string(),

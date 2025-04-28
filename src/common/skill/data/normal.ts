@@ -18,7 +18,7 @@ export const NORMAL_ATTACK: Record<string, Skill> = {
     // },
     physical_normal: {
         id: 'physical_normal',
-        name: '物理普通攻击',
+        name: '物理普攻',
         type: 'NORMAL_ATTACK',
         description: '普通物理攻击',
         targetType: 'SINGLE',
@@ -32,7 +32,7 @@ export const NORMAL_ATTACK: Record<string, Skill> = {
     },
     magic_normal: {
         id: 'magic_normal',
-        name: '魔法普通攻击',
+        name: '魔法普攻',
         type: 'NORMAL_ATTACK',
         description: '普通魔法攻击',
         targetType: 'SINGLE',

@@ -29,8 +29,9 @@ export const EventData = z.object({
     effects: z.array(EffectsSchema).default([]),
     probability: z.number().optional().default(100), //触发概率
     // conditionType: z.union([z.enum(['all']),targetSchema]).default('all'),
-    buffs:z.any().optional(),
+    buffs: z.any().optional(),
     conditions: z.array(CheckCondition).optional(),
+    hidden: z.boolean().default(false)
 });
 // 检查函数
 export function checkCondition(condition: z.infer<typeof CheckCondition>, value: number): boolean {

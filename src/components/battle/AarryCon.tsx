@@ -53,14 +53,16 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         avatar?: string,
         device?: number
         data?: any
+        index?: number
     }>({
         type: "",
         id: "",
         avatar: "",
         device: 0,
-        data: null
+        data: null,
     })
     const handleConfirm = () => {
+        console.log('roleAarry', roleAarry)
         onConfirm(roleData, roleAarry)
 
     }
@@ -89,7 +91,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         if (!role) selectRole(role, type, index)
         if (!curRole.id) {
             const device = roleData[type].findIndex(i => i.id === role.id)
-            device >= 0 && selectRole(role, type, device)
+            device >= 0 && selectRole(role, type, device, index)
         }
         // if (!curRole.id) return setRoleAarry({
         //     ...roleAarry,
@@ -102,12 +104,16 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         if (curRole.id) {
             const a = {}
             roleAarry[type] && Object.keys(roleAarry[type]).forEach((key) => {
-                if (roleAarry[type][key].id === role.id) {
+                if (roleAarry[type][key]?.id === role.id) {
                     a[type] = {
-                        [key]: {}
+                        [key]: roleAarry[type][index] || {},
+                    }
+                    if (role.index) {
+                        a[type][key].index = role.index
                     }
                 }
             })
+
             setRoleAarry({
                 ...roleAarry,
                 [type]: {
@@ -128,13 +134,14 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
 
 
     }
-    const selectRole = (role: never, key: string, device: number) => {
+    const selectRole = (role: never, key: string, device: number, index: number) => {
         const r = {
             type: key,
             id: role.id,
             avatar: role.avatar,
             device: device,
-            data: role.data || role
+            data: role.data || role,
+            index,
         }
         setCurRole(r)
         return r
@@ -192,7 +199,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                                         <div className='flex justify-center items-center aspect-square rd-full  border-box p-2 cursor-pointer border-1 border-solid border-transparent'
                                             onClick={(e) => (e.stopPropagation(), selectRole(role, key, index))} >
                                             <BreatheImg style={{
-                                                ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black)`, border: `${elementColors[role.element]} 1px solid`,  boxShadow: curRole.id === role.id ?  `0 0 20px ${elementColors[role.element]}, inset 0 0 10px ${elementColors[role.element]} `: ""
+                                                ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black)`, border: `${elementColors[role.element]} 1px solid`, boxShadow: curRole.id === role.id ? `0 0 20px ${elementColors[role.element]}, inset 0 0 10px ${elementColors[role.element]} ` : ""
                                             }}
                                                 src={role.avatar} draggable={false} className='w-full h-full  rd-full' />
                                         </div>
