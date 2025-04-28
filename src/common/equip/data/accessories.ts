@@ -9,6 +9,7 @@ export const accessories: Equipment[]= [
         type: 'NECKLACE',
         level: 1,
         rarity: 4,
+        cost: 50,
         description: '蕴含远古力量的项链，提供全面的属性加成',
         stats: {
             hp: 50,
@@ -22,6 +23,7 @@ export const accessories: Equipment[]= [
         id: 'power_ring_01',
         name: '力量之戒',
         type: 'RING',
+        cost: 50,
         level: 1,
         rarity: 4,
         description: '增强佩戴者力量的魔法戒指',
@@ -37,6 +39,7 @@ export const accessories: Equipment[]= [
         name: '守护者腰带',
         type: 'BELT',
         level: 1,
+        cost: 50,
         rarity: 4,
         description: '提供额外防护的魔法腰带',
         stats: {
@@ -51,6 +54,7 @@ export const accessories: Equipment[]= [
         name: '风暴之翼',
         type: 'BACK',
         level: 1,
+        cost: 50,
         rarity: 4,
         description: '由风暴元素凝聚而成的翅膀，提供强大的机动性',
         stats: {

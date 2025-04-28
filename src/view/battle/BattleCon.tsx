@@ -13,7 +13,7 @@ import VList from "../../components/VList";
 import { SkillCooldown } from "../../common/skill/cooldown";
 import HealthBar from "../../components/HealthBar";
 import SkillItem from "../../components/SkillItem";
-import { ConfigProvider, Popover, Segmented, theme } from "antd"
+import { ConfigProvider, message, Popover, Segmented, theme } from "antd"
 import tw, { styled } from 'twin.macro';
 import ItemShop from "../../components/ShopContent";
 import { useDialog } from "../../components/DialogManager";
@@ -40,6 +40,10 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     const coldData = useRef<Map<number, SkillCooldown[]>>();
     const data = useThrottledProxyRef(dataCon.current);
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
+    const [curRole, setCurRole] = useState<Character | { id: string, carry: any }>({
+        id: "",
+        carry: {}
+    })
     useEffect(() => {
         // battleManager.current = battleManageData.current
         battleManageData.current.load_plugins_init().then(() => {
@@ -47,9 +51,10 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         })
         console.log(battleManager.current, ' battleManager.current', data)
     }, [])
+    const { openDialog, updateDialog, closeDialog } = useDialog();
 
     const itemsManager = useThrottledProxyRef(battleManager.current?.ItemsManager?.ItemsData);
-    const logsType = useThrottledProxyRef('event');
+    const logsType = useThrottledProxyRef('tatakai');
     const inventory = useRef<any[]>(Array(28).fill(null));
     const showTooltipContent = useRef(false);
     const currentItem = useRef(null);
@@ -68,28 +73,99 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     //         windowResize()
     //     })
     // })
-    // 添加新的 ref
+
     const logsTypeEnum = useRef<z.infer<typeof LogsType>[]>([
-        { value: 'event', label: '事件' },
         { value: 'tatakai', label: '对战' },
+        { value: 'event', label: '事件' },
         { value: 'status', label: '状态' },
         { value: 'settle', label: '结算' },
         { value: 'global', label: '全局' },
     ]);
+    const ItemShopRef =
+        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} key={curRole.id} id={curRole.id}
+            data={{
+                ITEM: Object.values(battleManager.current?.ItemsManager.ItemsData) || [],
+                EQUIP: battleManager.current?.ItemsManager.equipmentsData || [],
+            }}></ItemShop></div>
+
     const getRemainingCooldown = useRef();
+    const onPurchaseItem = (itemId: string, quantity: number, cls: string) => {
+        if (!curRole.carry) {
+            curRole.carry = { currency: 0, items: {} };
+        }
+        let item
+        if (cls === "ITEM") {
+            item = battleManager.current?.ItemsManager.ItemsData[itemId] || {};
+        } else {
+            item = battleManager.current?.ItemsManager.equipmentsDataMap[itemId] || {};
+        }
+        const totalCost = Math.floor((item!.cost || 0) * quantity);
+        let targetSlot: number | null = null;
+        const MAX_SLOTS = 28;
+        const MAX_STACK = 99;
+        for (const [slot, item] of Object.entries(curRole.carry.items)) {
+            if (item?.id === itemId && (item.count + quantity <= MAX_STACK && cls === "ITEM")) {
+                targetSlot = Number(slot);
+                break;
+            }
+        }
+        if (targetSlot === null) {
+            for (let i = 1; i <= MAX_SLOTS; i++) {
+                if (!curRole.carry.items[i]?.id) {
+                    targetSlot = i;
+                    break;
+                }
+            }
+        }
+        if (targetSlot === null) {
+            message.error('物品栏已满');
+            return;
+        }
+        curRole.carry.currency = Math.floor((curRole.carry.currency || 0) - totalCost);
+        if (!curRole.carry.items[targetSlot]?.id) {
+            curRole.carry.items[targetSlot] = {
+                id: item.id,
+                count: quantity,
+                cls: cls,
+                type: item.type
+            };
+        } else {
+            curRole.carry.items[targetSlot].count += quantity;
+        }
+    }
+    const openShop = (id = "") => {
+        if (id) {
+            setCurRole(battleManager.current?.roles_group[id])
+        } else {
+            setCurRole({ id: "" })
+        }
+        closeDialog(`item-shop`)
+        openDialog({
+            id: `item-shop`,
+            title: "商店",
+            initialSize: { width: 800, height: 600 },
+            minWidth: 800,
+            minHeight: 500,
+            content: (ItemShopRef),
+        })
+    }
     useEffect(() => {
         coldData.current = battleManager.current?.cooldownManager.cooldowns;
         getRemainingCooldown.current = battleManager.current?.cooldownManager;
 
-         openDialog({
-            id: `item-${uuidv4()}`,
-            title: "123",
-            initialSize: { width: 320, height: 400 },
-            content: (<div>12311111111111111111111111111111111111111111111111111</div>),
-        })
-
+        return () => {
+            closeDialog(`item-shop`)
+        }
     }, []);
-    // 鼠标位置追踪
+    useEffect(() => {
+        if (curRole.id) {
+            updateDialog('item-shop', {
+                content: (
+                    ItemShopRef
+                )
+            });
+        }
+    }, [curRole.id, curRole?.carry?.currency]);
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             mousePos.current = { x: e.clientX, y: e.clientY };
@@ -123,7 +199,6 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         showTooltipContent.current = false;
         currentItem.current = null;
     };
-    const { openDialog } = useDialog();
 
     return (
         <ConfigProvider theme={{
@@ -134,7 +209,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                     <div className="flex-col gap-2 h-[200px] order-2 bottom-0 w-full px-6  border-2 border-t-solid border-t-amber  bg-[rgb(0 0 0 / 24%)] z-10" style={{ background: "rgb(0 0 0 / 67%)" }}>
                         {/* 日志部分 */}
                         <div className="flex justify-between ">
-                            {controlPanel}
+                            {controlPanel({ openShop })}
                             <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
                                 <div className="w-160 flex gap-6 border-r-amber border-2 border-r-solid">
                                     {/* 战斗阵型图 */}
@@ -199,7 +274,8 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                             </div>
                         </div>
                     </div>
-                    {arrConOpen && <div className="  flex-1 bg-gray z-6 w-full relativ overflow-x-hiddene">
+                    {/* 队伍 */}
+                    {arrConOpen && <div className="  flex-1  z-6 w-full relativ overflow-x-hiddene" style={{background:"url(/ArrayBg.jpg)"}}>
                         {AarryCon}
                     </div>}
                     <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>
@@ -245,7 +321,9 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                 {/* 角色头像 */}
                                                 <div className="relative h-full w-64 hidden 2xl:block" style={{ direction: 'rtl' }}>
                                                     <img
-                                                        className="w-20 h-20 w-46 h-46 rounded-full box-border  "
+                                                        onClick={() => (setCurRole(item))}
+                                                        className="w-20 h-20 w-46 h-46 rounded-full box-border"
+                                                        draggable={false}
                                                         style={{
                                                             objectFit: 'cover',
                                                             border: `4px solid ${elementColors[item.element]}`,
@@ -333,8 +411,8 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                 {Object.entries(EquipTypeNames).map(([kk, equip]) => (
                                                                     <b key={kk} className="basis-50% my-1 indent-sm">
                                                                         {equip}:
-                                                                        <span style={{ color: levelColorClass(EquipmentMap[item.carry.equipments[kk]]?.level) }}>
-                                                                            {item.carry.equipments && EquipmentMap[item.carry.equipments[kk]]?.name || "空"}
+                                                                        <span style={{ color: levelColorClass(battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.level) }}>
+                                                                            {item.carry.equipments && battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.name || "空"}
                                                                         </span>
                                                                     </b>
                                                                 ))}
@@ -383,9 +461,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             </div>
                                                             {/* 状态 */}
                                                             <div className="flex flex-wrap indent-xs w-full h-full flex-1 items-center" style={{ display: item.display.frame_type === "state" ? "" : "none" }}>
-
                                                                 <div className="w-full text-md text-center">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
-
                                                             </div>
                                                             {/* 物品栏部分-&gt;转换样式 */}
                                                             <div className="p-2 bg-[#1a1a1aad] rounded-lg w-fit" style={{ display: item.display.frame_type === "item" ? "" : "none" }}>
@@ -395,6 +471,8 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                 <div className="grid grid-cols-7 gap-2 w-fit">
                                                                     {inventory.current.map((i, index) => {
                                                                         const ii = item.carry.items[index] || null
+                                                                        const itemData = ii?.id ? (ii.cls === 'ITEM' ? battleManager.current?.ItemsManager.ItemsData[ii.id] : battleManager.current?.ItemsManager.equipmentsDataMap[ii.id]) : {} as any
+                                                                        // "ice_scythe"
                                                                         return (
                                                                             <div
                                                                                 className="relative w-8 h-8 bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded cursor-pointer 
@@ -402,24 +480,26 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                     hover:border-[#4a4a4a] hover:bg-[#333]"
                                                                                 key={index}
                                                                                 onContextMenu={(e) => e.preventDefault()}
-                                                                                onAuxClick={() => battleManager.current?.ItemsManager.use_item(item, ii.id, index + '')}
+                                                                                onClick={() => openShop(item.id)}
+                                                                                onAuxClick={() => battleManager.current?.ItemsManager.use_item(item, ii.id, index + '', ii.cls)}
                                                                             >
-                                                                                {ii && (
-                                                                                    <Popover className="w-full w-full flex p-1" content={itemsManager.current && ii.description} title={itemsManager.current && itemsManager.current[ii.id]?.name} trigger="hover">
-                                                                                        <img
-                                                                                            src={itemsManager.current && itemsManager.current[ii.id]?.icon}
-                                                                                            alt={itemsManager.current && itemsManager.current[ii.id]?.name}
-                                                                                            className="object-contain"
-                                                                                            onMouseEnter={() => showTooltip(ii)}
-                                                                                            onMouseLeave={hideTooltip}
-                                                                                        />
-                                                                                        {ii?.count > 1 && (
-                                                                                            <span className="absolute bottom-0.5 right-0.5 bg-black/80 text-white pr-0.5 rounded text-xs pointer-events-none">
-                                                                                                {ii.count}
-                                                                                            </span>
-                                                                                        )}
-                                                                                    </Popover>
-                                                                                )}
+                                                                                {
+                                                                                    (ii && (
+                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && ii.description} title={itemsManager.current && itemData?.name} trigger="hover">
+                                                                                            {itemData?.icon ? <img
+                                                                                                src={itemData?.icon}
+                                                                                                className="object-contain"
+                                                                                                onMouseEnter={() => showTooltip(ii)}
+                                                                                                onMouseLeave={hideTooltip}
+                                                                                            /> : <div className="indent-xs text-center">{itemData.name.slice(0, 1)}</div>}
+                                                                                            {ii?.count > 1 && (
+                                                                                                <span className="absolute bottom-0.5 right-0.5 bg-black/80 text-white pr-0.5 rounded text-xs pointer-events-none">
+                                                                                                    {ii.count}
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </Popover>
+                                                                                    ))
+                                                                                }
                                                                             </div>
                                                                         )
                                                                     })}

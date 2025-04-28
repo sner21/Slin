@@ -11,8 +11,8 @@ import { DeleteOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/i
 import { BattleManager } from '../common/tatakai';
 import { SkillMap, SkillTypeMap } from '../common/skill';
 import { FC } from 'react';
-import { ItemBaseSchema } from '../common/items/type';
 import { EffectsSchema } from '../common/char/attr';
+import { ItemBaseSchema } from '../common/items/type';
 
 interface CharacterEditorProps {
   formRef?: React.MutableRefObject<FormInstance | undefined>;

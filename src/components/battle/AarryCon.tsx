@@ -174,7 +174,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
 
 
     return (
-        <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box", background: 'rgb(29 29 29 / 99%)' }} onClick={() => setCurRole({})}>
+        <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box",  }} onClick={() => setCurRole({})}>
             <div>
                 <div className='text-center h-20  items-center justify-center'>
                     <ReactMarkdown>

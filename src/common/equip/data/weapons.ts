@@ -5,7 +5,7 @@ import { Equipment } from '../index';
 export const weapons: Equipment[] = [
     {
         id: 'ice_scythe',
-        cost: 1,
+        cost: 50,
         name: '四镰童子',
         description: "",
         type: 'MAIN_HAND',

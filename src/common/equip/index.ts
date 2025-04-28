@@ -17,9 +17,7 @@ export const EquipType = z.enum([
     'MISC_2'       // 杂项2
 ]);
 
-// 装备属性
 export const EquipStats = z.object({
-    // 基础属性
     hp: z.number().optional(),    // 生命上限
     shield: z.number().optional(),         // 护盾值
     attack: z.number().optional(),         // 攻击力
@@ -46,12 +44,13 @@ export const EquipStats = z.object({
     shield_strength: z.number().optional()  // 护盾强度
 });
 
-// 装备模式
+
 export const Equipment = z.object({
     id: z.string(),
     name: z.string(),
     cost: z.number().default(1),
     type: EquipType,
+    cls: z.enum(["ITEM", "EQUIP"]).default('ITEM'),
     description: z.string().default(""),
     level: z.number().min(1).default(1),
     rarity: z.number().min(1).max(5).default(1),
@@ -59,28 +58,23 @@ export const Equipment = z.object({
     isTwoHanded: z.boolean().optional()
 });
 export const EquipTypeNames = {
-    // 武器类
     MAIN_HAND: '主手',
     OFF_HAND: '副手',
-    // 防具类
     HELMET: '头盔',
     ARMOR: '护甲',
     GAUNTLETS: '护手',
     GREAVES: '护腿',
     BOOTS: '靴子',
-    // 饰品类
     NECKLACE: '项链',
     RING: '戒指',
     BELT: '腰带',
     BACK: '背部',
-    // 杂项
     MISC_1: '杂项',
     MISC_2: '杂项'
 } as const;
 
-// 导出类型
+
 export type EquipTypeName = keyof typeof EquipTypeNames;
-// 导出类型
 export type EquipStats = z.infer<typeof EquipStats>;
 export type Equipment = z.infer<typeof Equipment>;
 
@@ -89,11 +83,11 @@ import { armor } from './data/armor';
 import { accessories } from './data/accessories';
 
 
-export const equipments: Equipment[] = [
+export const equipments: Equipment[] = z.array(Equipment).parse([
     ...weapons,
     ...armor,
     ...accessories
-];
+]);
 
 export const EquipmentMap: Record<string, Equipment> = {
     ...Object.fromEntries(equipments.map(equip => [equip.id, equip])),

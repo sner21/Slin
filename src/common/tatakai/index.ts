@@ -281,17 +281,24 @@ export class BattleManager {
         }
     }
 
-    /**
-     * 计算并分配金钱
-     */
     private settle_currency(char: Character, team: Character[]) {
-        const baseCurrency = char.grow.level * 5
-        const currencyRarityBonus = char.grow.rarity * 0.1 + 0.9
-        const teamSizeModifier = 1 + Math.log10(team.length)
-        const currency = Math.floor(baseCurrency * currencyRarityBonus / teamSizeModifier)
+        // 基础金钱，确保是整数
+        const baseCurrency = Math.floor(char.grow.level * 5)
+
+        // 稀有度加成，转换为百分比整数计算
+        const rarityBonus = 90 + char.grow.rarity * 10  // 90% - 140%
+
+        // 队伍人数修正，转换为百分比整数计算
+        const teamSizePenalty = Math.floor(100 / (1 + Math.log10(team.length)))
+
+        // 最终金钱计算：基础金钱 * 稀有度加成 * 队伍人数修正 / 10000
+        const currency = Math.floor(baseCurrency * rarityBonus * teamSizePenalty / 10000)
+
+        // 确保至少获得1金币
+        const finalCurrency = Math.max(1, currency)
 
         team.forEach(role => {
-            role.carry.currency = Math.floor((role.carry.currency || 0) + currency)
+            role.carry.currency = Math.floor((role.carry.currency || 0) + finalCurrency)
         })
     }
 
@@ -300,8 +307,8 @@ export class BattleManager {
             const baseExp = 2
             const rarityBonus = role.grow.rarity * 0.1 + 0.9
             const gainExp = Math.floor(baseExp * rarityBonus)
-
-            role.grow.exp += gainExp
+//TODO
+            // role.grow.exp += gainExp
 
             while (true) {
                 const baseExpNeed = role.grow.level * role.grow.level * 50
@@ -632,8 +639,8 @@ export class BattleManager {
         // 叠加装备属性
         if (character.carry.equipments) {
             Object.values(character.carry.equipments).forEach(equipId => {
-                if (equipId && EquipmentMap[equipId]) {
-                    const equip = EquipmentMap[equipId];
+                if (equipId && this.ItemsManager.equipmentsDataMap[equipId]) {
+                    const equip = this.ItemsManager.equipmentsDataMap[equipId];
                     // 叠加装备属性
                     (Object.entries(equip.stats) as [keyof typeof stats, string][]).forEach(([key, value]) => {
                         stats[key] = Math.round((stats[key] || 0) + Number(value));

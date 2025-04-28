@@ -22,9 +22,11 @@ type props = {
   mode?: string,
   startViewData: any
   refreshBet?: () => any
+  openShop?: (arg1: string) => any
+  setArrConOpen?: (arg1: boolean) => any
 }
 
-const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet, setArrConOpen }) => {
+const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet, setArrConOpen, openShop }) => {
   const modeEnum = useRef([
     { value: 'panel', label: '面板' },
     // { value: 'shop', label: '商店' },
@@ -137,7 +139,8 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         {mode == 'panel' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
           {/* <div>{battleManager.current.battle_data.round}</div> */}
-          <span onClick={() => setArrConOpen(true)}>队伍</span>
+          <span onClick={() => setArrConOpen && setArrConOpen(true)}>队伍</span>
+          <span onClick={() => openShop && openShop("")}>商店</span>
           {!pause ? <span onClick={() => (battleManager.current.pause_round(), setPause(true))}>暂停</span> : <span onClick={() =>
             !battleManager.current.round_timer ||
             (battleManager.current.battle_data.pause = false) ||

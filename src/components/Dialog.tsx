@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Rnd } from 'react-rnd';
 
 export interface DialogProps {
@@ -14,7 +14,9 @@ export interface DialogProps {
   zIndex?: number;
 }
 
-const Dialog: React.FC<DialogProps> = ({
+const MOVE_STEP = 20; // 每次移动的像素
+
+const Dialog: React.FC<DialogProps & { isActive?: boolean }> = ({
   id,
   title,
   children,
@@ -24,7 +26,8 @@ const Dialog: React.FC<DialogProps> = ({
   minWidth = 200,
   minHeight = 150,
   zIndex = 1000,
-  handleDialogClick
+  handleDialogClick,
+  isActive = false
 }) => {
   const [position, setPosition] = useState(initialPosition || {
     x: Math.max(0, (window.innerWidth / 2 - initialSize.width / 2)),
@@ -45,15 +48,48 @@ const Dialog: React.FC<DialogProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [size]);
 
+  // 键盘方向键移动窗口
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      console.log(123)
+      if (!isActive) return;
+      let { x, y } = position;
+      let moved = false;
+      if (e.key === 'ArrowLeft') {
+        console.log(12323)
+        x = Math.max(0, x - MOVE_STEP);
+        moved = true;
+      } else if (e.key === 'ArrowRight') {
+        x = Math.min(window.innerWidth - size.width, x + MOVE_STEP);
+        moved = true;
+      } else if (e.key === 'ArrowUp') {
+        y = Math.max(0, y - MOVE_STEP);
+        moved = true;
+      } else if (e.key === 'ArrowDown') {
+        y = Math.min(window.innerHeight - size.height, y + MOVE_STEP);
+        moved = true;
+      }
+      if (moved) {
+        setPosition({ x, y });
+        e.preventDefault();
+      }
+    },
+    [isActive, position, size]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
     <Rnd
       onClick={() => handleDialogClick(id)}
       style={{
         display: 'flex',
         flexDirection: 'column',
-        background: 'white',
+        background: 'rgba(0 0 0 / 0.9)',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e5e7eb',
         borderRadius: '6px',
         zIndex,
         transform: 'translate(0, 0)'
@@ -87,9 +123,9 @@ const Dialog: React.FC<DialogProps> = ({
       }}
     >
       <div
-        className="dialog-handle select-none flex items-center justify-between p-3 border-b cursor-move bg-gray-50 rounded-t-lg"
+        className="dialog-handle select-none flex items-center justify-between p-3 border-b cursor-move bg-black rounded-t-lg"
       >
-        <h3 className="text-sm font-medium">{title}</h3>
+        <b className="text-md font-medium">{title}</b>
         <button
           onClick={onClose}
           className="p-1 hover:bg-gray-200 rounded-full transition-colors"

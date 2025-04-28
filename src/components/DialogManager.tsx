@@ -9,11 +9,13 @@ interface DialogConfig {
   initialSize?: { width: number; height: number };
   minWidth?: number;
   minHeight?: number;
+  isActive?: boolean
 }
 
 interface DialogContextType {
   openDialog: (config: DialogConfig) => void;
   closeDialog: (id: string) => void;
+  updateDialog: (id: string, newConfig: Partial<DialogConfig>) => void;
 }
 
 const DialogContext = createContext<DialogContextType | null>(null);
@@ -47,21 +49,31 @@ export const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setActiveDialog(id);
   };
 
+  const updateDialog = (id: string, newConfig: Partial<DialogConfig>) => {
+    setDialogs(prev =>
+      prev.map(dialog =>
+        dialog.id === id ? { ...dialog, ...newConfig } : dialog
+      )
+    );
+  };
+
   return (
-    <DialogContext.Provider value={{ openDialog, closeDialog }}>
+    <DialogContext.Provider value={{ openDialog, closeDialog, updateDialog }}>
       {children}
       {dialogs.map((dialog, index) => (
 
-          <Dialog
-            {...dialog}
-            id={dialog.id}
-            handleDialogClick={handleDialogClick}
-            zIndex={1000 + (activeDialog === dialog.id ? dialogs.length : index)}
-            onClose={() => closeDialog(dialog.id)}
-          >
-            {dialog.content}
-          </Dialog>
-       
+        <Dialog
+          key={dialog.id}
+          {...dialog}
+          id={dialog.id}
+          handleDialogClick={handleDialogClick}
+          zIndex={1000 + (activeDialog === dialog.id ? dialogs.length : index)}
+          onClose={() => closeDialog(dialog.id)}
+          isActive={dialog.isActive || (activeDialog === dialog.id)}
+        >
+          {dialog.content}
+        </Dialog>
+
       ))}
     </DialogContext.Provider>
   );

@@ -20,6 +20,8 @@ export const ActionSchema = z.array(BattleActionSchema);
 export const ItemsDataSchema = z.object({
   id: z.string(),
   count: z.number().default(1),
+  cls: z.string(),
+  type: z.string().default(""),
 });
 // 角色星级定义
 export const RaritySchema = z.number().min(1).max(5);
@@ -64,8 +66,8 @@ export const CharacterSaveSchema = z.object({
   count: z.number().min(0).default(1), // 角色拥有数量
   element: ElementType,
   gender: z.enum(["0", "1", "2"]).describe('0:无,1:男,2:女').default("0"), // 1 男 2女
-  position:z.object({ //阵型
-    index:z.number().optional(),
+  position: z.object({ //阵型
+    index: z.number().optional(),
   }).default({}),
   description: z.string().optional(),
   status: StatusSchema.optional(),
@@ -109,7 +111,7 @@ export const CharacterSaveSchema = z.object({
 })
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
-  (data.type === "1"  && (data.display.frame_type = "logs"))
+  (data.type === "1" && (data.display.frame_type = "logs"))
   if (!data.status) {
     data.status = StatusSchema.parse({ ...cloneDeep(data.ability) });
     data.status.reborn = 0;

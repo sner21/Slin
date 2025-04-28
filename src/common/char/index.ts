@@ -186,6 +186,7 @@ export const initialData = DataSchema.parse([
         "0": {
           id: "1",
           count: 3,
+          cls: "ITEM",
         }
       },
       equipments: {
