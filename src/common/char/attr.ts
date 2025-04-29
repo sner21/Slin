@@ -98,10 +98,10 @@ export const AbilitySchema = z.object({
     find_gap: z.number().default(3), //索敌间隔
 });
 export const CarryBuffSchema = z.record(z.object({
-    buffId: z.string(),
+    id: z.string(),
     duration: z.number().optional(),
     count: z.number().default(1),
-    source: z.object({
+    self: z.object({
         type: z.number(),
         name: z.string(),
         id: z.string(),

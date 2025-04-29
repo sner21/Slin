@@ -14,7 +14,7 @@ export const items_medic = [
             operator: 'increase',
         }],
         buffs: [{
-            buffId: 'zs',
+            id: 'zs',
         }],
         icon: get_svg_uri(23, import.meta.url, 'item'),
         type: 'medic',
@@ -41,7 +41,7 @@ export const items_medic = [
             }
         ],
         buffs: [{
-            buffId: 'power_up',
+            id: 'power_up',
         }],
         icon: get_svg_uri(13, import.meta.url),
         type: 'medic',
@@ -74,7 +74,7 @@ export const items_medic = [
             operator: 'increase',
         }],
         buffs: [{
-            buffId: 'hp_regen',
+            id: 'hp_regen',
             type: 'target'
         }],
         icon: get_svg_uri(11, import.meta.url),
@@ -93,7 +93,7 @@ export const items_medic = [
             operator: 'increase',
         }],
         buffs: [{
-            buffId: 'mp_regen',
+            id: 'mp_regen',
             type: 'target'
         }],
         icon: get_svg_uri(12, import.meta.url),
@@ -113,11 +113,11 @@ export const items_medic = [
         }],
         buffs: [
             {
-                buffId: 'attack_up',
+                id: 'attack_up',
                 type: 'target'
             },
             {
-                buffId: 'defense_up',
+                id: 'defense_up',
                 type: 'target'
             }
         ],

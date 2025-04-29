@@ -7,7 +7,7 @@ import { EffectsSchema } from "../char/attr";
 export const LogsType = z.enum(['tatakai', 'global', 'event', 'status', 'settle'])
 
 export const LogsBasicSchema = z.object({
-    id:z.number().default(0),
+    id: z.number().default(0),
     timestamp: z.number(),
     round: z.number(),  //回合数
     logs_type: LogsType,
@@ -17,7 +17,7 @@ export const LogsBasicSchema = z.object({
         name: z.string(),
         id: z.string(),
     }).optional(),
-    source: z.object({
+    self: z.object({
         type: z.string(),
         name: z.string(),
         id: z.string(),
@@ -49,8 +49,8 @@ export const GlobalSchema = z.object({
 // 定义战斗行为记录结构
 export const BattleActionSchema = z.object({
     // 基础信息
-    skillId: z.string().optional(),          
-    skillName: z.string().default("未知"),          
+    skillId: z.string().optional(),
+    skillName: z.string().default("未知"),
     skillType: SkillType.optional(),         // 技能类型
     elementalBonus: z.number().default(1),      // 元素克制倍率
     // 伤害相关
@@ -64,8 +64,8 @@ export const BattleActionSchema = z.object({
     }),
     isCrit: z.boolean().default(false),          // 是否暴击
     buffs: Skill.shape.buffs,          // buff
-    element: ElementType,         
-    effectType: EffectType,       
+    element: ElementType,
+    effectType: EffectType,
     isEvaded: z.boolean().default(false),        // 是否被闪避
     attacker: z.object({
         type: z.string(),

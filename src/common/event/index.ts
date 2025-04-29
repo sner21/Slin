@@ -76,7 +76,7 @@ export function EventManager(dataCon) {
         if (trigger) {
             trigger_event(event, target!.id!)
             event.buffs?.forEach(e => {
-                dataCon.BuffManage.add_buff(target, e.buffId || e)
+                dataCon.BuffManage.add_buff(target, e.id || e)
             })
             // 添加调试日志
             //事件日志记录

@@ -11,11 +11,14 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         skillType: 'SINGLE',
         effectType: 'BUFF',
         targetType: targetTypeEnum.SELF,
-        multiplier: 0,
-        buffs:[
-            ""
+        multiplier: 1,
+        not_lethal: true,
+        buffs: [
+            {
+                id: "ack_up",
+                type: "self",
+            }
         ],
-        // cost: { hp: 80 },
         effects: [
             {
                 isBuff: true,
@@ -23,7 +26,14 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
                 attr: "hp",
                 value: 0,
                 operator: "multiply"
-            }
+            },
+            {
+                isBuff: true,
+                path: "status",
+                attr: "hp",
+                value: 0,
+                operator: "multiply"
+            },
         ],
         cooldown: 3,
         level: 1,

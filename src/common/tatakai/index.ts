@@ -664,7 +664,7 @@ export class BattleManager {
                 }
             });
         }
-
+     
         for (let key in stats) {
             stats[key] = Math.round((stats[key] || 0));
         }
@@ -807,7 +807,7 @@ export class BattleManager {
         }
 
         !isEvaded && skill.buffs?.forEach(buff => {
-            this.BuffManage.add_buff(buff.type === "target" ? defender : attacker, buff.buffId)
+            this.BuffManage.add_buff(buff.type === "target" ? defender : attacker, buff.id)
         })
         damage = Math.round(damage)
         defender.status.hp -= damage || 0

@@ -23,7 +23,7 @@ export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
             })
             item.buffs?.forEach(buff => {
                 //TODO 判断是target
-                zenkio.BuffManage.add_buff(role, buff.buffId)
+                zenkio.BuffManage.add_buff(role, buff.id)
             })
             role.carry.items[index].count -= 1
             if (role.carry.items[index].count <= 0) {

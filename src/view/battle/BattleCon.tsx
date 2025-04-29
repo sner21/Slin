@@ -357,7 +357,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                     {/* <div className=" gap-0.1 md:gap-0.5  scale-80   items-center text-xs text-gray-300"> */}
                                                     {Object.keys(item.buff).map((key, index) => (
                                                         <div key={index} className="text-xs text-gray-300">
-                                                            {battleManager.current?.BuffManage?.buff_default[item.buff[key]?.buffId]?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
+                                                            {battleManager.current?.BuffManage?.buff_default[item.buff[key]?.id]?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
                                                         </div>
                                                     ))}
                                                     {/* </div> */}

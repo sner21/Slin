@@ -41,14 +41,14 @@ export const Skill = z.object({
     skillType: skillType,
     targetType: targetType,
     effectType: EffectType,
-
+    not_lethal: z.boolean().optional(),
     uri: z.string().default(get_svg_uri(50, import.meta.url)),
     uri_type: z.enum(["local", "inter"]).optional(),
     multiplier: z.number(),
     cost: costTypeSchema,
     buffs: z.array(z.object({
-        buffId: z.string(),
-        type: z.enum(['source', 'target']).default('target')
+        id: z.string(),
+        type: z.enum(['self', 'target']).default('target')
     })).optional(),
     // 冷却时间（回合数）
     cooldown: z.number(),

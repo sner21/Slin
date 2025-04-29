@@ -10,36 +10,36 @@ export function BuffManage(dataCon) {
         ...buff_data,
     }
 
-    const add_buff = (role: Character, buffId: string, source = undefined) => {
-        const buff = buff_default[buffId]
+    const add_buff = (role: Character, id: string, self = undefined) => {
+        const buff = buff_default[id]
         if (!buff) {
             return
         }
-        if (!role.buff[buffId]) {
-            role.buff[buffId] = {
-                buffId: buff.id,
+        if (!role.buff[id]) {
+            role.buff[id] = {
+                id: buff.id,
                 duration: buff.duration,
                 count: 0,
-                source,
+                self,
             }
         }
         switch (buff.durationType) {
             case 'OVERLAY': {
-                role.buff[buffId].count += 1
-                role.buff[buffId].duration = buff.duration
+                role.buff[id].count += 1
+                role.buff[id].duration = buff.duration
                 break
             }
             case 'PERMANENT-OVERLAY': {
-                role.buff[buffId].count += 1
+                role.buff[id].count += 1
                 break
             }
             case 'TURNS': {
-                role.buff[buffId].count = 1
-                role.buff[buffId].duration = buff.duration
+                role.buff[id].count = 1
+                role.buff[id].duration = buff.duration
                 break
             }
             case 'PERMANENT': {
-                role.buff[buffId].count = 1
+                role.buff[id].count = 1
                 break
             }
         }
@@ -52,7 +52,7 @@ export function BuffManage(dataCon) {
     const settle_buff = (role: Character) => {
         Object.keys(role.buff || {}).forEach(k => {
             const i = role.buff[k]
-            const buff = buff_default[i.buffId]
+            const buff = buff_default[i.id]
             if (!buff) {
                 return
             }
@@ -69,7 +69,7 @@ export function BuffManage(dataCon) {
                 i.duration = i.duration - 1
                 if (i.duration <= 0) {
                     i.count && (i.count -= 1)
-                    !i.count && Reflect.deleteProperty(role.buff!, i.buffId)
+                    !i.count && Reflect.deleteProperty(role.buff!, i.id)
                 }
             }
         })

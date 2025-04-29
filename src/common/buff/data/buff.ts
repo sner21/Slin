@@ -11,7 +11,7 @@ export const buff_data = z.record(BuffSchema).parse({
             target: 'attacker',
             path: 'status',
             attr: 'attack',
-            value: 15,
+            value: 25,
             operator: 'increase',
         }],
         durationType: "TURNS",
