@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { costTypeSchema, EffectsSchema } from '../char/attr';
+import { costTypeSchema, EffectSimple } from '../char/attr';
 import { ElementType, get_svg_uri } from '..';
 
 // 移动所有类型定义到这里
@@ -63,7 +63,7 @@ export const Skill = z.object({
     elemMasteryBonus: z.number().optional(),   // 技能元素精通提升
     elemBonusBonus: z.number().optional(),     // 技能元素伤害提升
     // 额外效果
-    effects: z.array(EffectsSchema).optional(),
+    effects: z.array(EffectSimple).optional(),
 });
 
 // 中英文对照

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { Character } from '../char/types';
 import type { Equipment } from '../equip';
-import { CheckCondition, CompareOperator, EffectsSchema, EventEffectType, targetSchema } from '../char/attr';
+import { ConditionSchema,CompareOperator, EffectSimple, EffectsSchema, EventEffectType, targetSchema } from '../char/attr';
 
 // 事件类型枚举
 export const EventType = z.enum([
@@ -17,24 +17,22 @@ export const EventType = z.enum([
     'STORY',          // 剧情事件
 ]);
 
-
-
-export type CheckCondition = z.infer<typeof CheckCondition>
+export type ConditionType= z.infer<typeof ConditionSchema>
 // 事件数据结构
 export const EventData = z.object({
     id: z.string(),
     type: EventType,
     name: z.string(),
     description: z.string(),
-    effects: z.array(EffectsSchema).default([]),
+    effects: z.array(EffectSimple).default([]),
     probability: z.number().optional().default(100), //触发概率
     // conditionType: z.union([z.enum(['all']),targetSchema]).default('all'),
     buffs: z.any().optional(),
-    conditions: z.array(CheckCondition).optional(),
+    conditions: z.array(ConditionSchema).optional(),
     hidden: z.boolean().default(false)
 });
 // 检查函数
-export function checkCondition(condition: z.infer<typeof CheckCondition>, value: number): boolean {
+export function ConditionOp(condition: z.infer<typeof ConditionSchema>, value: number): boolean {
     switch (condition.operator) {
         case 'EQ': return value === condition.value;
         case 'NE': return value !== condition.value;

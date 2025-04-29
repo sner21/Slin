@@ -7,15 +7,15 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         name: '蝶引来生',
         type: 'ELEMENTAL_SKILL',
         uri: get_svg_uri(10, import.meta.url),
-        description: '消耗生命值，获得火元素附魔，提升攻击力',
+        description: '消耗生命值，获得火元素附魔，提升攻击力50%',
         skillType: 'SINGLE',
         effectType: 'BUFF',
         targetType: targetTypeEnum.SELF,
-        multiplier: 1,
+        multiplier: 0,
         not_lethal: true,
         buffs: [
             {
-                id: "ack_up",
+                id: "蝶引来生",
                 type: "self",
             }
         ],
@@ -23,19 +23,22 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
             {
                 isBuff: true,
                 path: "status",
+                target: 'self',
                 attr: "hp",
-                value: 0,
-                operator: "multiply"
-            },
-            {
-                isBuff: true,
-                path: "status",
-                attr: "hp",
-                value: 0,
-                operator: "multiply"
+                value: 0.8,
+                operator: "multiply",
+                conditions:[
+                    {
+                        operator: 'GT',
+                        path: "status",
+                        target: 'self',
+                        attr: "hp",
+                        value: 100
+                    }
+                ]
             },
         ],
-        cooldown: 3,
+        cooldown: 10,
         level: 1,
         element: 'fire',
         damageType: 'physical'

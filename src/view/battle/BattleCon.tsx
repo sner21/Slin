@@ -143,13 +143,13 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         } else {
             setCurRole({ id: "" })
             console.log(dialogs)
-            if(dialogs){
+            if (dialogs) {
                 const a = dialogs.find(i => i.id === `item-shop`)
                 if (a) {
                     return closeDialog(`item-shop`)
                 }
             }
-       
+
         }
         openDialog({
             id: `item-shop`,
@@ -271,10 +271,12 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                             <>
                                                 {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
                                                     <span className="text-sm">
-                                                        {at.attacker.name} -&gt; {at.defender.name} -&gt;
+                                                        {at.self.name} -&gt;   <span>{at.target.id === at.self.id ? "自身" : at.target.name} -&gt;</span>
                                                         <span style={{ color: elementColors[at.element] }}> {SkillMap[at.skillId]?.name || ""}</span>
                                                         {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>} -&gt;
                                                         <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : at.damage.hp}</span>
+                                                        {/* 施加BUFF */}
+                                                        {at.buffs?.length && at.buffs.map((buff) => <span>{ battleManager.current.BuffManage. }</span>)}
                                                     </span>
                                                 )}
                                                 {(logsType.current === 'event' || at.logs_type === 'event') && (
@@ -451,7 +453,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                         {({ at }) => (
                                                                             at.skillId !== 'default' && (
                                                                                 <span key={`char-attack-${at.id}-${at.timestamp}`}>
-                                                                                    {at.attacker.name} &gt; {at.defender.name} &gt; <span>{SkillMap[at.skillId]?.name || ""}</span> &gt; {at.damage.hp}
+                                                                                    {at.self.name} &gt; {at.target.name} &gt; <span>{SkillMap[at.skillId]?.name || ""}</span> &gt; {at.damage.hp}
                                                                                 </span>
                                                                             )
                                                                         )}

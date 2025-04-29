@@ -9,7 +9,7 @@ export const BATTLE_EVENTS = z.record(EventData).parse({
     name: '魔法回复',
     description: '${target.name}收到了魔法回复30点',
     effects: [{
-      target: 'attacker',
+      target: 'self',
       path: 'status',
       attr: 'mp',
       value: 30,

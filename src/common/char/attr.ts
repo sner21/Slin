@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { string, z } from "zod";
 
 export const costType = {
     mp: z.number().default(0),     // 能量消耗
@@ -12,8 +12,7 @@ export const EventEffectType = z.enum([
     "assign",
     "splice",
     "equal",
-    //TODO
-    "multiply", 
+    "multiply",
 
 ]);
 export const CompareOperator = z.enum([
@@ -25,9 +24,12 @@ export const CompareOperator = z.enum([
     'LE',  // 小于等于 (Less or Equal)
 ]);
 
-export const targetSchema = z.enum(['attacker', 'defender', 'global']).default('defender')
+export const targetSchema = z.enum(['self', 'target', 'global']).default('target')
 // 定义检查条件的结构
-export const CheckCondition = z.object({
+export const ConditionSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().optional(),
+    description: z.string().optional(),
     target: targetSchema,
     operator: CompareOperator.optional(),
     value: z.any(),
@@ -36,6 +38,9 @@ export const CheckCondition = z.object({
     path: z.string().default("").refine((value) => !(value in ['at'])),
 });
 export const EffectsSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().optional(),
+    description: z.string().optional(),
     isBuff: z.boolean().default(false),
     target: targetSchema,
     path: z.string().default("").refine((value) => !(value in ['at', 'id'])),
@@ -51,9 +56,16 @@ export const EffectsSchema = z.object({
     duration: z.number().default(0),
     sourceId: z.string().optional(),          // 攻击方ID
     targetId: z.string().optional(),
-    conditions: z.array(CheckCondition).optional(),
+    conditions: z.array(z.union([ConditionSchema, z.object({
+        id: z.string(),
+        replace: ConditionSchema.optional()
+    })])).optional(),
     operator: EventEffectType,
 })
+export const EffectSimple = z.union([EffectsSchema, z.object({
+    id: z.string(),
+    replace: EffectsSchema.optional()
+})])
 export type effectsSchema = z.infer<typeof EffectsSchema>;
 export const costTypeSchema = z.object({
     mp: z.number().default(0),     // 能量消耗

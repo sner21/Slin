@@ -6,7 +6,7 @@ import { CooldownManager } from "../skill/cooldown";
 import { ActionGauge } from "./action";
 import { ref, Ref } from "vue";
 import { DataCon } from "../data/dataCon";
-import { effectsSchema, EffectsSchema } from '../char/attr';
+import { effectsSchema, EffectsSchema, EffectSimple } from '../char/attr';
 import { fixedPush, getMirrorPosition, randomInt } from "..";
 import { EventManager } from "../event";
 import { BattleActionSchema } from "../record/type";
@@ -27,6 +27,7 @@ const PluginsDataSchma = z.object({
 import assignIn from "lodash-es/assignIn";
 import { isNumber } from "lodash-es";
 import { targetType } from '../skill/types';
+import { EffectManage } from "../effect";
 
 // 战斗管理器
 export class BattleManager {
@@ -37,6 +38,7 @@ export class BattleManager {
     actionGauge: ActionGauge;
     EventManager
     BuffManage
+    EffectManage
     RecordManager
     ItemsManager
     enemy: Character[] = []
@@ -75,6 +77,7 @@ export class BattleManager {
         this.cooldownManager = new CooldownManager();
         this.actionGauge = new ActionGauge();
         this.ItemsManager = ItemsManager(this);
+        this.EffectManage = EffectManage(this);
         this.globalConfig = data.globalConfig;
         this.data.battleManagerGourp[this.battle_id] = this
         this.roleAarry = {}
@@ -562,8 +565,16 @@ export class BattleManager {
         })
     }
     //计算副作用
-    exec_effect(target: Character | typeof this, effect: effectsSchema, count = 1) {
-        let { path, find, operator, attr, value, sourceId, targetId } = effect
+    exec_effect(target: Character | typeof this, effect:z.infer<typeof EffectSimple>, count = 1) {
+        if (effect.id) {
+            //TODO
+            const replace = effect.replace
+            effect = this.EffectManage.effectsMap[effect.id]
+            if (replace) {
+                effect = assignIn(effect, replace)
+            }
+        }
+        let { path, find, operator, attr, value, sourceId, targetId } = effect as z.infer<typeof EffectsSchema> 
         let data = path ? get(target, path) : target
         if (find) {
             data = data.find((i: any) => i[find.attr] === find.value)
@@ -572,7 +583,6 @@ export class BattleManager {
         if (typeof value === "number") {
             value = value * count
         }
-        // console.log(target?.name + operator + path + attr + value);
         switch (operator) {
             case "increase": {
                 data[attr] += value
@@ -599,12 +609,12 @@ export class BattleManager {
                 break
             }
             case "multiply": {
-                data[attr] * value
+                data[attr] *= value
                 break
             }
 
         }
-        if (effect.attr === 'hp' && effect.target === 'defender' && sourceId && targetId /* && target !== 'global' */) {
+        if (effect.attr === 'hp' && effect.target === 'target' && sourceId && targetId /* && target !== 'global' */) {
             this.compute_damage(sourceId, targetId, value)
         }
     }
@@ -664,7 +674,7 @@ export class BattleManager {
                 }
             });
         }
-     
+
         for (let key in stats) {
             stats[key] = Math.round((stats[key] || 0));
         }
@@ -680,22 +690,22 @@ export class BattleManager {
         this.BuffManage.settle_buff(character)
     }
     // 结算攻击
-    char_attack(attacker: Character, defender: Character, skill: Skill) {
+    char_attack(self: Character, target: Character, skill: Skill) {
         //削减当前数值 ?  除了boss可以删掉
         let damage = 0
         let isEvaded = false
         let isCrit = false
-        isCrit = Math.random() * 100 <= attacker.ability.crit_rate;
+        isCrit = Math.random() * 100 <= self.ability.crit_rate;
         //计算伤害
         if (skill.damageType === 'physical') {
-            damage = attacker.imm_ability.attack * (Number(skill.multiplier) ) / 100
-            damage = char_attack_physical(attacker, defender, damage)
+            damage = self.imm_ability.attack * (Number(skill.multiplier)) / 100
+            damage = char_attack_physical(self, target, damage)
         } else {
-            damage = attacker.imm_ability.elem_bonus * (Number(skill.multiplier)) / 100
-            damage = char_attack_magic(attacker, defender, damage)
+            damage = self.imm_ability.elem_bonus * (Number(skill.multiplier)) / 100
+            damage = char_attack_magic(self, target, damage)
         }
         //元素适应性加成
-        if (skill.element === attacker.element) {
+        if (skill.element === self.element) {
             damage *= 1.1
         }
         const ElementalRelations = {
@@ -791,62 +801,69 @@ export class BattleManager {
                 default: 1
             }
         } as const;
-        const elementalBonus = ElementalRelations[skill.element] && ElementalRelations[skill.element][defender.element] || 1;
+        const elementalBonus = ElementalRelations[skill.element] && ElementalRelations[skill.element][target.element] || 1;
         damage *= elementalBonus;
         // 暴击判定
         if (isCrit) {
-            damage *= attacker.imm_ability.crit_dmg / 100;
+            damage *= self.imm_ability.crit_dmg / 100;
         }
         //闪避概率
         if (skill.type === "NORMAL_ATTACK") {
             const r = randomInt(0, 100)
-            if (r <= defender.imm_ability?.evasion) {
+            if (r <= target.imm_ability?.evasion) {
                 isEvaded = true
                 damage = 0 // ! 闪避 damage归0
             }
         }
 
         !isEvaded && skill.buffs?.forEach(buff => {
-            this.BuffManage.add_buff(buff.type === "target" ? defender : attacker, buff.id)
+            this.BuffManage.add_buff(buff.type === "target" ? target : self, buff.id)
         })
         damage = Math.round(damage)
-        defender.status.hp -= damage || 0
-        if (defender.status.hp <= 0) defender.status.hp = 0
+        target.status.hp -= damage || 0
+        skill.effects?.forEach(effect => {
+            if (effect.target === 'global') {
+                this.exec_effect(this.data, effect)
+            } else {
+                this.exec_effect(target || target, effect)
+            }
+        })
+        if (target.status.hp <= 0) target.status.hp = 0
         //记录
         const at = BattleActionSchema.parse({
             logs_type: 'tatakai',
             skillId: skill.id,
             skillType: skill.type,
             skillName: skill.name,
-            sourceId: attacker.id,
-            targetId: defender.id,
+            sourceId: self.id,
+            targetId: target.id,
             round: this.battle_data.round,
             damage: {
                 hp: damage,
             },
             cost: skill.cost || {},
-            buffs:skill.buffs,
+            buffs: skill.buffs,
             isCrit,
             elementalBonus,
             element: skill.element,
             effectType: "DAMAGE",
             timestamp: Date.now(),
             isEvaded,
-            attacker: {
-                type: attacker.type || 2,
-                name: attacker.name,
-                id: attacker.id.toString()
+            self: {
+                type: self.type || 2,
+                name: self.name,
+                id: self.id.toString()
             },
-            defender: {
-                type: defender.type || 2,
-                name: defender.name,
-                id: defender.id.toString()
+            target: {
+                type: target.type || 2,
+                name: target.name,
+                id: target.id.toString()
             }
         })
-        this.RecordManager.fixedPush(defender as any, 'at', at, true)
-        this.RecordManager.fixedPush(attacker as any, 'at', at, true)
+        this.RecordManager.fixedPush(target as any, 'at', at, true)
+        this.RecordManager.fixedPush(self as any, 'at', at, true)
         this.RecordManager.fixedPush(this.RecordManager.logsDataSchma, 'tatakai', at)
-        this.compute_damage(attacker.id, defender.id, damage || 0)
+        this.compute_damage(self.id, target.id, damage || 0)
         return damage
     }
     // 角色行动完成
@@ -953,50 +970,50 @@ export function settle_attack_boss(damage: number, boss: { blood: number }) {
 
 
 //  物理伤害计算
-export function char_attack_physical(attacker: Character, defender: Character | BB, damage: number) {
+export function char_attack_physical(self: Character, target: Character | BB, damage: number) {
     // 护甲穿透
-    const effectiveDefense = Math.max(0, defender.imm_ability.defense * (1 - attacker.imm_ability.penetration / 100));
+    const effectiveDefense = Math.max(0, target.imm_ability.defense * (1 - self.imm_ability.penetration / 100));
     // 防御系数 = 防御力 / (防御力 + 等级系数)
-    const defense = defender.imm_ability.defense - effectiveDefense
+    const defense = target.imm_ability.defense - effectiveDefense
     const defenseRatio = defense / (defense + 100);
     damage *= (1 - defenseRatio);
     // 元素伤害加成
-    // if (attacker.ability.element) {
-    //     damage *= (1 + attacker.ability.elem_bonus / 100);
+    // if (self.ability.element) {
+    //     damage *= (1 + self.ability.elem_bonus / 100);
     // }
 
     // 元素抗性计算
-    const elementResistance = getElementResistance(defender, attacker.imm_ability.element);
+    const elementResistance = getElementResistance(target, self.imm_ability.element);
     damage *= (1 - elementResistance / 100);
     return Math.round(damage);
 }
 // 魔法伤害计算
-export function char_attack_magic(attacker: Character, defender: Character | BB, damage: number) {
+export function char_attack_magic(self: Character, target: Character | BB, damage: number) {
     // 护甲穿透
-    const effectiveDefense = Math.max(0, defender.imm_ability.defense * (1 - attacker.imm_ability.penetration / 100));
-    const defense = defender.imm_ability.defense - effectiveDefense
+    const effectiveDefense = Math.max(0, target.imm_ability.defense * (1 - self.imm_ability.penetration / 100));
+    const defense = target.imm_ability.defense - effectiveDefense
     const defenseRatio = defense / (defense + 100);
     damage *= (1 - defenseRatio);
     // 元素伤害加成
-    // if (attacker.ability.element) {
-    //     damage *= (1 + attacker.ability.elem_bonus / 100);
+    // if (self.ability.element) {
+    //     damage *= (1 + self.ability.elem_bonus / 100);
     // }
 
     // 元素抗性计算
-    const elementResistance = getElementResistance(defender, attacker.imm_ability.element);
+    const elementResistance = getElementResistance(target, self.imm_ability.element);
     damage *= (1 - elementResistance / 100);
     return Math.round(damage);
 }
 // 获取元素抗性
-function getElementResistance(defender: Character, attackerElement: string): number {
+function getElementResistance(target: Character, attackerElement: string): number {
     // 默认抗性为0
-    if (!defender.imm_ability.total_res || !attackerElement) return 0;
+    if (!target.imm_ability.total_res || !attackerElement) return 0;
 
     // 返回对应元素抗性，如果没有则返回0
-    return defender.imm_ability.total_res[attackerElement] || 0;
+    return target.imm_ability.total_res[attackerElement] || 0;
 }
 // // 生命偷取计算
-// function calculateLifesteal(damage: number, attacker: Character) {
-//     return damage * (attacker.imm_ability.lifesteal / 100);
+// function calculateLifesteal(damage: number, self: Character) {
+//     return damage * (self.imm_ability.lifesteal / 100);
 // }
 

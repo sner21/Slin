@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { EffectsSchema } from "../char/attr";
+import { EffectSimple } from "../char/attr";
 
 export const ItemBaseSchema = z.object({
     id: z.string(),
     name: z.string(),
-    effects: z.array(EffectsSchema).default([]),
+    effects: z.array(EffectSimple).default([]),
     icon: z.string(),
     type: z.enum(['medic']),
     description: z.string().default(""),

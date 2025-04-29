@@ -4,10 +4,11 @@ import { effectsSchema } from "../char/attr";
 import { Character } from "../char/types";
 import { EventSchema } from "../record/type";
 import { BATTLE_EVENTS, events } from './data';
-import { checkCondition, EventData, CheckCondition } from "./types";
+import { ConditionType, EventData } from "./types";
 import get from 'lodash-es/get'
 import set from 'lodash-es/set'
 import assignIn from "lodash-es/assignIn";
+import { EffectManage } from '../effect/index';
 export function EventManager(dataCon) {
     const event_info = {
         round: 0,
@@ -18,7 +19,7 @@ export function EventManager(dataCon) {
     let event_list = Object.values(events)
     // const roles = dataCon.roles
     // const roles_group = dataCon.roles_group
-    const global_effects: effectsSchema[] = []
+    // const global_effects: effectsSchema[] = []
 
     //随机获取事件
     const get_random_event = () => {
@@ -58,20 +59,7 @@ export function EventManager(dataCon) {
         let trigger = true
 
         if (event.conditions) {
-            event.conditions.forEach(condition => {
-                try {
-                    if (condition.target === 'global') {
-                        trigger = cheak_condition_global(condition)
-                    } else {
-                        trigger = cheak_condition_role(condition, condition.targetId || target!.id!)
-                    }
-                } catch {
-                    console.log('事件检查失败', event.id, target!.name);
-                    trigger = false
-                }
-
-            });
-
+            trigger = dataCon.EffectManage.cheak_conditions(event.conditions)
         }
         if (trigger) {
             trigger_event(event, target!.id!)
@@ -109,11 +97,11 @@ export function EventManager(dataCon) {
             //     isCrit:false,
             //     effectType: "DAMAGE",
             //     timestamp: Date.now(),
-            //     attacker: {
+            //     self: {
             //         type: 2,
             //         id: 1
             //     },
-            //     defender: {
+            //     target: {
             //         type: 2,
             //         id: 2
             //     }
@@ -134,19 +122,11 @@ export function EventManager(dataCon) {
         })
     }
     //检查事件
-    const cheak_condition_global = (condition: CheckCondition) => {
-        return checkCondition(condition, (condition.path ? get(dataCon, condition.path) : dataCon)[condition.attr])
-    }
-    const cheak_condition_role = (condition: CheckCondition, roleId: Character['id']) => {
 
-        return checkCondition(condition, (condition.path ? get(dataCon.roles_group[roleId], condition.path) : dataCon.roles_group[roleId])[condition.attr])
-    }
     return {
         trigger_event,
         trigger_random_event,
         get_random_event,
-        cheak_condition_global,
-        cheak_condition_role,
         cheak_event,
         load_plugins_event,
         events

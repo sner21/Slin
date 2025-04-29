@@ -8,7 +8,7 @@ export const buff_data = z.record(BuffSchema).parse({
         name: "提升攻击力",
         description: "提升攻击力",
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'attack',
             value: 25,
@@ -18,12 +18,27 @@ export const buff_data = z.record(BuffSchema).parse({
         duration: 3,
         isDebuff: false,
     },
+    '蝶引来生': {
+        id: "蝶引来生",
+        name: "蝶引来生",
+        description: "提升攻击力",
+        effects: [{
+            target: 'self',
+            path: 'status',
+            attr: 'attack',
+            value: 40,
+            operator: 'increase',
+        }],
+        durationType: "TURNS",
+        duration: 6,
+        isDebuff: false,
+    },
     'speed_down': {
         id: "speed_down",
         name: "减速",
         description: "降低速度",
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'speed',
             value: -30,
@@ -38,7 +53,7 @@ export const buff_data = z.record(BuffSchema).parse({
         name: "生命恢复",
         description: "每回合恢复生命值",
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'hp',
             value: 8,

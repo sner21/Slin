@@ -7,7 +7,7 @@ export const items_medic = [
         name: "生命药水",
         cost: 50,
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'hp',
             value: 100,
@@ -26,14 +26,14 @@ export const items_medic = [
         cost: 50,
         effects: [
             {
-                target: 'attacker',
+                target: 'self',
                 path: 'status',
                 attr: 'hp',
                 value: 200,
                 operator: 'increase',
             },
             {
-                target: 'attacker',
+                target: 'self',
                 path: 'status',
                 attr: 'mp',
                 value: 100,
@@ -52,7 +52,7 @@ export const items_medic = [
         name: "小型生命药水",
         cost: 50,
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'hp',
             value: 50,
@@ -67,7 +67,7 @@ export const items_medic = [
         name: "中型生命药水",
         cost: 50,
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'hp',
             value: 150,
@@ -86,7 +86,7 @@ export const items_medic = [
         name: "魔力恢复药剂",
         cost: 50,
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'mp',
             value: 80,
@@ -105,7 +105,7 @@ export const items_medic = [
         name: "战斗药剂",
         cost: 50,
         effects: [{
-            target: 'attacker',
+            target: 'self',
             path: 'status',
             attr: 'hp',
             value: 100,

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EffectType, Skill, SkillType } from "../skill";
 import { ElementType } from "..";
-import { EffectsSchema } from "../char/attr";
+import { EffectSimple } from "../char/attr";
 
 
 export const LogsType = z.enum(['tatakai', 'global', 'event', 'status', 'settle'])
@@ -67,18 +67,18 @@ export const BattleActionSchema = z.object({
     element: ElementType,
     effectType: EffectType,
     isEvaded: z.boolean().default(false),        // 是否被闪避
-    attacker: z.object({
+    self: z.object({
         type: z.string(),
         name: z.string(),
         id: z.string(),
     }),
-    defender: z.object({
+    target: z.object({
         type: z.string(),
         name: z.string(),
         id: z.string(),
     }),
     // 额外效果
-    effects: z.array(EffectsSchema).optional(),
+    effects: z.array(EffectSimple).optional(),
     // 战斗数据
     sourceHp: z.number().optional(),         // 攻击方血量
     targetHp: z.number().optional(),         // 目标血量

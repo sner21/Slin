@@ -1,7 +1,7 @@
 import { number, z } from "zod";
 import { Skill, SkillType, SkillTypeMap } from "../skill";
 import cloneDeep from "lodash-es/cloneDeep";
-import { AbilitySchema, CarryBuffSchema, EffectsSchema } from "./attr";
+import { AbilitySchema, CarryBuffSchema } from "./attr";
 import { ElementType } from "..";
 import { BattleActionSchema } from "../record/type";
 

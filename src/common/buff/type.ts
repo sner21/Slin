@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ElementType } from '..';
 import { Effect } from '@tauri-apps/api/window';
-import { AbilitySchema, EffectsSchema } from '../char/attr';
+import { AbilitySchema, EffectSimple } from '../char/attr';
 
 // Buff/Debuff 类型
 export const BuffType = z.enum([
@@ -56,8 +56,8 @@ export const BuffSchema = z.object({
     name: z.string(),
     // type: BuffType,
     description: z.string(),
-    effects: z.array(EffectsSchema).default([]),
-    cancelEffects: z.array(EffectsSchema).default([]),
+    effects: z.array(EffectSimple).default([]),
+    cancelEffects: z.array(EffectSimple).default([]),
     // 持续时间相关
     durationType: BuffDurationType.default('TURNS'),
     duration: z.number().optional(),
