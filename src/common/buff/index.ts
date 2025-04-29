@@ -1,17 +1,17 @@
 import { z } from "zod";
 import { Character } from "../char/types";
-import { buff_data } from "./data/buff";
+import { buff_init } from "./data/buff";
 import { AbilitySchema } from "../char/attr";
 import assignIn from "lodash-es/assignIn";
+import { keyBy } from "lodash-es";
+import { BuffSchema } from "./type";
 
 
 export function BuffManage(dataCon) {
-    const buff_default = {
-        ...buff_data,
-    }
-
+    const buff_data = z.array(BuffSchema).parse(buff_init)
+    const buff_map = keyBy(buff_data,'id')
     const add_buff = (role: Character, id: string, self = undefined) => {
-        const buff = buff_default[id]
+        const buff = buff_map[id]
         if (!buff) {
             return
         }
@@ -46,13 +46,13 @@ export function BuffManage(dataCon) {
     }
     const load_plugins_buff = (data: any[]) => {
         data.forEach(i => {
-            buff_default[i.id] = assignIn(buff_default[i.id], i)
+            buff_map[i.id] = assignIn(buff_map[i.id], i)
         })
     }
     const settle_buff = (role: Character) => {
         Object.keys(role.buff || {}).forEach(k => {
             const i = role.buff[k]
-            const buff = buff_default[i.id]
+            const buff = buff_map[i.id]
             if (!buff) {
                 return
             }
@@ -76,7 +76,8 @@ export function BuffManage(dataCon) {
     }
     return {
         settle_buff,
-        buff_default,
+        buff_map,
+        buff_data,
         add_buff,
         load_plugins_buff
     }

@@ -61,7 +61,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     const showTooltipContent = useRef(false);
     const currentItem = useRef(null);
     const mousePos = useRef({ x: 0, y: 0 });
-    const frameEnum: z.infer<typeof CharacterDisplaySchema.shape.display>["frame_type"][] = ['skill', 'equip', 'item', 'troops', 'state', 'logs']
+    const frameEnum: z.infer<typeof CharacterDisplaySchema.shape.display>["frame_type"][] = ['skill', 'item', 'equip', /* 'troops', */ /* 'state',  */'logs']
     // function windowResize() {
     //     const devicewidth = document.documentElement.clientWidth;//获取当前分辨率下的可是区域宽度
     //     const clientHeight = document.documentElement.clientHeight;
@@ -271,12 +271,14 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                             <>
                                                 {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
                                                     <span className="text-sm">
-                                                        {at.self.name} -&gt;   <span>{at.target.id === at.self.id ? "自身" : at.target.name} -&gt;</span>
-                                                        <span style={{ color: elementColors[at.element] }}> {SkillMap[at.skillId]?.name || ""}</span>
-                                                        {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>} -&gt;
-                                                        <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : at.damage.hp}</span>
+                                                        {at.self.name} -&gt;   {at.target.id !== at.self.id && <span>{at.target.name} -&gt;</span>}
+                                                        <Popover className="inline" content={template(SkillMap[at.skillId].description)(at.self)} trigger="hover">
+                                                            <span style={{ color: elementColors[at.element] ||elementColors[battleManager.current.roles_group[at.self.id]?.element]  }}> {(SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name) || ""}{at.effectType && at.effectType !== 'DAMAGE' && <span class="text-xs">({at.effectType})</span>}</span>
+                                                        </Popover>
+                                                        {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>}
+                                                        &#160;-&gt;  <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : (at.effectType === 'HEAL' ? -at.damage.hp : at.damage.hp)}</span>
                                                         {/* 施加BUFF */}
-                                                        {at.buffs?.length && at.buffs.map((buff) => <span>{ battleManager.current.BuffManage. }</span>)}
+                                                        {at.buffs?.length && <span> -&gt; BUFF -&gt;{at.buffs.map((buff) => <span>&#160;{battleManager.current.BuffManage.buff_map[buff.id]?.name}</span>)}</span>}
                                                     </span>
                                                 )}
                                                 {(logsType.current === 'event' || at.logs_type === 'event') && (
@@ -357,16 +359,22 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                     />
                                                     {/* BUFF */}
                                                     {/* <div className=" gap-0.1 md:gap-0.5  scale-80   items-center text-xs text-gray-300"> */}
-                                                    {Object.keys(item.buff).map((key, index) => (
-                                                        <div key={index} className="text-xs text-gray-300">
-                                                            {battleManager.current?.BuffManage?.buff_default[item.buff[key]?.id]?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
-                                                        </div>
-                                                    ))}
+                                                    {Object.keys(item.buff).map((key, index) => {
+                                                        const buff = battleManager.current?.BuffManage?.buff_map[item.buff[key]?.id]
+                                                        return (
+                                                            <div key={index} className="text-xs text-gray-300">
+                                                                <Popover className="w-auto  inline" content={template(buff.description)(item)} trigger="hover">
+                                                                    {buff?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
+                                                                </Popover>
+                                                            </div>
+
+                                                        )
+                                                    })}
                                                     {/* </div> */}
                                                 </div>
 
                                                 {/* 角色状态 */}
-                                                <div className="flex flex-col h-full justify-center flex-wrap items-center gap-1 w-70 text-gray-300 text-sm">
+                                                <div className="flex flex-col h-full justify-center flex-wrap  gap-1 w-70 text-gray-300 text-sm">
                                                     <div className="relative w-full mb-1">
                                                         <div className="text-center w-full absolute top-0 left-0 -translate-y-100%" style={{ display: item.salu ? '' : 'none' }}>{`< ${item.salu} >`}</div>
                                                         <b className="text-lg w-full text-center text-amber-400 inline-block text-center">
@@ -403,17 +411,23 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                         </div>
                                                     </div>
                                                     {/* 属性列表 */}
-                                                    <div className="flex gap-0.5 min-w-20 flex-wrap w-full text-xs justify-center">
-                                                        {item.ability && Object.entries(item.ability).map(([attr, ability]) => (
-                                                            attr !== 'hp' && AttributeNameCN[attr as keyof typeof AttributeNameCN] && (
-                                                                <b key={attr} className="basis-45% indent-sm">
-                                                                    {AttributeNameCN[attr as keyof typeof AttributeNameCN]}:
-                                                                    <span>
-                                                                        {item.imm_ability[attr] || ability || 0}
-                                                                    </span>
-                                                                </b>
-                                                            )
-                                                        ))}
+
+                                                    <div className="group flex gap-0.5 min-w-20 flex-wrap w-full text-xs justify-center h-[88px]">
+                                                        <div className="group-hover:flex  w-full text-xs justify-center hidden h-full">
+                                                            <div className="text-md h-full flex items-center">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
+                                                        </div>
+                                                        <div className="flex gap-0.5 min-w-20 flex-wrap w-full text-xs justify-center group-hover:hidden">
+                                                            {item.ability && Object.entries(item.ability).map(([attr, ability]) => (
+                                                                attr !== 'hp' && AttributeNameCN[attr as keyof typeof AttributeNameCN] && (
+                                                                    <b key={attr} className="basis-45% indent-sm">
+                                                                        {AttributeNameCN[attr as keyof typeof AttributeNameCN]}:
+                                                                        <span>
+                                                                            {item.imm_ability[attr] || ability || 0}
+                                                                        </span>
+                                                                    </b>
+                                                                )
+                                                            ))}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 {/* 技能和装备部分 */}
@@ -440,7 +454,10 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             <div className="flex flex-wrap indent-xs flex-1 items-center" style={{ display: item.display.frame_type === "logs" ? "" : "none" }}>
                                                                 {/* 事件列表 */}
                                                                 <div className="text-sm text-gray-300  flex flex-col gap-2 items-center flex-1">
-                                                                    <span>造成伤害 {item.status?.damage || 0}</span>
+                                                                    <div className="w-full text-center">
+                                                                        {/* <div className="text-md">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div> */}
+                                                                        <span className="text-center">造成伤害 {item.status?.damage || 0}</span>
+                                                                    </div>
                                                                     {/* 角色攻击记录 VList */}
                                                                     <VList
                                                                         className="flex-1 px-4 w-full"
@@ -504,7 +521,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                             >
                                                                                 {
                                                                                     (ii && (
-                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && ii.description} title={itemsManager.current && itemData?.name} trigger="hover">
+                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && template(ii.description)(item)} title={itemsManager.current && itemData?.name} trigger="hover">
                                                                                             {itemData?.icon ? <img
                                                                                                 src={itemData?.icon}
                                                                                                 className="object-contain"

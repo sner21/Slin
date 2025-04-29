@@ -51,7 +51,7 @@ export const BattleActionSchema = z.object({
     // 基础信息
     skillId: z.string().optional(),
     skillName: z.string().default("未知"),
-    skillType: SkillType.optional(),         // 技能类型
+    scopeType: SkillType.optional(),         // 技能类型
     elementalBonus: z.number().default(1),      // 元素克制倍率
     // 伤害相关
     damage: z.object({

@@ -5,16 +5,7 @@ import { AbilitySchema, CarryBuffSchema } from "./attr";
 import { ElementType } from "..";
 import { BattleActionSchema } from "../record/type";
 
-// 技能效果类型
-export const EffectType = z.enum([
-  'DAMAGE',            // 伤害
-  'HEAL',             // 治疗
-  'SHIELD',           // 护盾
-  'BUFF',             // 增益
-  'DEBUFF',            // 减益
-  'REGEN',            // 回复
-  'DEFAULT'
-]);
+
 
 export const ActionSchema = z.array(BattleActionSchema);
 export const ItemsDataSchema = z.object({
@@ -94,6 +85,7 @@ export const CharacterSaveSchema = z.object({
   }).default({}),
   ability: AbilitySchema.merge(BaseStatSchema).default({}),
   normal: z.string().default(SkillTypeMap.NORMAL_ATTACK.physical_normal.id),
+  normal_name:z.string().optional(),
   skill: z.array(z.string()).max(8).optional(),
   grow: z.object({
     level: z.number().min(0).max(50).default(1), // 角色等级

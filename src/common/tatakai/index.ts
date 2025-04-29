@@ -833,7 +833,7 @@ export class BattleManager {
         const at = BattleActionSchema.parse({
             logs_type: 'tatakai',
             skillId: skill.id,
-            skillType: skill.type,
+            scopeType: skill.type,
             skillName: skill.name,
             sourceId: self.id,
             targetId: target.id,
@@ -846,7 +846,7 @@ export class BattleManager {
             isCrit,
             elementalBonus,
             element: skill.element,
-            effectType: "DAMAGE",
+            effectType: skill.effectType,
             timestamp: Date.now(),
             isEvaded,
             self: {

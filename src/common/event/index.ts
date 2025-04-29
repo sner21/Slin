@@ -85,7 +85,7 @@ export function EventManager(dataCon) {
             // const at = {
             //     logs_type: 'tatakai',
             //     skillId: 'hutao_skill',
-            //     skillType: 'ELEMENTAL_SKILL',
+            //     scopeType: 'ELEMENTAL_SKILL',
             //     skillName:'蝶引来生',
             //     sourceId: 1,          // 攻击方ID
             //     targetId: 2,          // 目标ID

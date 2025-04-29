@@ -5,13 +5,13 @@ import { Skill } from './types';
 import { z } from 'zod';
 export * from './types';
 
-// 合并所有技能
+
 export const SkillMap: Record<string, Skill> = z.record(Skill).parse({
     ...NORMAL_ATTACK,
     ...ELEMENTAL_SKILL,
     ...ELEMENTAL_BURST,
 });
-// 合并所有技能
+
 export const SkillTypeMap: Record<string, Record<string, Skill>> = z.record(z.record(Skill)).parse({
     NORMAL_ATTACK,
     ELEMENTAL_SKILL,

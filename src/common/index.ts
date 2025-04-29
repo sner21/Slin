@@ -53,7 +53,7 @@ export const elementColors = ElementColors.parse({
     thunder: 'rgb(247 255 59)',
     wind: '#80FF80',
     water: '#3399FF',
-    default: '#CCCCCC',
+    // default: '#CCCCCC',
     grass: '#33CC33',
     dark: '#9966FF',  //#9966FF rgb(71 24 228)
     light: '#FFE666'

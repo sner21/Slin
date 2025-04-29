@@ -1,9 +1,6 @@
-import { z } from "zod";
-import { BuffSchema } from "../type";
 
-
-export const buff_data = z.record(BuffSchema).parse({
-    'ack_up': {
+export const buff_init = [
+    {
         id: "ack_up",
         name: "提升攻击力",
         description: "提升攻击力",
@@ -17,11 +14,10 @@ export const buff_data = z.record(BuffSchema).parse({
         durationType: "TURNS",
         duration: 3,
         isDebuff: false,
-    },
-    '蝶引来生': {
-        id: "蝶引来生",
-        name: "蝶引来生",
-        description: "提升攻击力",
+    }, {
+        id: "彼岸蝶舞",
+        name: "彼岸蝶舞",
+        description: "提高\${name}的攻击力",
         effects: [{
             target: 'self',
             path: 'status',
@@ -30,10 +26,9 @@ export const buff_data = z.record(BuffSchema).parse({
             operator: 'increase',
         }],
         durationType: "TURNS",
-        duration: 6,
+        duration: 9,
         isDebuff: false,
-    },
-    'speed_down': {
+    }, {
         id: "speed_down",
         name: "减速",
         description: "降低速度",
@@ -47,8 +42,7 @@ export const buff_data = z.record(BuffSchema).parse({
         durationType: "TURNS",
         duration: 2,
         isDebuff: true,
-    },
-    'regeneration': {
+    }, {
         id: "regeneration",
         name: "生命恢复",
         description: "每回合恢复生命值",
@@ -63,4 +57,5 @@ export const buff_data = z.record(BuffSchema).parse({
         duration: 5,
         isDebuff: false,
     }
-})
+]
+

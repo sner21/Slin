@@ -2,16 +2,29 @@ import { z } from 'zod';
 import { costTypeSchema, EffectSimple } from '../char/attr';
 import { ElementType, get_svg_uri } from '..';
 
+// 技能效果类型
+export const EffectType = z.enum([
+    'DAMAGE',            // 伤害
+    'HEAL',             // 治疗
+    'BUFF',             // 增益
+    'DEBUFF',            // 减益
+    'DEFAULT'
+]);
 // 移动所有类型定义到这里
 
 export const SkillType = z.enum(['NORMAL_ATTACK', 'ELEMENTAL_SKILL', 'ELEMENTAL_BURST', 'PASSIVE']);
 
 // 技能目标类型
-export const skillType = z.enum([
+export const skillCls = z.enum([
+    "NORMAL_ATTACK",
+    "ELEMENTAL_SKILL",
+    "ELEMENTAL_BURST",
+    "PASSIVE"
+]);
+export const scopeType = z.enum([
     'SINGLE',            // 单体
     'MULTI',             // 多目标
     'ALL',               // 全体
-
 ]);
 export enum targetTypeEnum {
     'ENEMY' = 'ENEMY',               // 敌人
@@ -20,25 +33,15 @@ export enum targetTypeEnum {
 }
 export const targetType = z.nativeEnum(targetTypeEnum).default(targetTypeEnum.ENEMY)
 
-// 技能效果类型
-export const EffectType = z.enum([
-    'DAMAGE',            // 伤害
-    'HEAL',             // 治疗
-    'SHIELD',           // 护盾
-    'BUFF',             // 增益
-    'DEBUFF',            // 减益
-    'REGEN',            // 回复
-    'DEFAULT'
-]);
-
 // 技能数据结构
 export const Skill = z.object({
     id: z.string(),
     name: z.string(),
     type: SkillType,
+    // cls: skillCls,
     damageType: z.enum(['physical', 'magic']),
     description: z.string(),
-    skillType: skillType,
+    scopeType: scopeType,
     targetType: targetType,
     effectType: EffectType,
     not_lethal: z.boolean().optional(),

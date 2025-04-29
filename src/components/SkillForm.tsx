@@ -24,7 +24,7 @@ const SkillForm = () => {
         onFinish={onFinish}
         initialValues={{
           type: 'ELEMENTAL_BURST',
-          skillType: 'ALL',
+          scopeType: 'ALL',
           effectType: 'DAMAGE',
           cooldown: 5,
           element: 'ice',
@@ -66,7 +66,7 @@ const SkillForm = () => {
         </Form.Item>
 
         <Form.Item
-          name="skillType"
+          name="scopeType"
           label="目标类型"
         >
           <Select>

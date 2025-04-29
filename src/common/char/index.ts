@@ -302,6 +302,7 @@ export const initialData = DataSchema.parse([
     gender: "2",
     element: "fire", // 修正元素属性为火
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    normal_name: "往生秘传枪法",
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
       SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id

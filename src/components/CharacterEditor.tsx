@@ -118,7 +118,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
                 {renderFormItem(CharacterSaveSchema.shape.element, handleField("element"))}
                 {renderFormItem(CharacterSaveSchema.shape.salu, handleField("salu"))}
                 {renderFormItem(CharacterSaveSchema.shape.normal, handleField("normal", () => {
-                  return <Select mode="multiple" placeholder="普通攻击" onChange={(normal) => form.setFieldValue('normal', normal)}>
+                  return <Select  placeholder="普通攻击" onChange={(normal) => form.setFieldValue('normal', normal)}>
                     {Object.values(SkillMap).map((value: string) => (
                       <Select.Option value={value.id} >
                         {value.name}
@@ -162,7 +162,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
         ]}
       />
     </Form>
-  ),[avatarType, isAvatarLocal]);
+  ),[avatarType, isAvatarLocal,update]);
 };
 
 export default React.memo(CharacterEditor)
