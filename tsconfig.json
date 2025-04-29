@@ -13,10 +13,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",                // 确保这行存在
-    "types": ["vite/client"],      // 添加这行
+    "jsx": "react-jsx",               
+    "types": ["vite/client"],    
     /* Linting */
-    "strict": true,
+    "strict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true

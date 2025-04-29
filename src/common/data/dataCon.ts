@@ -145,10 +145,8 @@ export class DataCon {
         if (!save || loadMode) {
             this.newData()
             save = this.init_data
-            console.log(this.init_data, 'this.init_data')
         } else {
             save = JSON.parse(save)
-            console.log(this.init_data, '123')
         }
 
         this.characters = save.characters.map(i => CharacterSchema.parse(i))

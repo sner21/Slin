@@ -25,7 +25,7 @@ interface CharacterEditorProps {
   setCurRoleEdit
 }
 
-const CharacterEditor: React.FC<CharacterEditorProps> = ({
+const ItemsEditor: React.FC<CharacterEditorProps> = ({
   formRef,
   onSave,
   curRoleEdit,
@@ -35,7 +35,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   handleDeleteCharacter,
   setCurRoleEdit,
 }) => {
-
   const [form] = Form.useForm();
   const [avatarType, setAvatarType] = useState('local');
   const [update, setUpdate] = useState(0);
@@ -62,8 +61,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
     setUpdate(update + 1)
   }, []);
 
-
-
   const handleField = (field: string, slot?: Component) => {
     const i = get(CharacterTranslations, field) || field
     return { field: field, label: i.label?.zh || i.zh, slot }
@@ -71,7 +68,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   useEffect(() => {
     if (formRef) formRef.current = form;
   }, [form, formRef]);
-  return curRoleEdit.visible ? (
+  return useMemo(() => (<>{curRoleEdit.visible ? (
     <Form
       form={form}
       layout="vertical"
@@ -99,7 +96,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
                 </Form.Item> */}
 
                 {renderFormItem(ItemBaseSchema.shape.name, handleField("name"))}
-                {renderFormItem(ItemBaseSchema.shape.effects, handleField("effects"))}
+                {/* {renderFormItem(ItemBaseSchema.shape.effects, handleField("effects"))} */}
                 {renderFormItem(ItemBaseSchema.shape.type, handleField("type"))}
                 {renderFormItem(ItemBaseSchema.shape.description, handleField("description"))}
                 {/* {renderFormItem(ItemBaseSchema.shape.buffs, handleField("buffs"))} */}
@@ -146,8 +143,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
       visible: true,
       data: null
     })}
-  />;
-};
+  />}</>), [curRoleEdit])
+
+}
 const EffectsFormList: React.FC<EffectsFormListProps> = ({ handleField }) => {
   return (
 
@@ -388,4 +386,4 @@ const CharacterSelector: React.FC<any> = ({
 };
 
 
-export default React.memo(CharacterEditor)
+export default React.memo(ItemsEditor)

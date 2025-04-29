@@ -3,9 +3,9 @@ import { BuffSchema } from "../type";
 
 
 export const buff_data = z.record(BuffSchema).parse({
-    'strength_up': {
-        id: "strength_up",
-        name: "力量增强",
+    'ack_up': {
+        id: "ack_up",
+        name: "提升攻击力",
         description: "提升攻击力",
         effects: [{
             target: 'attacker',

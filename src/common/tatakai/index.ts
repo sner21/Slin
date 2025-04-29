@@ -1,6 +1,6 @@
 import { Character, Action, Ability, CharacterSaveSchema, CharacterSchema } from "../char/types";
 import { bb, BB, initialData } from "../char";
-import { Skill, SkillMap } from "../skill";
+import { Skill, SkillMap, targetTypeEnum } from "../skill";
 import { EquipmentMap } from "../equip";
 import { CooldownManager } from "../skill/cooldown";
 import { ActionGauge } from "./action";
@@ -26,6 +26,7 @@ const PluginsDataSchma = z.object({
 })
 import assignIn from "lodash-es/assignIn";
 import { isNumber } from "lodash-es";
+import { targetType } from '../skill/types';
 
 // 战斗管理器
 export class BattleManager {
@@ -307,7 +308,7 @@ export class BattleManager {
             const baseExp = 2
             const rarityBonus = role.grow.rarity * 0.1 + 0.9
             const gainExp = Math.floor(baseExp * rarityBonus)
-//TODO
+            //TODO
             // role.grow.exp += gainExp
 
             while (true) {
@@ -349,6 +350,10 @@ export class BattleManager {
             char.status.hp = 0
             char.status.mp = 0
             char.state = 1
+            char.buff = {}
+            this.actionGauge.gauges.set(char.id, 0)
+            this.cooldownManager.resetCharacterCooldowns(char.id)
+            //cooldownManager  actionGauge
             char.description = "正在休息"
             if (!char.status.reborn || char.status?.reborn <= 0) {
                 char.status.reborn = char.ability.reborn || 10
@@ -459,7 +464,7 @@ export class BattleManager {
             target = aliveEnemies[0];
         }
 
-        role.target = target;
+        return target;
     }
     update_cur() {
         this.cur_enemy = this.enemy.filter(i => i.position?.index)
@@ -477,7 +482,7 @@ export class BattleManager {
         list.forEach((i, k) => {
             i.forEach(role => {
                 if (!this.roleAarry[k]) this.roleAarry[k] = {}
-                if (role.position?.index) {
+                if (isNumber(role.position?.index)) {
                     const index = k === 1 ? getMirrorPosition(role.position.index) : role.position.index
                     this.roleAarry[k][index] = {
                         id: role.id,
@@ -501,24 +506,7 @@ export class BattleManager {
             const i = actionOrder[key]
             //计算角色属性
             if (isNumber(i.status?.find_gap) && actionOrderId.includes(i.id)) {
-                //索敌
-                if (i.ability.find_gap === i.status.find_gap || Number(i.target?.state) === 1) {
-                    if (i.type === "1") {
-                        this.get_target(i, this.cur_characters)
-                    } else {
-                        this.get_target(i, this.cur_enemy)
-                    }
-                    // i.status.find_gap = i.ability.find_gap
-                    i.status.find_gap = 0
-                } else {
-                    i.status.find_gap += 1
-                }
-                if (!i.target) {
-                    continue
-                }
-                this.useSkill(i, i.target, i.normal)
-                this.get_round_ack(i, i.target)
-                this.finishAction(i);
+                this.handle_target(i)
             }
             //获取所有角色事件
             this.total_event(i)
@@ -526,18 +514,41 @@ export class BattleManager {
         this.endTurn()
         // console.log(this.tatakai_logs, "总事件")
     }
+    handle_target(i: Character) {
+        if (!i.status) return
+        //索敌
+        if (i.ability.find_gap === i.status.find_gap || Number(i.target?.state) === 1) {
+            i.target = this.get_target(i, i.type === "1" ? this.cur_characters : this.cur_enemy)
+            i.status.find_gap = 0
+        } else {
+            i.status.find_gap = (i.status.find_gap || 0) + 1
+        }
+        if (!i.target) {
+            return
+        }
+        this.useSkill(i, i.target, i.normal)
+        this.get_round_ack(i, i.target)
+        this.finishAction(i);
 
+    }
     // 获取当前回合可行动的角色
     getActionOrder(characters: Character[]): Character[] {
         // 更新所有角色的行动条
         this.actionGauge.updateGauges(characters);
         // 获取可以行动的角色
-
         const readyCharacters = this.actionGauge.getReadyCharacters(characters);
         // 按速度排序
         return readyCharacters.sort((a, b) => b.imm_ability.speed - a.imm_ability.speed);
     }
-
+    get_skill_target(skill, char, bb) {
+        switch (skill.targetType) {
+            case targetTypeEnum.ENEMY: return bb
+            case targetTypeEnum.SELF: return char
+            //TODO 暂时随机
+            // case targetTypeEnum.ALLY: return this.cur_characters[randomInt(0, this.cur_characters.length - 1)]
+            case targetTypeEnum.ALLY: return this.get_target(char, this.cur_characters)
+        }
+    }
     //检查并更新cost 获取当前一轮要释放的技能
     get_round_ack(char: Character, bb: Character) {
         char.skill?.forEach(id => {
@@ -587,6 +598,11 @@ export class BattleManager {
                 data[attr](value)
                 break
             }
+            case "multiply": {
+                data[attr] * value
+                break
+            }
+
         }
         if (effect.attr === 'hp' && effect.target === 'defender' && sourceId && targetId /* && target !== 'global' */) {
             this.compute_damage(sourceId, targetId, value)
@@ -672,10 +688,10 @@ export class BattleManager {
         isCrit = Math.random() * 100 <= attacker.ability.crit_rate;
         //计算伤害
         if (skill.damageType === 'physical') {
-            damage = attacker.imm_ability.attack * (skill.multiplier || 100) / 100
+            damage = attacker.imm_ability.attack * (Number(skill.multiplier) ) / 100
             damage = char_attack_physical(attacker, defender, damage)
         } else {
-            damage = attacker.imm_ability.elem_bonus * (skill.multiplier || 100) / 100
+            damage = attacker.imm_ability.elem_bonus * (Number(skill.multiplier)) / 100
             damage = char_attack_magic(attacker, defender, damage)
         }
         //元素适应性加成
@@ -809,6 +825,7 @@ export class BattleManager {
                 hp: damage,
             },
             cost: skill.cost || {},
+            buffs:skill.buffs,
             isCrit,
             elementalBonus,
             element: skill.element,
@@ -860,7 +877,7 @@ export class BattleManager {
             }
         }
         //使用技能
-        this.char_attack(character, bb, skill)
+        this.char_attack(character, this.get_skill_target(skill, character, bb), skill)
         // 添加冷却
         this.cooldownManager.startCooldown(character.id, skillId, skill.cooldown);
     }

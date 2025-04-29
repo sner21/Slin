@@ -22,6 +22,7 @@ export const CustomP: React.FC<ShopEditorProps> = ({
     // onSave,
     // initialValues
 }) => {
+    
     const [itemEditorOpen, setItemEditorOpen] = useState(false);
     const FormRef = useRef<FormInstance>();
     const [disabled, setDisabled] = useState(true);
@@ -205,11 +206,4 @@ export const CustomP: React.FC<ShopEditorProps> = ({
 
 
 
-interface DraggableModalProps {
-    title: string;
-    open: boolean;
-    onCancel: () => void;
-    children: React.ReactNode;
-    footer?: React.ReactNode[];
-}
 

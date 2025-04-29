@@ -3,6 +3,7 @@ import tw, { styled } from "twin.macro";
 import ReactMarkdown from 'react-markdown';
 import { elementColors, getMirrorPosition } from '../../common';
 import cloneDeep from 'lodash-es/cloneDeep';
+import { isNumber } from 'lodash-es';
 
 
 
@@ -44,7 +45,6 @@ box-sizing:border-box;
 `;
 const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
     const [roleAarry, setRoleAarry] = useState(roleAarryData || {});
-
     const [roleData, setRoleData] = useState(roles || []);
     const [roleFlat, setRoleFlat] = useState([]);
     const [curRole, setCurRole] = useState<{
@@ -108,7 +108,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                     a[type] = {
                         [key]: roleAarry[type][index] || {},
                     }
-                    if (role.index) {
+                    if (isNumber(role.index)) {
                         a[type][key].index = role.index
                     }
                 }
@@ -174,7 +174,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
 
 
     return (
-        <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box",  }} onClick={() => setCurRole({})}>
+        <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box", }} onClick={() => setCurRole({})}>
             <div>
                 <div className='text-center h-20  items-center justify-center'>
                     <ReactMarkdown>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { Button, InputNumber, Tabs } from 'antd';
+import { Button, InputNumber, Switch, Tabs } from 'antd';
 import { Equipment } from '../common/equip';
 import { ItemBaseSchema } from '../common/items/type';
+
 
 
 interface Props {
@@ -11,26 +12,33 @@ interface Props {
   data?: (Equipment | ItemBaseSchema)[];
   onPurchase?: (id: string, quantity: number, cls: string) => void;
   id?: string
+  roleId?: string
   cls?: string
+  name?: string
 }
 
 const ItemShop: React.FC<Props> = ({ data = {
   ITEM: [],
   EQUIP: [],
-}, playerCurrency = 0, onPurchase, id = "" }) => {
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const getQuantity = (id: string) => quantities[id] || 1;
-  const handleQuantityChange = (id: string, value: number) => {
-    if (value > 0) {
-      setQuantities(prev => ({ ...prev, [id]: value }));
-    }
-  };
-
+}, playerCurrency = 0, onPurchase, id = "", roleId = "", name }) => {
+  // const [quantities, setQuantities] = useState<Record<string, number>>({});
+  // const getQuantity = (id: string) => quantities[id] || 1;
+  // const handleQuantityChange = (id: string, value: number) => {
+  //   if (value > 0) {
+  //     setQuantities(prev => ({ ...prev, [id]: value }));
+  //   }
+  // };
+  const [activeMode, setActiveMode] = useState('ITEM');
   return (
     <div className="px-3">
-      {/* <h2 className="text-xl font-bold mb-2">商店</h2> */}
-      <div className="mb-0">
-        <span className="text-sm">{id ? `当前金币: ${playerCurrency.toFixed(0)}` : "请先选择人物(点击人物头像)"}</span>
+      <div className="flex items-center  mb-0">
+        <span className="text-sm">{roleId ? `当前金币: ${playerCurrency.toFixed(0)} (${name})` : "请先选择人物(点击人物头像)"}</span>
+        {/* <div className="flex gap-4 items-center  mb-0 ml-auto mr-8">
+          <span>物品</span>
+          <Switch onChange={e => setActiveMode(e ? 'EQUIP' : 'ITEM')}></Switch>
+          <span>装备</span>
+        </div> */}
+
       </div>
       <Tabs
         className='w-full h-full'
@@ -40,14 +48,14 @@ const ItemShop: React.FC<Props> = ({ data = {
             key: 'ITEM',
             label: '物品',
             children: (<>
-              <ItemMain data={data['ITEM']} playerCurrency={playerCurrency} onPurchase={onPurchase} id={id} cls={"ITEM"}></ItemMain>
+              <ItemMain data={data['ITEM']} playerCurrency={playerCurrency} onPurchase={onPurchase} id={roleId} cls={"ITEM"}></ItemMain>
             </>)
           },
           {
             key: 'EQUIP',
             label: '装备',
             children: (<>
-              <ItemMain data={data['EQUIP']} playerCurrency={playerCurrency} onPurchase={onPurchase} id={id} cls={"EQUIP"}></ItemMain>
+              <ItemMain data={data['EQUIP']} playerCurrency={playerCurrency} onPurchase={onPurchase} id={roleId} cls={"EQUIP"}></ItemMain>
             </>)
           },
         ]
@@ -74,14 +82,13 @@ const ItemMain: React.FC<Props> = ({ data = [], playerCurrency = 0, onPurchase, 
 
         return (
           <div
-            key={item.id}
             className="border rounded p-2 bg-transparent"
           >
             <div className="flex flex-col space-x-2 justify-center items-center overflow-hidden">
               {item.icon && <img src={item.icon} alt={item.name} className="w-6 h-6" />}
               <div className="flex-1 min-w-0 overflow-hidden w-full text-center">
                 <h3 className="text-sm font-medium truncate my-2">{item.name}</h3>
-                <p className="text-xs text-gray-500 truncate overflow-hidden my-0.5">{item.description||"..."}</p>
+                <p className="text-xs text-gray-500 truncate overflow-hidden my-0.5">{item.description || "..."}</p>
               </div>
             </div>
             <div >

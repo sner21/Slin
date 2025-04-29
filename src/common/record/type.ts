@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EffectType, SkillType } from "../skill";
+import { EffectType, Skill, SkillType } from "../skill";
 import { ElementType } from "..";
 import { EffectsSchema } from "../char/attr";
 
@@ -63,6 +63,7 @@ export const BattleActionSchema = z.object({
         mp: z.number().default(0),
     }),
     isCrit: z.boolean().default(false),          // 是否暴击
+    buffs: Skill.shape.buffs,          // buff
     element: ElementType,         
     effectType: EffectType,       
     isEvaded: z.boolean().default(false),        // 是否被闪避

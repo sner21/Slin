@@ -27,7 +27,7 @@ const Dialog: React.FC<DialogProps & { isActive?: boolean }> = ({
   minHeight = 150,
   zIndex = 1000,
   handleDialogClick,
-  isActive = false
+  isActive = false,
 }) => {
   const [position, setPosition] = useState(initialPosition || {
     x: Math.max(0, (window.innerWidth / 2 - initialSize.width / 2)),

@@ -42,6 +42,8 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
     const [curRole, setCurRole] = useState<Character | { id: string, carry: any }>({
         id: "",
+        cid: "",
+        name: "",
         carry: {}
     })
     useEffect(() => {
@@ -51,7 +53,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         })
         console.log(battleManager.current, ' battleManager.current', data)
     }, [])
-    const { openDialog, updateDialog, closeDialog } = useDialog();
+    const { openDialog, updateDialog, closeDialog, dialogs } = useDialog();
 
     const itemsManager = useThrottledProxyRef(battleManager.current?.ItemsManager?.ItemsData);
     const logsType = useThrottledProxyRef('tatakai');
@@ -82,7 +84,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         { value: 'global', label: '全局' },
     ]);
     const ItemShopRef =
-        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} key={curRole.id} id={curRole.id}
+        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} name={curRole.name} id={curRole.cid} roleId={curRole.id}
             data={{
                 ITEM: Object.values(battleManager.current?.ItemsManager.ItemsData) || [],
                 EQUIP: battleManager.current?.ItemsManager.equipmentsData || [],
@@ -134,20 +136,35 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         }
     }
     const openShop = (id = "") => {
+
         if (id) {
             setCurRole(battleManager.current?.roles_group[id])
+
         } else {
             setCurRole({ id: "" })
+            console.log(dialogs)
+            if(dialogs){
+                const a = dialogs.find(i => i.id === `item-shop`)
+                if (a) {
+                    return closeDialog(`item-shop`)
+                }
+            }
+       
         }
-        closeDialog(`item-shop`)
         openDialog({
             id: `item-shop`,
             title: "商店",
             initialSize: { width: 800, height: 600 },
+            initialPosition: { x: window.innerWidth - 800, y: 0 },
             minWidth: 800,
             minHeight: 500,
             content: (ItemShopRef),
         })
+        updateDialog('item-shop', {
+            content: (
+                ItemShopRef
+            )
+        });
     }
     useEffect(() => {
         coldData.current = battleManager.current?.cooldownManager.cooldowns;
@@ -275,7 +292,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                         </div>
                     </div>
                     {/* 队伍 */}
-                    {arrConOpen && <div className="  flex-1  z-6 w-full relativ overflow-x-hiddene" style={{background:"url(/ArrayBg.jpg)"}}>
+                    {arrConOpen && <div className="  flex-1  z-6 w-full relativ overflow-x-hiddene" style={{ background: "url(/ArrayBg.jpg)" }}>
                         {AarryCon}
                     </div>}
                     <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>

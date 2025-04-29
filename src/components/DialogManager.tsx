@@ -4,6 +4,7 @@ import Dialog from './Dialog';
 interface DialogConfig {
   id: string;
   title: string;
+  roleId: string;
   content: React.ReactNode;
   initialPosition?: { x: number; y: number };
   initialSize?: { width: number; height: number };
@@ -16,6 +17,7 @@ interface DialogContextType {
   openDialog: (config: DialogConfig) => void;
   closeDialog: (id: string) => void;
   updateDialog: (id: string, newConfig: Partial<DialogConfig>) => void;
+  dialogs: DialogConfig[];
 }
 
 const DialogContext = createContext<DialogContextType | null>(null);
@@ -58,12 +60,11 @@ export const DialogProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <DialogContext.Provider value={{ openDialog, closeDialog, updateDialog }}>
+    <DialogContext.Provider value={{ openDialog, closeDialog, updateDialog, dialogs }}>
       {children}
       {dialogs.map((dialog, index) => (
 
         <Dialog
-          key={dialog.id}
           {...dialog}
           id={dialog.id}
           handleDialogClick={handleDialogClick}

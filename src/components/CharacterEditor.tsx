@@ -26,7 +26,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   const [avatarType, setAvatarType] = useState('local');
   const [update, setUpdate] = useState(0);
   const [formValues, setFormValues] = useState({});
-
+  
   const [isAvatarLocal, setIsAvatarLocal] = useState(false);
   const handleFinish = useCallback((values: any) => {
     if (initialValues?.id) {
@@ -58,7 +58,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
   useEffect(() => {
     if (formRef) formRef.current = form;
   }, [form, formRef]);
-  return (
+  return useMemo(()=>(
     <Form
       form={form}
       layout="vertical"
@@ -162,7 +162,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
         ]}
       />
     </Form>
-  );
+  ),[avatarType, isAvatarLocal]);
 };
 
 export default React.memo(CharacterEditor)

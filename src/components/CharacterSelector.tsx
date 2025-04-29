@@ -1,5 +1,5 @@
 // CharacterSelector.tsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, Button, Popconfirm, Empty } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Character } from '../common/char/types';
@@ -17,7 +17,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
     onDelete,
     onAdd,
 }) => {
-    return (
+    return useMemo(()=>(
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {/* 添加新角色卡片 */}
             <Card
@@ -99,6 +99,6 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
                 <Empty description="暂无角色" />
             )}
         </div>
-    );
+    ),[]);
 };
 
