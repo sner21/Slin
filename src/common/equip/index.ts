@@ -28,7 +28,7 @@ export const EquipStats = z.object({
     speed: z.number().optional(),          // 速度
     mp: z.number().optional(),         // 能量值
     penetration: z.number().optional(),    // 护甲穿透
-    description: z.string().optional(),    // 描述
+    desc: z.string().optional(),    // 描述
     // 元素相关
     lifesteal: z.number().optional(),      // 生命偷取(%)
     elem_mastery: z.number().optional(),   // 元素精通
@@ -51,7 +51,7 @@ export const Equipment = z.object({
     cost: z.number().default(50),
     type: EquipType,
     cls: z.enum(["ITEM", "EQUIP"]).default('ITEM'),
-    description: z.string().default(""),
+    desc: z.string().default(""),
     level: z.number().min(1).default(1),
     rarity: z.number().min(1).max(5).default(1),
     stats: EquipStats,

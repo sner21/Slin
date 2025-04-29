@@ -135,7 +135,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({
                     ))}
                   </Select>
                 }))}
-                {/* {renderFormItem(CharacterSaveSchema.shape.description, handleField("description"))} */}
+                {/* {renderFormItem(CharacterSaveSchema.shape.desc, handleField("desc"))} */}
               </Card>
             )
           },

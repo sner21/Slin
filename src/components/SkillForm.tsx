@@ -48,7 +48,7 @@ const SkillForm = () => {
         </Form.Item>
 
         <Form.Item
-          name="description"
+          name="desc"
           label="技能描述"
           rules={[{ required: true, message: '请输入技能描述' }]}
         >

@@ -61,13 +61,13 @@ export const renderFormItem = (schema: z.ZodType<any>, info: { field: string, la
     } else {
         const Component = info.slot || getFieldComponent(schema, info.type);
         const constraints = getNumberConstraints(schema);
-        const description = schema._def?.description || '';
+        const desc = schema._def?.description || '';
 
         // 根据类型返回对应组件
         return (
             <Form.Item
                 name={convertFieldPath(info.field)}
-                label={(info.label || info.field) + ` ${description}`}
+                label={(info.label || info.field) + ` ${desc}`}
                 rules={zodToFormRules(schema)}
                 key={info.field}
             >

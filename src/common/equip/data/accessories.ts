@@ -10,7 +10,7 @@ export const accessories: Equipment[]= [
         level: 1,
         rarity: 4,
         cost: 50,
-        description: '蕴含远古力量的项链，提供全面的属性加成',
+        desc: '蕴含远古力量的项链，提供全面的属性加成',
         stats: {
             hp: 50,
             attack: 10,
@@ -26,7 +26,7 @@ export const accessories: Equipment[]= [
         cost: 50,
         level: 1,
         rarity: 4,
-        description: '增强佩戴者力量的魔法戒指',
+        desc: '增强佩戴者力量的魔法戒指',
         stats: {
             attack: 15,
             crit_rate: 8,
@@ -41,7 +41,7 @@ export const accessories: Equipment[]= [
         level: 1,
         cost: 50,
         rarity: 4,
-        description: '提供额外防护的魔法腰带',
+        desc: '提供额外防护的魔法腰带',
         stats: {
             hp: 100,
             defense: 15,
@@ -56,7 +56,7 @@ export const accessories: Equipment[]= [
         level: 1,
         cost: 50,
         rarity: 4,
-        description: '由风暴元素凝聚而成的翅膀，提供强大的机动性',
+        desc: '由风暴元素凝聚而成的翅膀，提供强大的机动性',
         stats: {
             speed: 20,
             evasion: 10,

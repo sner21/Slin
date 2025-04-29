@@ -55,7 +55,7 @@ export const BuffSchema = z.object({
     id: z.string(),
     name: z.string(),
     // type: BuffType,
-    description: z.string(),
+    desc: z.string(),
     effects: z.array(EffectSimple).default([]),
     cancelEffects: z.array(EffectSimple).default([]),
     // 持续时间相关

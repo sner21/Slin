@@ -7,7 +7,7 @@ export const BATTLE_EVENTS = z.record(EventData).parse({
     id: 'mp_re_randow',
     type: 'BATTLE',
     name: '魔法回复',
-    description: '${target.name}收到了魔法回复30点',
+    desc: '${target.name}收到了魔法回复30点',
     effects: [{
       target: 'self',
       path: 'status',
@@ -24,7 +24,7 @@ const TREASURE_EVENTS = z.record(EventData).parse({
     id: 'common_chest',
     type: 'TREASURE',
     name: '普通宝箱',
-    description: '发现一个普通宝箱',
+    desc: '发现一个普通宝箱',
     effects: [{
       type: 'ADD_GOLD',
       target: 'global',
@@ -38,7 +38,7 @@ const TREASURE_EVENTS = z.record(EventData).parse({
     id: 'rare_chest',
     type: 'TREASURE',
     name: '稀有宝箱',
-    description: '发现一个稀有宝箱',
+    desc: '发现一个稀有宝箱',
     effects: [{
       type: 'ADD_EQUIPMENT',
       target: 'global',
@@ -56,7 +56,7 @@ const LEVEL_EVENTS = z.record(EventData).parse({
     id: 'level_10_milestone',
     type: 'LEVEL_UP',
     name: '等级10里程碑',
-    description: '达到10级获得奖励',
+    desc: '达到10级获得奖励',
     effects: [{
       type: 'ADD_SKILL',
       target: 'global',
@@ -74,7 +74,7 @@ const EQUIPMENT_EVENTS = z.record(EventData).parse({
     id: 'weapon_enhance',
     type: 'EQUIPMENT_CHANGE',
     name: '武器强化',
-    description: '武器得到强化',
+    desc: '武器得到强化',
     effects: [{
       type: 'MODIFY_EQUIPMENT',
       target: 'global',

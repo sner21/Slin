@@ -14,7 +14,7 @@ export const items_medic = [
     //     }],
     //     icon: get_svg_uri(1, import.meta.url, 'item'),
     //     type: 'skill_book',
-    //     description: "技能书",
+    //     desc: "技能书",
     // },
     {
         id: "1",
@@ -32,7 +32,7 @@ export const items_medic = [
         }],
         icon: get_svg_uri(23, import.meta.url, 'item'),
         type: 'medic',
-        description: "生命药水",
+        desc: "生命药水",
     },
     {
         id: "4",
@@ -59,7 +59,7 @@ export const items_medic = [
         }],
         icon: get_svg_uri(13, import.meta.url),
         type: 'medic',
-        description: "恢复大量生命值和魔法值，并提升攻击力",
+        desc: "恢复大量生命值和魔法值，并提升攻击力",
     },
     {
         id: "med_001",
@@ -74,7 +74,7 @@ export const items_medic = [
         }],
         icon: get_svg_uri(10, import.meta.url),
         type: 'medic',
-        description: "恢复50点生命值",
+        desc: "恢复50点生命值",
     },
     {
         id: "med_002",
@@ -93,7 +93,7 @@ export const items_medic = [
         }],
         icon: get_svg_uri(11, import.meta.url),
         type: 'medic',
-        description: "恢复150点生命值，并获得持续回复效果",
+        desc: "恢复150点生命值，并获得持续回复效果",
     },
     {
         id: "med_003",
@@ -112,7 +112,7 @@ export const items_medic = [
         }],
         icon: get_svg_uri(12, import.meta.url),
         type: 'medic',
-        description: "恢复80点魔法值，并获得魔力回复效果",
+        desc: "恢复80点魔法值，并获得魔力回复效果",
     },
     {
         id: "med_005",
@@ -137,6 +137,6 @@ export const items_medic = [
         ],
         icon: get_svg_uri(14, import.meta.url),
         type: 'medic',
-        description: "恢复100点生命值，并提升攻击力和防御力",
+        desc: "恢复100点生命值，并提升攻击力和防御力",
     }
 ]

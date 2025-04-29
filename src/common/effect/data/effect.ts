@@ -2,7 +2,7 @@ export const effectsInit = [
     {
         id: "initial",
         name: "initial",
-        description: "initial",
+        desc: "initial",
         isBuff: true,
         path: "status",
         target: 'self',
@@ -24,7 +24,7 @@ export const conditionsInit = [
     {
         id: "initial",
         name: "initial",
-        description: "initial",
+        desc: "initial",
         target: 'target',
         operator: 'EQ',
         value: '2',

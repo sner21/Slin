@@ -1,7 +1,7 @@
 [package]
 name = "shinoa"
 version = "0.1.0"
-description = "shinoa"
+desc = "shinoa"
 authors = ["you"]
 edition = "2021"
 

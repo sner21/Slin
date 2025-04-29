@@ -7,7 +7,7 @@ export const weapons: Equipment[] = [
         id: 'ice_scythe',
         cost: 50,
         name: '四镰童子',
-        description: "",
+        desc: "",
         type: 'MAIN_HAND',
         level: 5,
         rarity: 4,
@@ -224,7 +224,7 @@ export const weapons: Equipment[] = [
         type: 'MAIN_HAND',
         level: 1,
         rarity: 4,
-        description: '蕴含魔力的利剑，可以增强使用者的攻击力',
+        desc: '蕴含魔力的利剑，可以增强使用者的攻击力',
         stats: {
             attack: 25,
             crit_rate: 5,
@@ -239,7 +239,7 @@ export const weapons: Equipment[] = [
         type: 'OFF_HAND',
         level: 1,
         rarity: 4,
-        description: '由龙鳞打造的盾牌，提供强大的防护能力',
+        desc: '由龙鳞打造的盾牌，提供强大的防护能力',
         stats: {
             defense: 30,
             hp: 100,

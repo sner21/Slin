@@ -246,7 +246,7 @@ export class BattleManager {
         char.status!.hp = char.imm_ability.hp
         char.status!.mp = char.imm_ability.mp
         char.state = 0
-        char.description = ""
+        char.desc = ""
     }
     settle_exp(char: Character) {
         const baseExp = char.grow.level * 20
@@ -335,7 +335,7 @@ export class BattleManager {
         if (!char.status) return
         if (char.status.dizz) {
             char.status.dizz = (char.status.dizz || 0) - 1
-            char.
+            char.desc = "\${name}被控制"
         }
         //判断HP是否死亡 
         //TODO 另一个模式不判断char.type
@@ -361,7 +361,7 @@ export class BattleManager {
             this.actionGauge.gauges.set(char.id, 0)
             this.cooldownManager.resetCharacterCooldowns(char.id)
             //cooldownManager  actionGauge
-            char.description = "正在休息"
+            char.desc = "正在休息"
             if (!char.status.reborn || char.status?.reborn <= 0) {
                 char.status.reborn = char.ability.reborn || 10
             }
@@ -504,8 +504,8 @@ export class BattleManager {
     //战斗
     battle_turn() {
         this.startTurn()
-        // 获取当前回合可行动的角色
-        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy]);
+        // 获取当前回合可行动的角色  技能还是会冷却
+        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy].filter(i => !i.status?.dizz));
         const actionOrderId = actionOrder.map(i => i.id)
         // console.log("可以行动的角色", actionOrderId)
 
@@ -533,6 +533,11 @@ export class BattleManager {
         if (!i.target) {
             return
         }
+        i.target.beTarget.push({
+            id: i.id,
+            type: i.type,
+            name: i.name
+        })
         this.useSkill(i, i.target, i.normal)
         this.get_round_ack(i, i.target)
         this.finishAction(i);
@@ -683,7 +688,7 @@ export class BattleManager {
         }
         let key: keyof typeof character.status
         for (key in character.status) {
-            if (key === 'description') continue
+            if (key === 'desc') continue
             const rate = character.status[key] / (character.imm_ability[key] || character.ability[key] || 0)
             character.status[key] += ((stats[key] - (character.imm_ability[key] || character.ability[key])) * rate) || 0
             // stats[key] = Math.round((stats[key] || 0));
@@ -832,7 +837,7 @@ export class BattleManager {
                 this.exec_effect(target || target, effect)
             }
         })
-        if (target.status.hp <= 0) target.status.hp = 0
+        if (target.status.hp <= 0) target.status.hp = skill.not_lethal ? 1 : 0
         //记录
         const at = BattleActionSchema.parse({
             logs_type: 'tatakai',
@@ -908,6 +913,7 @@ export class BattleManager {
         this.init_target_array()
         this.roles.forEach(i => {
             this.calculateFinalStats(i)
+            i.beTarget = []
             i.target?.position?.index && this.targetArray[i.target?.type]?.push(i.target.type === "1" ? getMirrorPosition(i.target.position.index) : i.target.position.index)
             // this.set_role_status(i)
         })

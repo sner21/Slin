@@ -16,7 +16,7 @@ export const CharacterTranslations = {
             '2': { en: 'Female', zh: '女' }
         }
     },
-    description: { en: 'Description', zh: '描述' },
+    desc: { en: 'Description', zh: '描述' },
 
     // 状态
     status: {

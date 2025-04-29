@@ -36,6 +36,7 @@ export const CharacterType = z.enum(["0", "1", "2"]).describe('0:人物 1:boss 2
 // 角色状态相关的Schema
 export const CharacterStatusSchema = z.object({
   target: z.any().optional(),
+  beTarget: z.array(z.any()).default([])
 });
 
 export const StatusSchema = z.object({
@@ -61,7 +62,7 @@ export const CharacterSaveSchema = z.object({
   position: z.object({ //阵型
     index: z.number().optional(),
   }).default({}),
-  description: z.string().optional(),
+  desc: z.string().optional(),
   status: StatusSchema.optional(),
   carry: z.object({
     items: z.record(ItemsDataSchema).default({}), //物品

@@ -29,7 +29,7 @@ export const targetSchema = z.enum(['self', 'target', 'global']).default('target
 export const ConditionSchema = z.object({
     id: z.string().optional(),
     name: z.string().optional(),
-    description: z.string().optional(),
+    desc: z.string().optional(),
     target: targetSchema,
     operator: CompareOperator.optional(),
     value: z.any(),
@@ -40,7 +40,7 @@ export const ConditionSchema = z.object({
 export const EffectsSchema = z.object({
     id: z.string().optional(),
     name: z.string().optional(),
-    description: z.string().optional(),
+    desc: z.string().optional(),
     isBuff: z.boolean().default(false),
     target: targetSchema,
     path: z.string().default("").refine((value) => !(value in ['at', 'id'])),

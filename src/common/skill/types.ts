@@ -40,7 +40,7 @@ export const Skill = z.object({
     type: SkillType,
     // cls: skillCls,
     damageType: z.enum(['physical', 'magic']),
-    description: z.string(),
+    desc: z.string(),
     scopeType: scopeType,
     targetType: targetType,
     effectType: EffectType,

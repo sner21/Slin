@@ -236,8 +236,11 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                             return (
                                                 <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className='overflow-hidden flex justify-center relative hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
                                                 >
-                                                    <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-2" style={{ display: role?.status?.reborn && role.type !== "1" && battleManager.current.battle_data.game_mode === "0" ? "" : "none" }}>
+                                                    <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-4" style={{ display: role?.status?.reborn && role.type !== "1" && battleManager.current.battle_data.game_mode === "0" ? "" : "none" }}>
                                                         <b className="absolute  left-50% top-50% text-2xl  -translate-y-50% -translate-x-50%  color-black">{role?.status?.reborn}</b>
+                                                    </div>
+                                                    <div className="absolute w-full h-full bg-[rgba(124,167,233,0.3)] z-3" style={{ display: !role?.status?.reborn && role?.status?.dizz ? "" : "none" }}>
+                                                        <b className="absolute  left-50% top-50% text-2xl  -translate-y-50% -translate-x-50%  color-blue">{role?.status?.dizz}</b>
                                                     </div>
                                                     <BreatheDiv className="absolute w-full h-full z-2" style={{ display: battleManager.current.targetArray[key].includes(i) && role?.state !== 1 ? "" : "none" }}></BreatheDiv>
                                                     {role && battleManager.current.roleAarry[key] && battleManager.current.roleAarry[key][i] && battleManager.current.roleAarry[key][i].id &&
@@ -272,7 +275,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                 {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
                                                     <span className="text-sm">
                                                         {at.self.name} -&gt;   {at.target.id !== at.self.id && <span>{at.target.name} -&gt;</span>}
-                                                        <Popover className="inline" content={template(SkillMap[at.skillId].description)(at.self)} trigger="hover">
+                                                        <Popover className="inline" content={template(SkillMap[at.skillId].desc)(at.self)} trigger="hover">
                                                             <span style={{ color: elementColors[at.element] || elementColors[battleManager.current.roles_group[at.self.id]?.element] }}> {(SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name) || ""}{at.effectType && at.effectType !== 'DAMAGE' && <span class="text-xs">({at.effectType})</span>}</span>
                                                         </Popover>
                                                         {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>}
@@ -284,7 +287,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                 {(logsType.current === 'event' || at.logs_type === 'event') && (
                                                     <div>
                                                         <span className="text-sm">
-                                                            {at.round} 回合 -&gt; {template(at.description)(at)}
+                                                            {at.round} 回合 -&gt; {template(at.desc)(at)}
                                                         </span>
                                                     </div>
                                                 )}
@@ -331,10 +334,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                     })}
                                 </div>
                             </div>
-
                             <div className=" flex flex-row  justify-between  w-full w-99% py-8 gap-8 2xl:gap-0">
-
-
                                 {[battleManager.current?.cur_characters, battleManager.current?.cur_enemy].map((i, roleType) => (<div className="flex gap-8 flex-col flex-3/4">
                                     {i && Object.values(i).map((item, index) => (
                                         <div key={index} className=" ">
@@ -363,7 +363,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                         const buff = battleManager.current?.BuffManage?.buff_map[item.buff[key]?.id]
                                                         return (
                                                             <div key={index} className="text-xs text-gray-300">
-                                                                <Popover className="w-auto  inline" content={template(buff.description)(item)} trigger="hover">
+                                                                <Popover className="w-auto  inline" content={template(buff.desc)(item)} trigger="hover">
                                                                     {buff?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
                                                                 </Popover>
                                                             </div>
@@ -379,7 +379,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                         <div className="text-center w-full absolute top-0 left-0 -translate-y-100%" style={{ display: item.salu ? '' : 'none' }}>{`< ${item.salu} >`}</div>
                                                         <b className="text-lg w-full text-center text-amber-400 inline-block text-center">
                                                             <span className="relative ">
-                                                                <span>    {item.name}</span>
+                                                                <span>{item.name}</span>
                                                                 <span className=" absolute right-0 bottom-0 translate-x-[120%] text-xs text-gray">Lv {item.grow.level}</span>
                                                             </span>
                                                         </b>
@@ -411,10 +411,9 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                         </div>
                                                     </div>
                                                     {/* 属性列表 */}
-
                                                     <div className="group flex gap-0.5 min-w-20 flex-wrap w-full text-xs justify-center h-[88px]">
                                                         <div className="group-hover:flex  w-full text-xs justify-center hidden h-full">
-                                                            <div className="text-md h-full flex items-center">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
+                                                            <div className="text-md h-full flex items-center">{template(item.desc || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`))(item)}</div>
                                                         </div>
                                                         <div className="flex gap-0.5 min-w-20 flex-wrap w-full text-xs justify-center group-hover:hidden">
                                                             {item.ability && Object.entries(item.ability).map(([attr, ability]) => (
@@ -455,7 +454,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                 {/* 事件列表 */}
                                                                 <div className="text-sm text-gray-300  flex flex-col gap-2 items-center flex-1">
                                                                     <div className="w-full text-center">
-                                                                        {/* <div className="text-md">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div> */}
+                                                                        {/* <div className="text-md">{item.desc || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div> */}
                                                                         <span className="text-center">造成伤害 {item.status?.damage || 0}</span>
                                                                     </div>
                                                                     {/* 角色攻击记录 VList */}
@@ -497,7 +496,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             </div>
                                                             {/* 状态 */}
                                                             <div className="flex flex-wrap indent-xs w-full h-full flex-1 items-center" style={{ display: item.display.frame_type === "state" ? "" : "none" }}>
-                                                                <div className="w-full text-md text-center">{item.description || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
+                                                                <div className="w-full text-md text-center">{item.desc || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
                                                             </div>
                                                             {/* 物品栏部分-&gt;转换样式 */}
                                                             <div className="p-2 bg-[#1a1a1aad] rounded-lg w-fit" style={{ display: item.display.frame_type === "item" ? "" : "none" }}>
@@ -521,7 +520,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                             >
                                                                                 {
                                                                                     (ii && (
-                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && template(ii.description)(item)} title={itemsManager.current && itemData?.name} trigger="hover">
+                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && template(ii.desc)(item)} title={itemsManager.current && itemData?.name} trigger="hover">
                                                                                             {itemData?.icon ? <img
                                                                                                 src={itemData?.icon}
                                                                                                 className="object-contain"

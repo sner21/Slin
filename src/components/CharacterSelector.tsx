@@ -96,7 +96,7 @@ export const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             ))}
 
             {characters.length === 0 && (
-                <Empty description="暂无角色" />
+                <Empty desc="暂无角色" />
             )}
         </div>
     ),[]);

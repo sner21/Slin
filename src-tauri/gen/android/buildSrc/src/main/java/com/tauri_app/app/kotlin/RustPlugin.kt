@@ -54,7 +54,7 @@ open class RustPlugin : Plugin<Project> {
                     DefaultTask::class.java
                 ).apply {
                     group = TASK_GROUP
-                    description = "Build dynamic library in $profile mode for all targets"
+                    desc = "Build dynamic library in $profile mode for all targets"
                 }
 
                 tasks["mergeUniversal${profileCapitalized}JniLibFolders"].dependsOn(buildTask)
@@ -68,7 +68,7 @@ open class RustPlugin : Plugin<Project> {
                         BuildTask::class.java
                     ).apply {
                         group = TASK_GROUP
-                        description = "Build dynamic library in $profile mode for $targetArch"
+                        desc = "Build dynamic library in $profile mode for $targetArch"
                         rootDirRel = config.rootDirRel
                         target = targetName
                         release = profile == "release"

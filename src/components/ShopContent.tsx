@@ -102,9 +102,9 @@ const ItemMain: React.FC<Props> = ({ data = [], playerCurrency = 0, onPurchase, 
             <div className="flex flex-col space-x-2 justify-center items-center overflow-hidden">
               {item.icon && <img src={item.icon} alt={item.name} className="w-6 h-6" />}
               <div className="flex-1 min-w-0 overflow-hidden w-full text-center">
-                <Popover className="inline" content={template(item.description)({ name: name })} trigger="hover">
+                <Popover className="inline" content={template(item.desc)({ name: name })} trigger="hover">
                   <h3 className="text-sm font-medium truncate my-2">{item.name}</h3>
-                  <p className="text-xs text-gray-500 truncate overflow-hidden my-0.5">{template(item.description)({ name: name }) || "..."}</p>
+                  <p className="text-xs text-gray-500 truncate overflow-hidden my-0.5">{template(item.desc)({ name: name }) || "..."}</p>
                 </Popover>
               </div>
             </div>

@@ -7,7 +7,7 @@ export const ItemBaseSchema = z.object({
     effects: z.array(EffectSimple).default([]),
     icon: z.string(),
     type: z.enum(['medic','skill_book']),
-    description: z.string().default(""),
+    desc: z.string().default(""),
     cost: z.number().default(1),
     cls: z.enum(["ITEM", "EQUIP"]).default('ITEM'),
     rarity: z.number().min(1).max(5).default(1),

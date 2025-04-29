@@ -11,7 +11,7 @@ export const LogsBasicSchema = z.object({
     timestamp: z.number(),
     round: z.number(),  //回合数
     logs_type: LogsType,
-    description: z.string().default(''),
+    desc: z.string().default(''),
     target: z.object({
         type: z.string(),
         name: z.string(),

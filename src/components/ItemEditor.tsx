@@ -98,7 +98,7 @@ const ItemsEditor: React.FC<CharacterEditorProps> = ({
                 {renderFormItem(ItemBaseSchema.shape.name, handleField("name"))}
                 {/* {renderFormItem(ItemBaseSchema.shape.effects, handleField("effects"))} */}
                 {renderFormItem(ItemBaseSchema.shape.type, handleField("type"))}
-                {renderFormItem(ItemBaseSchema.shape.description, handleField("description"))}
+                {renderFormItem(ItemBaseSchema.shape.desc, handleField("desc"))}
                 {/* {renderFormItem(ItemBaseSchema.shape.buffs, handleField("buffs"))} */}
                 {/* {renderFormItem(ItemBaseSchema.shape.normal, handleField("normal", () => {
                   return <Select mode="multiple" placeholder="普通攻击" onChange={(normal) => form.setFieldValue('normal', normal)}>
@@ -110,7 +110,7 @@ const ItemsEditor: React.FC<CharacterEditorProps> = ({
                   </Select>
                 }))} */}
 
-                {/* {renderFormItem(ItemBaseSchema.shape.description, handleField("description"))} */}
+                {/* {renderFormItem(ItemBaseSchema.shape.desc, handleField("desc"))} */}
               </Card>
             )
           },
@@ -371,7 +371,7 @@ const CharacterSelector: React.FC<any> = ({
             description={
               <div className="text-sm text-gray-500">
                 <div>类型: {character.type}</div>
-                <div>{character.description}</div>
+                <div>{character.desc}</div>
               </div>
             }
           />

@@ -44,7 +44,7 @@ const SkillItem: React.FC<SkillItemProps> = ({
     };
 
     return (
-        <Popover className="w-full w-full flex p-0" content={template(skill.description)(item)}  trigger="hover">
+        <Popover className="w-full w-full flex p-0" content={template(skill.desc)(item)}  trigger="hover">
             <div
                 className={`
                 flex items-center w-full   gap-2  p-1 box-border relative rd-md overflow-hidden

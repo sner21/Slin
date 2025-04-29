@@ -10,7 +10,7 @@ export const armor: Equipment[] = [
         cost: 50,
         level: 1,
         rarity: 4,
-        description: '充满魔力的头冠，增强使用者的精神力',
+        desc: '充满魔力的头冠，增强使用者的精神力',
         stats: {
             hp: 80,
             defense: 15,
@@ -24,7 +24,7 @@ export const armor: Equipment[] = [
         type: 'ARMOR',
         level: 1,
         rarity: 4,
-        description: '由暗影能量织就的战甲，提供优秀的防护和闪避能力',
+        desc: '由暗影能量织就的战甲，提供优秀的防护和闪避能力',
         stats: {
             defense: 40,
             hp: 150,
@@ -39,7 +39,7 @@ export const armor: Equipment[] = [
         level: 1,
         cost: 50,
         rarity: 4,
-        description: '蕴含雷电之力的护手，提升攻击速度',
+        desc: '蕴含雷电之力的护手，提升攻击速度',
         stats: {
             attack: 15,
             speed: 10,
@@ -54,7 +54,7 @@ export const armor: Equipment[] = [
         cost: 50,
         level: 1,
         rarity: 4,
-        description: '注入火焰之力的护腿，提供额外的攻击力',
+        desc: '注入火焰之力的护腿，提供额外的攻击力',
         stats: {
             defense: 20,
             hp: 80,
@@ -69,7 +69,7 @@ export const armor: Equipment[] = [
         cost: 50,
         level: 1,
         rarity: 4,
-        description: '轻盈如风的靴子，大幅提升移动速度',
+        desc: '轻盈如风的靴子，大幅提升移动速度',
         stats: {
             speed: 15,
             evasion: 8,

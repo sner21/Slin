@@ -23,7 +23,7 @@ export const EventData = z.object({
     id: z.string(),
     type: EventType,
     name: z.string(),
-    description: z.string(),
+    desc: z.string(),
     effects: z.array(EffectSimple).default([]),
     probability: z.number().optional().default(100), //触发概率
     // conditionType: z.union([z.enum(['all']),targetSchema]).default('all'),

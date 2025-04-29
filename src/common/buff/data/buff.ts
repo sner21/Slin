@@ -3,7 +3,7 @@ export const buff_init = [
     {
         id: "ack_up",
         name: "提升攻击力",
-        description: "提升攻击力",
+        desc: "提升攻击力",
         effects: [{
             target: 'self',
             path: 'status',
@@ -17,7 +17,7 @@ export const buff_init = [
     }, {
         id: "彼岸蝶舞",
         name: "彼岸蝶舞",
-        description: "提高\${name}的攻击力",
+        desc: "提高\${name}的攻击力",
         effects: [{
             target: 'self',
             path: 'status',
@@ -31,7 +31,7 @@ export const buff_init = [
     }, {
         id: "speed_down",
         name: "减速",
-        description: "降低速度",
+        desc: "降低速度",
         effects: [{
             target: 'self',
             path: 'status',
@@ -45,7 +45,7 @@ export const buff_init = [
     }, {
         id: "regeneration",
         name: "生命恢复",
-        description: "每回合恢复生命值",
+        desc: "每回合恢复生命值",
         effects: [{
             target: 'self',
             path: 'status',

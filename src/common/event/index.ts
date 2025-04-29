@@ -72,7 +72,7 @@ export function EventManager(dataCon) {
                 timestamp: Date.now(),
                 round: dataCon.battle_data.round,  //回合数
                 logs_type: 'event',
-                description: event.description,
+                desc: event.desc,
                 eventId: event.id,
                 target: {
                     type: target!.type,
