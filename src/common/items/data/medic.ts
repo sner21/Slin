@@ -2,6 +2,20 @@ import { get_svg_uri } from "../..";
 import { ItemBaseSchema } from "../type";
 
 export const items_medic = [
+    // {
+    //     id: "uuid",
+    //     name: "技能",
+    //     cost: 50,
+    //     effects: [{
+    //         target: 'self',
+    //         attr: 'skill',
+    //         value: "skill_id",
+    //         operator: 'push',
+    //     }],
+    //     icon: get_svg_uri(1, import.meta.url, 'item'),
+    //     type: 'skill_book',
+    //     description: "技能书",
+    // },
     {
         id: "1",
         name: "生命药水",

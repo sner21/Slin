@@ -42,7 +42,6 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
     const [curRole, setCurRole] = useState<Character | { id: string, carry: any }>({
         id: "",
-        cid: "",
         name: "",
         carry: {}
     })
@@ -84,10 +83,10 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         { value: 'global', label: '全局' },
     ]);
     const ItemShopRef =
-        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} name={curRole.name} id={curRole.cid} roleId={curRole.id}
+        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} name={curRole.name} roleId={curRole.id}
             data={{
-                ITEM: Object.values(battleManager.current?.ItemsManager.ItemsData) || [],
-                EQUIP: battleManager.current?.ItemsManager.equipmentsData || [],
+                ITEM: battleManager.current?.ItemsManager.ItemsDataGroup || [],
+                EQUIP: battleManager.current?.ItemsManager.equipmentsDataGroup || [],
             }}></ItemShop></div>
 
     const getRemainingCooldown = useRef();
@@ -112,7 +111,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
             }
         }
         if (targetSlot === null) {
-            for (let i = 1; i <= MAX_SLOTS; i++) {
+            for (let i = 0; i <= MAX_SLOTS - 1; i++) {
                 if (!curRole.carry.items[i]?.id) {
                     targetSlot = i;
                     break;
@@ -136,30 +135,31 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         }
     }
     const openShop = (id = "") => {
-
+        const a = dialogs?.find(i => i.id === `item-shop`)
         if (id) {
             setCurRole(battleManager.current?.roles_group[id])
 
         } else {
             setCurRole({ id: "" })
-            console.log(dialogs)
             if (dialogs) {
-                const a = dialogs.find(i => i.id === `item-shop`)
                 if (a) {
                     return closeDialog(`item-shop`)
                 }
             }
 
         }
-        openDialog({
-            id: `item-shop`,
-            title: "商店",
-            initialSize: { width: 800, height: 600 },
-            initialPosition: { x: window.innerWidth - 800, y: 0 },
-            minWidth: 800,
-            minHeight: 500,
-            content: (ItemShopRef),
-        })
+        if (!a) {
+            openDialog({
+                id: `item-shop`,
+                roleId: curRole.id,
+                title: "商店",
+                initialSize: { width: 800, height: 600 },
+                initialPosition: { x: window.innerWidth - 800, y: 0 },
+                minWidth: 800,
+                minHeight: 500,
+                content: (ItemShopRef),
+            })
+        }
         updateDialog('item-shop', {
             content: (
                 ItemShopRef
@@ -273,7 +273,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                     <span className="text-sm">
                                                         {at.self.name} -&gt;   {at.target.id !== at.self.id && <span>{at.target.name} -&gt;</span>}
                                                         <Popover className="inline" content={template(SkillMap[at.skillId].description)(at.self)} trigger="hover">
-                                                            <span style={{ color: elementColors[at.element] ||elementColors[battleManager.current.roles_group[at.self.id]?.element]  }}> {(SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name) || ""}{at.effectType && at.effectType !== 'DAMAGE' && <span class="text-xs">({at.effectType})</span>}</span>
+                                                            <span style={{ color: elementColors[at.element] || elementColors[battleManager.current.roles_group[at.self.id]?.element] }}> {(SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name) || ""}{at.effectType && at.effectType !== 'DAMAGE' && <span class="text-xs">({at.effectType})</span>}</span>
                                                         </Popover>
                                                         {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>}
                                                         &#160;-&gt;  <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : (at.effectType === 'HEAL' ? -at.damage.hp : at.damage.hp)}</span>

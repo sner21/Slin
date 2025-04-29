@@ -175,25 +175,60 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
 
 export const initialData = DataSchema.parse([
   {
+    name: "胡桃",
+    id: '3',
+    position: {
+      index: 8
+    },
+    avatar: hutao,
+    salu: '往生堂堂主',
+    gender: "2",
+    element: "fire", // 修正元素属性为火
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    normal_name: "往生秘传枪法",
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
+      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
+    ],
+    ability: {
+      hp: 140,
+      hp_re: 7,
+      shield: 0,
+      attack: 25,
+      defense: 2,
+      evasion: 6,
+      crit_rate: 20,
+      crit_dmg: 180,
+      speed: 105,
+      mp: 90,
+      penetration: 15,
+      lifesteal: 8,
+      element: "fire",
+      elem_mastery: 100,
+      elem_bonus: 20,
+      magic_res: 0,
+      fire_res: 20,
+      ice_res: 0,
+      lightning_res: 0,
+      rage_bonus: 25,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 14,
+      agility: 12,
+      intelligence: 8,
+    },
+    ac: [],
+    at: [],
+    blood: 100,
+    ee: 0,
+  },
+  {
     name: "柊筱娅",
     id: "1",
     avatar: shinoa,
     salu: '帝鬼军',
     gender: "2",
     at: [],
-    carry: {
-      items: {
-        "0": {
-          id: "1",
-          count: 3,
-          cls: "ITEM",
-        }
-      },
-      equipments: {
-        MAIN_HAND: 'ice_scythe',
-        HELMET: 'frost_crown'
-      }
-    },
     element: "ice", // 角色元素属性
     buff: {},
     skill: [
@@ -249,7 +284,6 @@ export const initialData = DataSchema.parse([
     normal: SkillTypeMap.NORMAL_ATTACK.magic_normal.id,
     skill: [
       SkillTypeMap.ELEMENTAL_BURST.shinoa_burst.id,
-      SkillTypeMap.ELEMENTAL_SKILL.katalina_skill.id
     ],
     position: {
       index: 4
@@ -283,68 +317,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'healing_staff',
-        OFF_HAND: 'water_shield'
-      }
-    },
-  },
-  {
-    name: "胡桃",
-    id: '3',
-    position: {
-      index: 8
-    },
-    avatar: hutao,
-    salu: '往生堂堂主',
-    gender: "2",
-    element: "fire", // 修正元素属性为火
-    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
-    normal_name: "往生秘传枪法",
-    skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
-      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
-    ],
-    ability: {
-      hp: 140,
-      hp_re: 7,
-      shield: 0,
-      attack: 25,
-      defense: 2,
-      evasion: 6,
-      crit_rate: 20,
-      crit_dmg: 180,
-      speed: 105,
-      mp: 90,
-      penetration: 15,
-      lifesteal: 8,
-      element: "fire",
-      elem_mastery: 100,
-      elem_bonus: 20,
-      magic_res: 0,
-      fire_res: 20,
-      ice_res: 0,
-      lightning_res: 0,
-      rage_bonus: 25,
-      healing_bonus: 0,
-      shield_strength: 0,
-      strength: 14,
-      agility: 12,
-      intelligence: 8,
-    },
-    ac: [],
-    at: [],
-    blood: 100,
-    ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'soul_spear',
-        NECKLACE: 'blood_pendant'
-      }
-    },
   },
   {
     name: "玛奇玛",
@@ -388,13 +360,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'demon_contract',
-        RING1: 'control_ring'
-      }
-    },
   },
   {
     name: "雷电将军",
@@ -437,13 +402,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'engulfing_lightning',
-        HELMET: 'thunder_crown'
-      }
-    },
   },
   {
     name: "早坂爱",
@@ -485,13 +443,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'wind_dagger',
-        BOOTS: 'stealth_boots'
-      }
-    },
   },
   {
     name: "一濑红莲",
@@ -534,13 +485,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'flame_katana',
-        ARMOR: 'flame_armor'
-      }
-    }
   },
   {
     name: "三宫三叶",
@@ -583,13 +527,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'wind_bow',
-        BACK: 'wind_cloak'
-      }
-    }
   },
   {
     name: "特弥斯",
@@ -632,13 +569,6 @@ export const initialData = DataSchema.parse([
     },
     blood: 100,
     ee: 0,
-    carry: {
-      items: {},
-      equipments: {
-        MAIN_HAND: 'justice_sword',
-        ARMOR: 'judge_robe'
-      }
-    }
   }
 ]);
 

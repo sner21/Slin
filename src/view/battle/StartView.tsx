@@ -130,14 +130,17 @@ const StartView: FC = () => {
         }
     }
     const changeTime = (v: number | null) => {
-        data.current.globalConfig.time = v || 5000
+        data.current.globalConfig.time = v
+        data.current.save_global_config({
+            time: v
+        })
         setUpdate(update + 1)
     }
     // battle_data_info
     useEffect(() => {
         if (data.current?.globalConfig.autoload) {
+            data.current.save_global_config(data.current.globalConfig)
             load(data.current?.globalConfig.autoload)
-
             // battleManager.current = new BattleManager(data.current)
             setMode('battle')
         }
@@ -180,7 +183,7 @@ const StartView: FC = () => {
                                 battleManager={battleManager}
                                 startViewData={startViewData}
                                 dataCon={data}
-                                setArrConOpen={setArrConOpen}
+                                setArrConOpen={() => setArrConOpen(!arrConOpen)}
                                 refreshBet={refreshBet}></ConPanel>)
                         }
                         startViewData={startViewData}

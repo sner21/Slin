@@ -1,8 +1,7 @@
 import { Skill, targetTypeEnum } from '../types';
 import { get_svg_uri } from '../..';
-
-export const ELEMENTAL_SKILL: Record<string, Skill> = {
-    hutao_skill: {
+export const ELEMENTAL_SKILL: Array< Skill> = [
+    {
         id: 'hutao_skill',
         name: '蝶引来生',
         type: 'ELEMENTAL_SKILL',
@@ -42,8 +41,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'fire',
         damageType: 'physical'
-    },
-    shinoa_skill: {
+    },{
         id: 'shinoa_skill',
         name: '神里流·冰华',
         type: 'ELEMENTAL_SKILL',
@@ -56,13 +54,11 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         element: 'ice',
         critRateBonus: 10,
         damageType: 'magic'
-    },
-
-    katalina_skill: {
-        id: 'katalina_skill',
-        name: '水之守护',
+    }, {
+        id: 'attack_flame',
+        name: '烈火突袭',
         type: 'ELEMENTAL_SKILL',
-        description: '为队友提供水元素护盾，吸收伤害',
+        description: '',
         targetType: targetTypeEnum.ALLY,
         scopeType: 'SINGLE',
         effectType: 'BUFF',
@@ -71,8 +67,20 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'water',
         damageType: 'magic'
-    },
-    eula_skill: {
+    },{
+        id: 'red_flame',
+        name: '赤焰漩涡',
+        type: 'ELEMENTAL_SKILL',
+        description: '',
+        targetType: targetTypeEnum.ALLY,
+        scopeType: 'SINGLE',
+        effectType: 'BUFF',
+        multiplier: 160,
+        cooldown: 4,
+        level: 1,
+        element: 'water',
+        damageType: 'magic'
+    }, {
         id: 'eula_skill',
         name: '安神秘法',
         type: 'ELEMENTAL_SKILL',
@@ -84,8 +92,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'fire',
         damageType: 'physical'
-    },
-    makima_skill: {
+    },{
         id: 'makima_skill',
         name: '支配之链',
         type: 'ELEMENTAL_SKILL',
@@ -97,8 +104,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'fire',
         damageType: 'magic'
-    },
-    raiden_skill: {
+    },{
         id: 'raiden_skill',
         name: '神变·恶曜开眼',
         type: 'ELEMENTAL_SKILL',
@@ -111,8 +117,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'thunder',
         damageType: 'magic'
-    },
-    keqing_skill: {
+    }, {
         id: 'keqing_skill',
         name: '星斗归位',
         type: 'ELEMENTAL_SKILL',
@@ -124,10 +129,9 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'thunder',
         damageType: 'physical'
-    },
-    ai_skill: {
+    },{
         id: 'ai_skill',
-        name: '风之舞步',
+        name: '乱气流',
         type: 'ELEMENTAL_SKILL',
         description: '快速移动并造成风元素伤害，提升速度',
         targetType: targetTypeEnum.SELF,
@@ -138,8 +142,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         level: 1,
         element: 'wind',
         damageType: 'physical'
-    },
-    lancelot_skill: {
+    },{
         id: 'lancelot_skill',
         name: '疾风突刺',
         type: 'ELEMENTAL_SKILL',
@@ -152,8 +155,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         element: 'wind',
         critRateBonus: 15,
         damageType: 'physical'
-    },
-    issei_skill: {
+    },{
         id: 'issei_skill',
         name: '不动明王咒',
         type: 'ELEMENTAL_SKILL',
@@ -166,8 +168,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         element: 'dark',
         critRateBonus: 15,
         damageType: 'physical'
-    },
-    mitsuba_skill: {
+    },{
         id: 'mitsuba_skill',
         name: '巨斧头',
         type: 'ELEMENTAL_SKILL',
@@ -180,8 +181,7 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         element: 'wind',
         elemBonusBonus: 20,
         damageType: 'physical'
-    },
-    themis_skill: {
+    },{
         id: 'themis_skill',
         name: '天秤制裁',
         type: 'ELEMENTAL_SKILL',
@@ -195,4 +195,4 @@ export const ELEMENTAL_SKILL: Record<string, Skill> = {
         elemBonusBonus: 15,
         damageType: 'magic'
     }
-}; 
+]

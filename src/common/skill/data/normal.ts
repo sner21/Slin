@@ -1,22 +1,7 @@
 import { Skill } from '../types';
-import { get_svg_uri } from '../..';
 
-export const NORMAL_ATTACK: Record<string, Skill> = {
-    // default: {
-    //     id: 'default',
-    //     name: '默认',
-    //     type: 'PASSIVE',
-    //     description: '回复',
-    //     scopeType: 'SINGLE',
-    //     effectType: 'DEFAULT',
-    //     multiplier: 100,
-    //     cost: {},
-    //     cooldown: 0,
-    //     level: 1,
-    //     element: 'default',
-    //     damageType: 'physical'
-    // },
-    physical_normal: {
+export const NORMAL_ATTACK: Array<Skill> = [
+    {
         id: 'physical_normal',
         name: '普攻',
         type: 'NORMAL_ATTACK',
@@ -29,8 +14,7 @@ export const NORMAL_ATTACK: Record<string, Skill> = {
         level: 1,
         element: 'default',
         damageType: 'physical'
-    },
-    magic_normal: {
+    }, {
         id: 'magic_normal',
         name: '普攻',
         type: 'NORMAL_ATTACK',
@@ -44,4 +28,4 @@ export const NORMAL_ATTACK: Record<string, Skill> = {
         element: 'default',
         damageType: 'magic'
     }
-}; 
+]; 

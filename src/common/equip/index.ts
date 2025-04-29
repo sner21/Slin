@@ -48,7 +48,7 @@ export const EquipStats = z.object({
 export const Equipment = z.object({
     id: z.string(),
     name: z.string(),
-    cost: z.number().default(1),
+    cost: z.number().default(50),
     type: EquipType,
     cls: z.enum(["ITEM", "EQUIP"]).default('ITEM'),
     description: z.string().default(""),

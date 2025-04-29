@@ -1,7 +1,6 @@
 import { Skill } from '../types';
-
-export const ELEMENTAL_BURST: Record<string, Skill> = {
-    shinoa_burst: {
+export const ELEMENTAL_BURST: Array<Skill> = [
+    {
         id: 'shinoa_burst',
         name: '永恒冰狱',
         type: 'ELEMENTAL_BURST',
@@ -14,8 +13,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         level: 1,
         element: 'ice',
         damageType: 'magic'
-    },
-    ayaka_skill: {
+    }, {
         id: 'ayaka_skill',
         name: '神里流·霜灭',
         type: 'ELEMENTAL_SKILL',
@@ -23,13 +21,12 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 180,
-        cost: { },
+        cost: {},
         cooldown: 3,
         level: 1,
         element: 'ice',
         damageType: 'magic'
-    },
-    tohka_skill: {
+    }, {
         id: 'tohka_skill',
         name: '最后之剑',
         type: 'ELEMENTAL_BURST',
@@ -43,8 +40,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         element: 'fire',
         critDmgBonus: 50,
         damageType: 'physical'
-    },
-    raiden_burst: {
+    }, {
         id: 'raiden_burst',
         name: '奥义·梦想真说',
         type: 'ELEMENTAL_BURST',
@@ -57,8 +53,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         level: 1,
         element: 'thunder',
         damageType: 'physical'
-    },
-    ai_burst: {
+    }, {
         id: 'ai_burst',
         name: '风暴之眼',
         type: 'ELEMENTAL_BURST',
@@ -71,8 +66,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         level: 1,
         element: 'wind',
         damageType: 'magic'
-    },
-    issei_burst: {
+    }, {
         id: 'issei_burst',
         name: '罪钥',
         type: 'ELEMENTAL_BURST',
@@ -86,8 +80,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         element: 'dark',
         critDmgBonus: 50,
         damageType: 'physical'
-    },
-    mitsuba_burst: {
+    }, {
         id: 'mitsuba_burst',
         name: '疾风之翼',
         type: 'ELEMENTAL_BURST',
@@ -100,8 +93,7 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         level: 1,
         element: 'wind',
         damageType: 'physical'
-    },
-    themis_burst: {
+    }, {
         id: 'themis_burst',
         name: '制裁之雷',
         type: 'ELEMENTAL_BURST',
@@ -116,4 +108,4 @@ export const ELEMENTAL_BURST: Record<string, Skill> = {
         critDmgBonus: 40,
         damageType: 'magic'
     }
-}; 
+]

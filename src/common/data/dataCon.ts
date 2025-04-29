@@ -22,7 +22,7 @@ export class DataCon {
     globalConfig = {
         autosave: true,
         autoload: 'auto',
-        time: 5000,
+        time: 3000,
     };
     init_data = {}
     save_data = {}
@@ -103,7 +103,7 @@ export class DataCon {
             }
         })
     }
-    save_global_config(config: Record<keyof typeof this.globalConfig, any> | null = null) {
+    save_global_config(config: Record<NonNullable<keyof typeof this.globalConfig>, any> | null = null) {
         if (config) {
             this.globalConfig = Object.assign(this.globalConfig, config)
         }

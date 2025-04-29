@@ -53,7 +53,7 @@ export class BattleManager {
         cur_time: 0,
         pause: false,
         round: 0,
-        time: 5000,
+        // time: 1000,
         cur_boss_id: '',
         battle_round: 1,
         game_mode: "0"
@@ -190,9 +190,9 @@ export class BattleManager {
         if (!this.battle_data.pause) {
             this.battle_turn()
             this.battle_data.cur_time = 0
-            if (!this.time_timer) {
-                this.time_timer = this.computed_time()
-            }
+            // if (!this.time_timer) {
+            //     this.time_timer = this.computed_time()
+            // }
 
             if (typeof this.round_timer === 'number') {
                 clearTimeout(this.round_timer)
@@ -202,7 +202,7 @@ export class BattleManager {
                 if (!this.battle_data.pause) {
                     this.start_round()
                 }
-            }, time)
+            }, this.battle_data.time)
         }
     }
     get_boss(filterId: string = '') {
@@ -333,6 +333,10 @@ export class BattleManager {
     //结算角色当前数据
     set_role_status(char: Character) {
         if (!char.status) return
+        if (char.status.dizz) {
+            char.status.dizz = (char.status.dizz || 0) - 1
+            char.
+        }
         //判断HP是否死亡 
         //TODO 另一个模式不判断char.type
         if (char.state === 1 && char.type !== "1" && this.battle_data.game_mode === "0" && this.battle_data.game_mode === "0") {
@@ -532,7 +536,6 @@ export class BattleManager {
         this.useSkill(i, i.target, i.normal)
         this.get_round_ack(i, i.target)
         this.finishAction(i);
-
     }
     // 获取当前回合可行动的角色
     getActionOrder(characters: Character[]): Character[] {
@@ -565,16 +568,15 @@ export class BattleManager {
         })
     }
     //计算副作用
-    exec_effect(target: Character | typeof this, effect:z.infer<typeof EffectSimple>, count = 1) {
+    exec_effect(target: Character | typeof this, effect: z.infer<typeof EffectSimple>, count = 1) {
         if (effect.id) {
-            //TODO
             const replace = effect.replace
             effect = this.EffectManage.effectsMap[effect.id]
             if (replace) {
                 effect = assignIn(effect, replace)
             }
         }
-        let { path, find, operator, attr, value, sourceId, targetId } = effect as z.infer<typeof EffectsSchema> 
+        let { path, find, operator, attr, value, sourceId, targetId } = effect as z.infer<typeof EffectsSchema>
         let data = path ? get(target, path) : target
         if (find) {
             data = data.find((i: any) => i[find.attr] === find.value)
@@ -593,7 +595,8 @@ export class BattleManager {
                 break
             }
             case "push": {
-                data.push(value)
+                if (!data) data = []
+                data[attr].push(value)
                 break
             }
             case "assign": {
@@ -801,7 +804,8 @@ export class BattleManager {
                 default: 1
             }
         } as const;
-        const elementalBonus = ElementalRelations[skill.element] && ElementalRelations[skill.element][target.element] || 1;
+        const elementType = skill.type === "NORMAL_ATTACK" ? self.element : skill.element
+        const elementalBonus = ElementalRelations[skill.element] && ElementalRelations[elementType][target.element] || 1;
         damage *= elementalBonus;
         // 暴击判定
         if (isCrit) {

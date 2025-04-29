@@ -44,6 +44,7 @@ export const StatusSchema = z.object({
   mp: z.number().min(0).optional(),
   reborn: z.number().min(0).optional(),
   find_gap: z.number().min(0).optional(),
+  dizz: z.number().min(0).optional(), //眩晕
 });
 
 // Save相关的Schema
@@ -85,7 +86,7 @@ export const CharacterSaveSchema = z.object({
   }).default({}),
   ability: AbilitySchema.merge(BaseStatSchema).default({}),
   normal: z.string().default(SkillTypeMap.NORMAL_ATTACK.physical_normal.id),
-  normal_name:z.string().optional(),
+  normal_name: z.string().optional(),
   skill: z.array(z.string()).max(8).optional(),
   grow: z.object({
     level: z.number().min(0).max(50).default(1), // 角色等级
