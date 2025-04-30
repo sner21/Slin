@@ -220,9 +220,9 @@ const VList: React.FC<VListProps> = ({
                 className="absolute left-0 right-0 top-0"
                 style={{ transform: `translateY(${startOffset}px)`, paddingBottom: "40px" }}
             >
-                {visibleData.map((item) => (
+                {visibleData.map((item,index) => (
                     <div
-                        key={item[rowKey]}
+                        key={index}
                         className="w-full"
                         ref={(el) => handleItemResize(item, el)}
                     >

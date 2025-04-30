@@ -50,34 +50,34 @@ const SkillItem: React.FC<SkillItemProps> = ({
                 {template(skill.desc)(item)}
             </div>}
             <div className=''>
-                {skill.multiplier > 0 && <span>倍率 : {skill.multiplier}</span>} 属性 : {elementNames[skill.element] || skill.element} 伤害类型 : {SkillTypeNames[skill.damageType] || skill.damageType} 范围 : {ScopeTypeNames[skill.scopeType] || skill.scopeType} 类别 : {SkillTypeNames[skill.type] || skill.type}
+                {skill.multiplier > 0 && <span>倍率 : {skill.multiplier}</span>} 属性 : {elementNames[skill.element] || skill.element} 冷却回合 : {elementNames[skill.cooldown] || skill.cooldown} 伤害类型 : {SkillTypeNames[skill.damageType] || skill.damageType} 范围 : {ScopeTypeNames[skill.scopeType] || skill.scopeType} 类别 : {SkillTypeNames[skill.type] || skill.type}
             </div>
         </div>} >
             <div
                 className={`
-                flex items-center w-full   gap-2  p-1 box-border relative rd-md overflow-hidden
+                flex items-center w-full  gap-2  p-1  box-border relative rd-md overflow-hidden
                 border-solid border-1 border-[rgba(165,164,164,0.1)]
-                hover:bg-white/20 h-full
+                hover:bg-white/20  h-[42px]
                 bg-[rgba(165,164,164,0.1)]
                 cursor-pointer
             `}
                 onClick={handleClick}
             >
                 <div
-                    className="bg-white/40 flex items-center transition-all-1000  justify-center h-full absolute left-0 top-0"
+                    className="bg-white/40 flex items-center  transition-all-1000  w-0 justify-center h-full absolute left-0 top-0 "
                     style={{
-                        width: `${(1 - (remainingTurns || 0) / skill.cooldown) * 100}%`,
+                        width: `${(1 - (remainingTurns || 100) / skill.cooldown) * 100}%`,
                         // ["transition-timing-function"]: "linear"
                     }}
                 />
                 <img
-                    className="w-8"
+                    className="w-8 skill-icon"
                     src={skill.uri}
                     alt={skill.name}
                     style={{ filter: `drop-shadow(2px 4px 6px black) ` }}
                 />
                 <b
-                    className="text-xs indent-0 break-all"
+                    className="ml-0.25 text-xs indent-0 break-all  truncate text-nowrap" 
                     style={{ color: elementColors[skill.element] }}
                 >
                     {skill?.name || ''}

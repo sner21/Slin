@@ -4,6 +4,7 @@ import { Button, InputNumber, Popover, Switch, Tabs } from 'antd';
 import { Equipment, EquipTypeNames } from '../common/equip';
 import { ItemBaseSchema } from '../common/items/type';
 import { template } from 'lodash-es';
+import { levelColorClass } from '../common';
 
 
 
@@ -79,7 +80,7 @@ const ItemShop: React.FC<Props> = ({ data = {
   );
 };
 const ItemMain: React.FC<Props> = ({ data = [], playerCurrency = 0, onPurchase, cls = "", name }) => {
-  
+
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const getQuantity = (id: string) => quantities[id] || 1;
   const handleQuantityChange = (id: string, value: number) => {
@@ -103,13 +104,13 @@ const ItemMain: React.FC<Props> = ({ data = [], playerCurrency = 0, onPurchase, 
               {item.icon && <img src={item.icon} alt={item.name} className="w-6 h-6" />}
               <div className="flex-1 min-w-0 overflow-hidden w-full text-center">
                 <Popover className="inline" content={template(item.desc)({ name: name })} trigger="hover">
-                  <h3 className="text-sm font-medium truncate my-2">{item.name}</h3>
+                  <h3 className="text-sm font-medium truncate my-2" style={{ color: levelColorClass(item.rarity) }}>{item.name}</h3>
                   <p className="text-xs text-gray-500 truncate overflow-hidden my-0.5">{template(item.desc)({ name: name }) || "..."}</p>
                 </Popover>
               </div>
             </div>
             <div >
-              <p className="text-xs text-amber-600 text-center my-1">
+              <p className="text-xs text-amber-600 text-center my-1" >
                 单: {item.cost}
               </p>
               {cls === "ITEM" && <p className="text-xs text-amber-600 text-center my-1">

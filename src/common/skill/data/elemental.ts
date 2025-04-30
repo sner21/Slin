@@ -78,21 +78,27 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         level: 1,
         element: 'fire',
         damageType: 'magic'
-    }, 
+    },
     {
         id: 'zy_skill',
-        name: '轰鸣长江之业火战船',
+        name: '轰鸣长江业火战船',
         type: 'ELEMENTAL_SKILL',
         desc: '由稍小型的楼船与Archer所持弓组成的宝具。楼船为宝具的副产物，攻击核心为弓箭。射出的箭矢命中后将会爆炸。赤壁之战中肩负重要使命的火船化作的武器。与其说是逸闻的具象……不如说是逸闻化为了兵器。',
+        buffs: [
+            {
+                id: "轰鸣长江业火战船",
+                type: "target",
+            }
+        ],
         targetType: targetTypeEnum.ENEMY,
-        scopeType: 'MULTI',
-        effectType: 'BUFF',
-        multiplier: 200,
-        cooldown: 10,
+        scopeType: 'ALL',
+        effectType: 'DEBUFF',
+        multiplier: 30,
+        cooldown: 5,
         level: 1,
         element: 'fire',
         damageType: 'magic'
-    }, 
+    },
     {
         id: 'red_flame',
         name: '赤焰漩涡',
@@ -221,7 +227,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         element: 'wind',
         critRateBonus: 15,
         damageType: 'physical'
-    }, 
+    },
     {
         id: 'issei_skill',
         name: '罪钥',
@@ -235,7 +241,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         element: 'dark',
         critDmgBonus: 50,
         damageType: 'physical'
-    },{
+    }, {
         id: 'mitsuba_skill',
         name: '巨斧头',
         type: 'ELEMENTAL_SKILL',

@@ -1,4 +1,12 @@
-import { string, z } from "zod";
+import { z } from "zod";
+import { ElementType } from "..";
+export type ElementType = z.infer<typeof ElementType>;
+export const baseDamageSchma = z.object({
+    element: ElementType.default('default'),
+    damageType: z.enum(['physical', 'magic']).default('physical'),
+    multiplier: z.number().default(0),
+    not_lethal: z.boolean().default(false)
+})
 
 export const costType = {
     mp: z.number().default(0),     // 能量消耗
@@ -61,7 +69,7 @@ export const EffectsSchema = z.object({
         replace: ConditionSchema.optional()
     })])).optional(),
     operator: EventEffectType,
-})
+}).merge(baseDamageSchma)
 export const EffectSimple = z.union([EffectsSchema, z.object({
     id: z.string(),
     replace: EffectsSchema.optional()

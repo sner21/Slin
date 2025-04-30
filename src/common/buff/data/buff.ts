@@ -1,5 +1,26 @@
+import { Buff } from "../type";
 
-export const buff_init = [
+export const buff_init: Buff = [
+    {
+        id: "轰鸣长江业火战船",
+        name: "轰鸣长江业火战船",
+        desc: "每层对\${name}造成0.1倍率伤害",
+        multiplier: 10,
+        damageType: "magic",
+        durationType: "OVERLAY",
+        duration: 14,
+        isDebuff: true,
+    },
+    {
+        id: "赤壁战祸",
+        name: "赤壁战祸·地狱摇篮",
+        desc: "每层对\${name}造成0.3倍率伤害",
+        multiplier: 10,
+        damageType: "magic",
+        durationType: "OVERLAY",
+        duration: 14,
+        isDebuff: true,
+    },
     {
         id: "不动明王咒",
         name: "不动明王咒",
@@ -28,7 +49,7 @@ export const buff_init = [
         }],
         durationType: "TURNS",
         duration: 10,
-        isDebuff: false,
+        isDebuff: true,
     },
     {
         id: "提升攻击力",

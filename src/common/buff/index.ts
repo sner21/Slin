@@ -9,18 +9,30 @@ import { BuffSchema } from "./type";
 
 export function BuffManage(dataCon) {
     const buff_data = z.array(BuffSchema).parse(buff_init)
-    const buff_map = keyBy(buff_data,'id')
-    const add_buff = (role: Character, id: string, self = undefined) => {
+    const buff_map = keyBy(buff_data, 'id')
+    const add_buff = (self: Character, role: Character, id: string) => {
         const buff = buff_map[id]
         if (!buff) {
             return
         }
+        // if (buff.multiplier) {
+        //     let { damage } = dataCon.settle_damage(self, role, {
+        //         element: buff.element || self.element,
+        //         damageType: buff.damageType,
+        //         multiplier: buff.multiplier * i.count,
+        //     })
+        //     dataCon.settle_damage_role(self, role, damage, buff.not_lethal)
+        // }
         if (!role.buff[id]) {
             role.buff[id] = {
                 id: buff.id,
                 duration: buff.duration,
                 count: 0,
-                self,
+                self: {
+                    type: Number(self.type),
+                    name: self.name,
+                    id: self.id
+                }
             }
         }
         switch (buff.durationType) {
@@ -43,6 +55,7 @@ export function BuffManage(dataCon) {
                 break
             }
         }
+
     }
     const load_plugins_buff = (data: any[]) => {
         data.forEach(i => {
@@ -61,9 +74,18 @@ export function BuffManage(dataCon) {
                     role.imm_ability[key] = Math.round((role.imm_ability[key] || 0) + (buff.imm_ability[key] || 0) * i.count);
                 })
             }
-            //TODO 计算伤害来源 的伤害 i
+            if (buff.multiplier) {
+           
+                const self = dataCon.roles_group[i.self.id]
+                let { damage } = dataCon.settle_damage(self, role, {
+                    element: buff.element || self.element,
+                    damageType: buff.damageType,
+                    multiplier: buff.multiplier * i.count,
+                })
+                dataCon.settle_damage_role(self, role, damage, buff.not_lethal||true)
+            }
             buff.effects.forEach(effect => {
-                dataCon.exec_effect(role, effect, i.count)
+                dataCon.exec_effect(role, effect, null, i.count)
             })
             if (buff.durationType === "TURNS" || buff.durationType === "OVERLAY" && i.duration) {
                 i.duration = i.duration - 1

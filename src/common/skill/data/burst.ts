@@ -20,8 +20,14 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         type: 'ELEMENTAL_BURST',
         desc: '赤壁之战的具象。通过与固有结界相似但不尽相同的大魔术，将周围一带化作熊熊燃烧的赤壁战船。在自身的魔力或敌人性命其中一方耗尽之前，可自由自在地操纵烈火与爆炸，持续对敌人造成严重伤害，宛如人间炼狱。发动时，还可将与战斗无关之人弹出范围。',
         scopeType: 'ALL',
-        effectType: 'DAMAGE',
-        multiplier: 380,
+        effectType: 'DEBUFF',
+        buffs: [
+            {
+                id: "赤壁战祸",
+                type: "target",
+            }
+        ],
+        multiplier: 120,
         cost: { mp: 80 },
         cooldown: 30,
         level: 1,

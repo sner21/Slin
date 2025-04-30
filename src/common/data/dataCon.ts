@@ -22,7 +22,7 @@ export class DataCon {
     globalConfig = {
         autosave: true,
         autoload: 'auto',
-        time: 3000,
+        time: 3000 / 3,
     };
     init_data = {}
     save_data = {}

@@ -41,7 +41,8 @@ export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
         if (cls === "ITEM") {
             const item = ItemsData[id]
             item.effects.forEach(effect => {
-                zenkio.exec_effect(role, effect)
+                //对自己使用
+                zenkio.exec_effect(role, effect, role)
             })
             item.buffs?.forEach(buff => {
                 //TODO 判断是target
@@ -54,13 +55,19 @@ export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
         } else {
             const item = equipmentsDataMap[id]
             const cache = equipmentsDataMap[role.carry.equipments[item.type]]
+            console.log(cache, 11)
             role.carry.equipments[item.type] = item.id
-            role.carry.items[index] = {
-                id: cache.id,
-                count: 1,
-                cls: "EQUIP",
-                type: cache.type,
+            if (cache?.id) {
+                role.carry.items[index] = {
+                    id: cache.id,
+                    count: 1,
+                    cls: "EQUIP",
+                    type: cache.type,
+                }
+            } else {
+                role.carry.items[index] = null
             }
+
         }
 
     }

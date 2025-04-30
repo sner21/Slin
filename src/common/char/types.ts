@@ -60,7 +60,7 @@ export const CharacterSaveSchema = z.object({
   element: ElementType,
   gender: z.enum(["0", "1", "2"]).describe('0:无,1:男,2:女').default("0"), // 1 男 2女
   position: z.object({ //阵型
-    index: z.number().optional(),
+    index: z.number().nullable().optional(),
   }).default({}),
   desc: z.string().optional(),
   status: StatusSchema.optional(),

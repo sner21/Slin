@@ -1,3 +1,7 @@
+import { SkillMap } from ".";
+import { Character } from "../char/types";
+import { BattleManager } from "../tatakai";
+
 // 冷却管理器
 export interface SkillCooldown {
     skillId: string;
@@ -12,7 +16,10 @@ export interface CharacterCooldowns {
 
 export class CooldownManager {
     public cooldowns: Map<string, SkillCooldown[]> = new Map();
-
+    private dataCon: BattleManager
+    constructor(dataCon) {
+        this.dataCon = dataCon
+    }
     // 初始化角色的冷却管理
     initCharacter(characterId: string) {
         if (!this.cooldowns.has(characterId)) {
@@ -42,7 +49,16 @@ export class CooldownManager {
         const cooldown = charCooldowns.find(cd => cd.skillId === skillId);
         return cooldown?.remainingTurns || 0;
     }
-
+    updateCooldownsRole(characterId) {
+        const charCooldowns = this.cooldowns?.get(characterId) || [];
+        charCooldowns.forEach(cd => {
+            if (cd.remainingTurns > 0) {
+                cd.remainingTurns--;
+            }
+        });
+        const activeCooldowns = charCooldowns.filter(cd => cd.remainingTurns > 0);
+        this.cooldowns.set(characterId, activeCooldowns);
+    }
     // 回合结束时更新冷却时间
     updateCooldowns() {
         this.cooldowns.forEach((charCooldowns, characterId) => {
@@ -58,11 +74,14 @@ export class CooldownManager {
         });
     }
 
-    // 重置指定角色的所有冷却
-    resetCharacterCooldowns(characterId: string) {
+    // 填满指定角色的所有冷却
+    fullCharacterCooldowns(characterId: string) {
         this.cooldowns.set(characterId, []);
     }
-
+    // 指定角色的所有冷却
+    resetCharacterCooldowns(char: Character) {
+        this.cooldowns.set(char.id, char.skill.map(skillId => ({ remainingTurns: SkillMap[skillId].cooldown, skillId: skillId })));
+    }
     // 重置所有冷却
     resetAllCooldowns() {
         this.cooldowns.clear();

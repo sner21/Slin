@@ -26,6 +26,18 @@ body {
     overflow: hidden;
     user-select: none;
 }
+justify-evenly
+@media screen and (max-width:980px) {
+    .skill-icon {
+        display: none !important;
+    }
+}
+@media screen and (min-width:1700px) {
+    .HealthBar {
+        width: 280px !important;
+    }
+}
+
 
 #app {
     backdrop-filter: blur(20px);

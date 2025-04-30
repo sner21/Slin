@@ -5,6 +5,22 @@ export const getMirrorPosition = (index: number): number => {
     const col = index % 3;
     return row * 3 + (2 - col);
 }
+export const levelColorClass = (rarity: number) => {
+    switch (rarity) {
+        case 1:
+            return 'gray'; 
+        case 2:
+            return 'green'; 
+        case 3:
+            return 'blue'; 
+        case 4:
+            return 'purple'; 
+        case 5:
+            return 'orange'; 
+        default:
+            return 'gray';
+    }
+};
 export const getNumberConstraints = (schema: any, constraints: any = {}) => {
     const def = schema._def;
     if (def.defaultValue) {
@@ -47,16 +63,109 @@ const svg_list = {
 export const ElementType = z.enum(['fire', 'ice', 'thunder', 'wind', 'water', 'default', 'grass', 'dark', 'light']).default('default');
 export const ElementColors = z.record(ElementType, z.string());
 export type ElementColors = z.infer<typeof ElementColors>;
+export const ElementalRelations = {
+    fire: {
+        ice: 1.5,
+        wind: 1.2,
+        water: 0.7,
+        grass: 1.5,
+        thunder: 1,
+        dark: 1,
+        light: 1,
+        default: 1
+    },
+    ice: {
+        water: 1.2,
+        thunder: 0.7,
+        wind: 1.5,
+        fire: 0.7,
+        grass: 1.2,
+        dark: 1,
+        light: 1,
+        default: 1
+    },
+    thunder: {
+        water: 1.5,
+        ice: 1.5,
+        wind: 0.7,
+        fire: 1,
+        grass: 0.7,
+        dark: 1.2,
+        light: 0.7,
+        default: 1
+    },
+    wind: {
+        thunder: 1.5,
+        fire: 0.7,
+        ice: 0.7,
+        water: 1.2,
+        grass: 1.2,
+        dark: 1,
+        light: 1,
+        default: 1
+    },
+    water: {
+        fire: 1.5,
+        thunder: 0.7,
+        ice: 1,
+        wind: 1,
+        grass: 0.7,
+        dark: 1,
+        light: 1.2,
+        default: 1
+    },
+    grass: {
+        water: 1.5,
+        thunder: 1.5,
+        fire: 0.7,
+        ice: 0.7,
+        wind: 1,
+        dark: 0.7,
+        light: 1.2,
+        default: 1
+    },
+    dark: {
+        light: 1.5,
+        grass: 1.5,
+        thunder: 0.7,
+        fire: 1,
+        ice: 1,
+        wind: 1,
+        water: 1,
+        default: 1
+    },
+    light: {
+        dark: 1.5,
+        thunder: 1.5,
+        water: 0.7,
+        grass: 0.7,
+        fire: 1,
+        ice: 1,
+        wind: 1,
+        default: 1
+    },
+    default: {
+        fire: 1,
+        ice: 1,
+        thunder: 1,
+        wind: 1,
+        water: 1,
+        grass: 1,
+        dark: 1,
+        light: 1,
+        default: 1
+    }
+} as const;
 export const elementColors = ElementColors.parse({
     fire: '#FF4C4C',
     ice: '#99FFFF',
-    thunder: 'rgb(247 255 59)',
+    thunder: 'rgb(214 223 0)',
     wind: '#80FF80',
     water: '#3399FF',
     // default: '#CCCCCC',
     grass: '#33CC33',
     dark: '#9966FF',  //#9966FF rgb(71 24 228)
-    light: '#FFE666'
+    light: 'rgb(255 241 171)'
 })
 export const elementNames = ElementColors.parse({
     fire: '火',

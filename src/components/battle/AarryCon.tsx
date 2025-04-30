@@ -155,13 +155,15 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
             const a = {}
             Object.keys(roleAarry[curRole.type]).forEach((key) => {
                 if (roleAarry[curRole.type][key].id === curRole.id) {
-                    console.log(roleAarry[curRole.type][key], curRole, 22)
+                    // roleAarry[curRole.type][key].index = null
+                    console.log(roleAarry[curRole.type][key],roleAarry, curRole, 22)
                     a[curRole.type] = {
                         ...roleAarry[curRole.type],
                         [key]: {}
                     }
                 }
             })
+
             setRoleAarry({
                 ...roleAarry,
                 ...a,

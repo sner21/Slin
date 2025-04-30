@@ -4,7 +4,7 @@ import { Character, Data, CharacterDisplaySchema } from '../../common/char/types
 import { bb as bbb, initialData, AttributeNameCN } from "../../common/char";
 import { EquipTypeNames, EquipmentMap } from "../../common/equip";
 import { BattleManager } from "../../common/tatakai/index";
-import { elementColors } from "../../common";
+import { elementColors, levelColorClass } from "../../common";
 import template from "lodash-es/template";
 import { LogsType } from "../../common/record/type";
 import { z } from "zod";
@@ -18,6 +18,9 @@ import tw, { styled } from 'twin.macro';
 import ItemShop from "../../components/ShopContent";
 import { useDialog } from "../../components/DialogManager";
 import { v4 as uuidv4 } from 'uuid';
+import RecordCon from "../../components/record/RecordCon";
+import ItemCon from "../../components/ItemCon";
+import ActionBar from "../../components/battle/ActionBar";
 const BreatheDiv = styled.div`
 ${tw`flex justify-center flex-col items-center`}
 animation: breathe 2s ease-in-out infinite;
@@ -40,6 +43,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     const coldData = useRef<Map<number, SkillCooldown[]>>();
     const data = useThrottledProxyRef(dataCon.current);
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
+    const shopRef = useRef()
     const [curRole, setCurRole] = useState<Character | { id: string, carry: any }>({
         id: "",
         name: "",
@@ -55,13 +59,12 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         })
         console.log(battleManager.current, ' battleManager.current', data)
     }, [])
-    const { openDialog, updateDialog, closeDialog, dialogs } = useDialog();
 
-    const itemsManager = useThrottledProxyRef(battleManager.current?.ItemsManager?.ItemsData);
+
+
     const logsType = useThrottledProxyRef('tatakai');
-    const inventory = useRef<any[]>(Array(28).fill(null));
-    const showTooltipContent = useRef(false);
-    const currentItem = useRef(null);
+
+
     const mousePos = useRef({ x: 0, y: 0 });
     const frameEnum: z.infer<typeof CharacterDisplaySchema.shape.display>["frame_type"][] = ['skill', 'item', 'equip', /* 'troops', */ /* 'state',  */'logs']
     // function windowResize() {
@@ -85,107 +88,16 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         { value: 'settle', label: '结算' },
         { value: 'global', label: '全局' },
     ]);
-    const ItemShopRef =
-        <div><ItemShop onPurchase={(id, quantity, cls) => onPurchaseItem(id, quantity, cls)} playerCurrency={curRole?.carry?.currency} name={curRole.name} roleId={curRole.id}
-            data={{
-                ITEM: battleManager.current?.ItemsManager.ItemsDataGroup || [],
-                EQUIP: battleManager.current?.ItemsManager.equipmentsDataGroup || [],
-            }}></ItemShop></div>
 
     const getRemainingCooldown = useRef();
-    const onPurchaseItem = (itemId: string, quantity: number, cls: string) => {
-        if (!curRole.carry) {
-            curRole.carry = { currency: 0, items: {} };
-        }
-        let item
-        if (cls === "ITEM") {
-            item = battleManager.current?.ItemsManager.ItemsData[itemId] || {};
-        } else {
-            item = battleManager.current?.ItemsManager.equipmentsDataMap[itemId] || {};
-        }
-        const totalCost = Math.floor((item!.cost || 0) * quantity);
-        let targetSlot: number | null = null;
-        const MAX_SLOTS = 28;
-        const MAX_STACK = 99;
-        for (const [slot, item] of Object.entries(curRole.carry.items)) {
-            if (item?.id === itemId && (item.count + quantity <= MAX_STACK && cls === "ITEM")) {
-                targetSlot = Number(slot);
-                break;
-            }
-        }
-        if (targetSlot === null) {
-            for (let i = 0; i <= MAX_SLOTS - 1; i++) {
-                if (!curRole.carry.items[i]?.id) {
-                    targetSlot = i;
-                    break;
-                }
-            }
-        }
-        if (targetSlot === null) {
-            message.error('物品栏已满');
-            return;
-        }
-        curRole.carry.currency = Math.floor((curRole.carry.currency || 0) - totalCost);
-        if (!curRole.carry.items[targetSlot]?.id) {
-            curRole.carry.items[targetSlot] = {
-                id: item.id,
-                count: quantity,
-                cls: cls,
-                type: item.type
-            };
-        } else {
-            curRole.carry.items[targetSlot].count += quantity;
-        }
-    }
-    const openShop = (id = "") => {
-        const a = dialogs?.find(i => i.id === `item-shop`)
-        if (id) {
-            setCurRole(battleManager.current?.roles_group[id])
 
-        } else {
-            setCurRole({ id: "" })
-            if (dialogs) {
-                if (a) {
-                    return closeDialog(`item-shop`)
-                }
-            }
 
-        }
-        if (!a) {
-            openDialog({
-                id: `item-shop`,
-                roleId: curRole.id,
-                title: "商店",
-                initialSize: { width: 800, height: 600 },
-                initialPosition: { x: window.innerWidth - 800, y: 0 },
-                minWidth: 800,
-                minHeight: 500,
-                content: (ItemShopRef),
-            })
-        }
-        updateDialog('item-shop', {
-            content: (
-                ItemShopRef
-            )
-        });
-    }
     useEffect(() => {
         coldData.current = battleManager.current?.cooldownManager.cooldowns;
         getRemainingCooldown.current = battleManager.current?.cooldownManager;
 
-        return () => {
-            closeDialog(`item-shop`)
-        }
     }, []);
-    useEffect(() => {
-        if (curRole.id) {
-            updateDialog('item-shop', {
-                content: (
-                    ItemShopRef
-                )
-            });
-        }
-    }, [curRole.id, curRole?.carry?.currency]);
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             mousePos.current = { x: e.clientX, y: e.clientY };
@@ -193,32 +105,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
-    const levelColorClass = (level: number) => {
-        switch (level) {
-            case 1:
-                return 'gray'; 
-            case 2:
-                return 'green'; 
-            case 3:
-                return 'blue'; 
-            case 4:
-                return 'purple'; 
-            case 5:
-                return 'orange'; 
-            default:
-                return 'gray';
-        }
-    };
 
-    const showTooltip = (item: any) => {
-        currentItem.current = item;
-        showTooltipContent.current = true;
-    };
-
-    const hideTooltip = () => {
-        showTooltipContent.current = false;
-        currentItem.current = null;
-    };
 
     return (
         <ConfigProvider theme={{
@@ -229,15 +116,15 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                     <div className="flex-col gap-2 h-[200px] order-2 bottom-0 w-full px-6  border-2 border-t-solid border-t-amber  bg-[rgb(0 0 0 / 24%)] z-10" style={{ background: "rgb(0 0 0 / 67%)" }}>
                         {/* 日志部分 */}
                         <div className="flex justify-between ">
-                            {controlPanel({ openShop })}
+                            {controlPanel({ openShop: shopRef.current && shopRef.current.openShop })}
                             <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
-                                <div className="w-160 flex gap-6 border-r-amber border-2 border-r-solid">
+                                <div className="w-160  gap-6 border-r-amber border-2 border-r-solid hidden lg:flex">
                                     {/* 战斗阵型图 */}
-                                    {[battleManager.current.cur_characters, battleManager.current.cur_enemy].map((item, key) => (<div className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
+                                    {[battleManager.current.cur_characters, battleManager.current.cur_enemy].map((item, key) => (<div key={key} className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
                                         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
                                             const role = battleManager.current?.roles_group[battleManager.current.roleAarry[key][i]?.id || ""]
                                             return (
-                                                <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className='overflow-hidden flex justify-center relative hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
+                                                <div key={i} style={{ filter: `drop-shadow(2px 4px 12px black)` }} className='overflow-hidden flex justify-center relative hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
                                                 >
                                                     <div className="absolute w-full h-full bg-[rgba(165,164,164,0.3)] z-4" style={{ display: role?.status?.reborn && role.type !== "1" && battleManager.current.battle_data.game_mode === "0" ? "" : "none" }}>
                                                         <b className="absolute  left-50% top-50% text-2xl  -translate-y-50% -translate-x-50%  color-black">{role?.status?.reborn}</b>
@@ -264,39 +151,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                 </div>
                                 <div className="text-sm text-gray-300 h-50  flex-col gap-2 items-center w-full p-3">
                                     {/* 战斗日志 VList */}
-                                    <VList
-                                        className="flex-1 px-4 w-full"
-                                        data={battleManager.current?.RecordManager?.logsDataSchma[logsType.current] || []}
-                                        height={180}
-                                        estimatedItemHeight={20}
-                                        bufferSize={10}
-                                        rowKey="id"
-                                        gap={battleManager.current.battle_data.time}
-                                    >
-                                        {({ at }) => (!at.hidden && (
-                                            <>
-                                                {(logsType.current === 'tatakai' || at.logs_type === 'tatakai') && at.skillId !== 'default' && (
-                                                    <span className="text-sm">
-                                                        {at.self.name} -&gt;   {at.target.id !== at.self.id && <span>{at.target.name} -&gt;</span>}
-                                                        <Popover className="inline" content={template(SkillMap[at.skillId].desc)(at.self)} trigger="hover">
-                                                            <span style={{ color: elementColors[at.element] || elementColors[battleManager.current.roles_group[at.self.id]?.element] }}> {(SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name) || ""}{at.effectType && at.effectType !== 'DAMAGE' && <span class="text-xs">({at.effectType})</span>}</span>
-                                                        </Popover>
-                                                        {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>}
-                                                        &#160;-&gt;  <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : (at.effectType === 'HEAL' ? -at.damage.hp : at.damage.hp)}</span>
-                                                        {/* 施加BUFF */}
-                                                        {at.buffs?.length && <span> -&gt; BUFF -&gt;{at.buffs.map((buff) => <span>&#160;{battleManager.current.BuffManage.buff_map[buff.id]?.name}</span>)}</span>}
-                                                    </span>
-                                                )}
-                                                {(logsType.current === 'event' || at.logs_type === 'event') && (
-                                                    <div>
-                                                        <span className="text-sm">
-                                                            {at.round} 回合 -&gt; {template(at.desc)(at)}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </>
-                                        ))}
-                                    </VList>
+                                    <RecordCon battleManager={battleManager} logsType={logsType}></RecordCon>
                                 </div>
                             </div>
                         </div>
@@ -308,76 +163,54 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                     <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>
 
                         <div className="flex flex-col gap-4 flex-1 overflow-y-auto overflow-x-hidden p-4  w-full relative">
-                            <div className="w-96% flex items-center justify-center gap-6 ">
-                                {/* 行动条 */}
-                                <div>回合：{battleManager.current.battle_data.round}</div>
-                                <div>轮数：{battleManager.current.battle_data.battle_round}</div>
-                                <div className="relative flex items-center h-10 flex-1 overflow-hidden" style={{ filter: `drop-shadow(2px 4px 4px black) ` }}>
-                                    <div className="w-full h-0.5 bg-amber"></div>
-                                    {[...battleManager.current?.cur_characters, ...battleManager.current?.cur_enemy].map((role, roleType) => {
-                                        return (
-                                            <>
-                                                {<div className="w-12 h-12 rounded-md inline-block absolute top-0 right-0 transition-all-1000" key={role.id} style={{ left: ((1 - battleManager.current?.actionGauge.gauges.get(role.id) / battleManager.current?.actionGauge.MAX_GAUGE) * 100) + '%', display: role.state === 1 ? "none" : "" }}>
-                                                    <img
-                                                        className="w-10 h-10  rounded-full box-border"
-                                                        style={{
-                                                            objectFit: 'cover',
-                                                            // filter: role.state ? 'saturate(0.2)' : '',
-                                                            border: `1px solid `,
-                                                            // filter:`drop-shadow(2px 4px 6px black) `
-                                                            // shapeOutside: 'circle(50%)',
-                                                        }}
-                                                        src={role.avatar}
-                                                        alt=""
-
-                                                    />
-                                                </div >}
-                                            </>
-                                        )
-                                    })}
-                                </div>
-                            </div>
+                            <ActionBar battleManager={battleManager}></ActionBar>
                             <div className=" flex flex-row  justify-between  w-full w-99% py-8 gap-8 2xl:gap-0">
                                 {[battleManager.current?.cur_characters, battleManager.current?.cur_enemy].map((i, roleType) => (<div className="flex gap-8 flex-col flex-3/4">
                                     {i && Object.values(i).map((item, index) => (
                                         <div key={index} className=" ">
-                                            <div className="flex items-center h-[220px]  gap-8 flex-row items-center h-full flex-wrap  " style={{ flexDirection: roleType === 0 ? 'row-reverse' : '' }}>
+                                            <div className="flex items-center h-[220px]  gap-8 flex-row items-center h-full flex-wrap " style={{ flexDirection: roleType === 0 ? 'row-reverse' : '' }}>
                                                 {/* 角色头像 */}
-                                                <div className="relative h-full w-64 hidden 2xl:block" style={{ direction: 'rtl' }}>
-                                                    <img
-                                                        onClick={() => (setCurRole(item))}
-                                                        className="w-20 h-20 w-46 h-46 rounded-full box-border"
-                                                        draggable={false}
-                                                        style={{
-                                                            objectFit: 'cover',
-                                                            border: `4px solid ${elementColors[item.element]}`,
-                                                            shapeOutside: 'circle(50%)',
-                                                            float: "right",
-                                                            filter: `drop-shadow(2px 4px 12px black) ${item.state ? 'saturate(0.2)' : ''}`,
-                                                            boxShadow: `0 0 10px ${elementColors[item.element]}, inset 0 0 10px ${elementColors[item.element]} `
-                                                        }}
-                                                        src={item.avatar}
-                                                        alt=""
+                                                <div className="relative h-full  hidden 2xl:block flex-1 max-w-[260px] items-center" style={{ direction: 'rtl' }}>
+                                                    <div>
+                                                        <img
+                                                            onClick={() => (setCurRole(item))}
+                                                            className="w-46 h-46  aspect-square flex-1 rounded-full box-border"
+                                                            draggable={false}
+                                                            style={{
+                                                                objectFit: 'cover',
+                                                                border: `4px solid ${elementColors[item.element]}`,
+                                                                shapeOutside: 'circle(50%)',
+                                                                float: item.type === "0" ? "left" : "right",
+                                                                filter: `drop-shadow(2px 4px 12px black) ${item.state ? 'saturate(0.2)' : ''}`,
+                                                                boxShadow: `0 0 10px ${elementColors[item.element]}, inset 0 0 10px ${elementColors[item.element]} `
+                                                            }}
+                                                            src={item.avatar}
+                                                            alt=""
+                                                        />
+                                                        {/* BUFF */}
+                                                        {/* <div className=" gap-0.1 md:gap-0.5  scale-80   items-center text-xs text-gray-300"> */}
+                                                        {Object.keys(item.buff).map((key, index) => {
+                                                            const buff = battleManager.current?.BuffManage?.buff_map[item.buff[key]?.id]
+                                                            return (
+                                                                <div key={index} className="text-xs text-gray-300" style={{
+                                                                    textAlign: item.type === "0" ? "left" : "right",
+                                                                }}>
+                                                                    <Popover className="w-auto  inline" content={<div>
+                                                                        <div className="mb-2">{template(buff.desc)(item)}</div>
+                                                                        <div>{buff.isDebuff ? "DEBUFF" : "BUFF"} &#160;剩余时间 : {item.buff[key]?.duration} &#160;层数 : {item.buff[key]?.count}</div>
+                                                                    </div>} trigger="hover">
+                                                                        <span>{item.buff[key]?.count > 1 && item.type === "0" && item.buff[key]?.count} <span className="">{buff?.name}</span> {item.buff[key]?.count > 1 && item.type === "1" && item.buff[key]?.count}</span>   {/*  {item.buff[key]?.duration} */}
+                                                                    </Popover>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
 
-                                                    />
-                                                    {/* BUFF */}
-                                                    {/* <div className=" gap-0.1 md:gap-0.5  scale-80   items-center text-xs text-gray-300"> */}
-                                                    {Object.keys(item.buff).map((key, index) => {
-                                                        const buff = battleManager.current?.BuffManage?.buff_map[item.buff[key]?.id]
-                                                        return (
-                                                            <div key={index} className="text-xs text-gray-300">
-                                                                <Popover className="w-auto  inline" content={template(buff.desc)(item)} trigger="hover">
-                                                                    {buff?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}   {item.buff[key]?.duration}
-                                                                </Popover>
-                                                            </div>
-
-                                                        )
-                                                    })}
                                                     {/* </div> */}
                                                 </div>
 
                                                 {/* 角色状态 */}
-                                                <div className="flex flex-col h-full justify-center flex-wrap  gap-1 w-70 text-gray-300 text-sm">
+                                                <div className="flex flex-col h-full justify-center flex-wrap w-60  gap-1  text-gray-300 text-sm HealthBar">
                                                     <div className="relative w-full mb-1">
                                                         <div className="text-center w-full absolute top-0 left-0 -translate-y-100%" style={{ display: item.salu ? '' : 'none' }}>{`< ${item.salu} >`}</div>
                                                         <b className="text-lg w-full text-center text-amber-400 inline-block text-center">
@@ -433,7 +266,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                     </div>
                                                 </div>
                                                 {/* 技能和装备部分 */}
-                                                <div className="flex flex-row text-sm text-gray-300 gap-12  justify-evenly items-center overflow-hidden flex-1">
+                                                <div className="flex flex-row text-sm text-gray-300 gap-12  justify-evenly items-center overflow-hidden flex-1  max-w-lg ">
                                                     <div className="flex   w-full  indent-xs  relative h-50 ">
                                                         <div className="relative flex flex-col left-2 top-0 -translate-x-100% gap-2 select-none cursor-pointer">
                                                             {frameEnum.map((type, index) => (
@@ -444,12 +277,14 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                             {/* 装备列表 */}
                                                             <div className="flex flex-wrap indent-xs flex-1 items-center" style={{ display: item.display.frame_type === "equip" ? "" : "none" }}>
                                                                 {Object.entries(EquipTypeNames).map(([kk, equip]) => (
-                                                                    <b key={kk} className="basis-50% my-1 indent-sm">
-                                                                        {equip}:
-                                                                        <span style={{ color: levelColorClass(battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.level) }}>
-                                                                            {item.carry.equipments && battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.name || "空"}
-                                                                        </span>
-                                                                    </b>
+                                                                    <Popover className="basis-50% my-1 indent-sm truncate" content={equip.desc} key={kk}>
+                                                                        <b>
+                                                                            {equip}:
+                                                                            <span style={{ color: levelColorClass(battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.rarity) }}>
+                                                                                {item.carry.equipments && battleManager.current.ItemsManager.equipmentsDataMap[item.carry.equipments[kk]]?.name || "空"}
+                                                                            </span>
+                                                                        </b>
+                                                                    </Popover>
                                                                 ))}
                                                             </div>
                                                             {/* 日志*/}
@@ -502,47 +337,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                 <div className="w-full text-md text-center">{item.desc || (item.target?.id ? `正在攻击${item.target.name}` : `正在休息`)}</div>
                                                             </div>
                                                             {/* 物品栏部分-&gt;转换样式 */}
-                                                            <div className="p-2 bg-[#1a1a1aad] rounded-lg w-fit" style={{ display: item.display.frame_type === "item" ? "" : "none" }}>
-                                                                <div className="pb-1 flex items-center">
-                                                                    <span className="ml-auto mr-2 text-xs"> Currency：{item.carry.currency.toFixed(0) || 0}</span>
-                                                                </div>
-                                                                <div className="grid grid-cols-7 gap-2 w-fit">
-                                                                    {inventory.current.map((i, index) => {
-                                                                        const ii = item.carry.items[index] || null
-                                                                        const itemData = ii?.id ? (ii.cls === 'ITEM' ? battleManager.current?.ItemsManager.ItemsData[ii.id] : battleManager.current?.ItemsManager.equipmentsDataMap[ii.id]) : {} as any
-                                                                        // "ice_scythe"
-                                                                        return (
-                                                                            <div
-                                                                                className="relative w-8 h-8 bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded cursor-pointer 
-                                    flex items-center justify-center transition-all-5000
-                                    hover:border-[#4a4a4a] hover:bg-[#333]"
-                                                                                key={index}
-                                                                                onContextMenu={(e) => e.preventDefault()}
-                                                                                onClick={() => openShop(item.id)}
-                                                                                onAuxClick={() => battleManager.current?.ItemsManager.use_item(item, ii.id, index + '', ii.cls)}
-                                                                            >
-                                                                                {
-                                                                                    (ii && (
-                                                                                        <Popover className="w-full w-full flex p-0" content={itemsManager.current && template(ii.desc)(item)} title={itemsManager.current && itemData?.name} trigger="hover">
-                                                                                            {itemData?.icon ? <img
-                                                                                                src={itemData?.icon}
-                                                                                                className="object-contain"
-                                                                                                onMouseEnter={() => showTooltip(ii)}
-                                                                                                onMouseLeave={hideTooltip}
-                                                                                            /> : <div className="indent-xs text-center">{itemData.name.slice(0, 1)}</div>}
-                                                                                            {ii?.count > 1 && (
-                                                                                                <span className="absolute bottom-0.5 right-0.5 bg-black/80 text-white pr-0.5 rounded text-xs pointer-events-none">
-                                                                                                    {ii.count}
-                                                                                                </span>
-                                                                                            )}
-                                                                                        </Popover>
-                                                                                    ))
-                                                                                }
-                                                                            </div>
-                                                                        )
-                                                                    })}
-                                                                </div>
-                                                            </div>
+                                                            <ItemCon item={item} curRole={curRole} setCurRole={setCurRole} battleManager={battleManager} ref={shopRef}></ItemCon>
                                                         </div>
                                                     </div>
                                                 </div>

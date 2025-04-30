@@ -77,6 +77,7 @@ export const BattleActionSchema = z.object({
         name: z.string(),
         id: z.string(),
     }),
+    result: z.enum(['dizz', 'kill', 'none']).default('none'),
     // 额外效果
     effects: z.array(EffectSimple).optional(),
     // 战斗数据

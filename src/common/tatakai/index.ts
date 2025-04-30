@@ -2,12 +2,12 @@ import { Character, Action, Ability, CharacterSaveSchema, CharacterSchema } from
 import { bb, BB, initialData } from "../char";
 import { Skill, SkillMap, targetTypeEnum } from "../skill";
 import { EquipmentMap } from "../equip";
-import { CooldownManager } from "../skill/cooldown";
+import { CooldownManager } from '../skill/cooldown';
 import { ActionGauge } from "./action";
 import { ref, Ref } from "vue";
 import { DataCon } from "../data/dataCon";
 import { effectsSchema, EffectsSchema, EffectSimple } from '../char/attr';
-import { fixedPush, getMirrorPosition, randomInt } from "..";
+import { ElementalRelations, fixedPush, getMirrorPosition, randomInt } from "..";
 import { EventManager } from "../event";
 import { BattleActionSchema } from "../record/type";
 import get from "lodash-es/get";
@@ -53,7 +53,7 @@ export class BattleManager {
         cur_time: 0,
         pause: false,
         round: 0,
-        time: 3000,
+        time: 3000 / 3,
         cur_boss_id: '',
         battle_round: 1,
         game_mode: "0"
@@ -74,7 +74,7 @@ export class BattleManager {
         this.RecordManager = RecordManager(this)
         this.BuffManage = BuffManage(this)
         this.EventManager = EventManager(this)
-        this.cooldownManager = new CooldownManager();
+        this.cooldownManager = new CooldownManager(this);
         this.actionGauge = new ActionGauge();
         this.ItemsManager = ItemsManager(this);
         this.EffectManage = EffectManage(this);
@@ -92,7 +92,10 @@ export class BattleManager {
         }
         this.update_array()
         this.battle_data.round !== 0 && this.update_cur()
-
+        this.battle_data.round === 0 && this.roles.forEach(i => {
+            this.cooldownManager.resetCharacterCooldowns(i)
+            // this.set_role_status(i)
+        })
         // this.battle_data.cur_boss_id = this.cur_enemy[0].id
         // this.load_plugins_init().then(() => {
         //     this.start_round()
@@ -170,7 +173,8 @@ export class BattleManager {
         })
 
         // import('../plugins/*').then(res => {
-        //     const data = PluginsDataSchma.parse(res.plugins_data)
+        // import { settle_attack_boss } from './index';
+        const data = PluginsDataSchma.parse(res.plugins_data)
         //     this.load_plugins(data)
         // })
         Object.keys(localStorage).forEach(k => {
@@ -186,22 +190,25 @@ export class BattleManager {
         this.ItemsManager.load_plugins_item(data.item || [])
         this.load_plugins_role(data.role || [])
     }
-    start_round(time = this.battle_data.time) {
+    start_round() {
         if (!this.battle_data.pause) {
+            // 清理已存在的定时器
+            if (this.round_timer) {
+                clearInterval(this.round_timer)
+            }
+            
+            // 立即执行一次战斗回合
             this.battle_turn()
             this.battle_data.cur_time = 0
-            // if (!this.time_timer) {
-            //     this.time_timer = this.computed_time()
-            // }
-
-            if (typeof this.round_timer === 'number') {
-                clearTimeout(this.round_timer)
-            }
-
-            this.round_timer = setTimeout(() => {
-                if (!this.battle_data.pause) {
-                    this.start_round()
+            
+            // 设置定时循环
+            this.round_timer = setInterval(() => {
+                if (this.battle_data.pause) {
+                    clearInterval(this.round_timer)
+                    return
                 }
+                this.battle_turn()
+                this.battle_data.cur_time = 0
             }, this.battle_data.time)
         }
     }
@@ -359,7 +366,7 @@ export class BattleManager {
             char.state = 1
             char.buff = {}
             this.actionGauge.gauges.set(char.id, 0)
-            this.cooldownManager.resetCharacterCooldowns(char.id)
+            this.cooldownManager.resetCharacterCooldowns(char)
             //cooldownManager  actionGauge
             char.desc = "正在休息"
             if (!char.status.reborn || char.status?.reborn <= 0) {
@@ -474,8 +481,15 @@ export class BattleManager {
         return target;
     }
     update_cur() {
-        this.cur_enemy = this.enemy.filter(i => isNumber(i.position?.index))
-        this.cur_characters = this.characters.filter(i => isNumber(i.position?.index))
+        this.cur_characters = this.characters.filter(i => {
+            i.type = "0"
+            return isNumber(i.position?.index)
+        })
+        this.cur_enemy = this.enemy.filter(i => {
+            i.type = "1"
+            return isNumber(i.position?.index)
+        })
+
         // this.update_array()
     }
     update_roles() {
@@ -504,15 +518,19 @@ export class BattleManager {
     //战斗
     battle_turn() {
         if (!(this.cur_characters.length && this.cur_enemy.length)) return
-        this.startTurn()
-        // 获取当前回合可行动的角色  技能还是会冷却
-        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy].filter(i => !i.status?.dizz));
-        const actionOrderId = actionOrder.map(i => i.id)
-        // console.log("可以行动的角色", actionOrderId)
 
+        // 获取当前回合可行动的角色  技能还是会冷却
+        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy])/* .filter(i => !i.status?.dizz)) */
+        const actionOrderId = actionOrder.map(i => i.id)
+
+        // console.log("可以行动的角色", actionOrderId)
+        if (!actionOrderId.length) return
+        this.startTurn()
         for (const key in actionOrder) {
             const i = actionOrder[key]
-            //计算角色属性
+            this.calculateFinalStats(i)
+            this.cooldownManager.updateCooldownsRole(i.id);
+            //被控制还是会执行的
             if (isNumber(i.status?.find_gap) && actionOrderId.includes(i.id)) {
                 this.handle_target(i)
             }
@@ -574,8 +592,8 @@ export class BattleManager {
         })
     }
     //计算副作用
-    exec_effect(target: Character | typeof this, effect: z.infer<typeof EffectSimple>, count = 1) {
-        if (effect.id) {
+    exec_effect(target: Character | typeof this, effect: z.infer<typeof EffectSimple>, self: Character = null, count = 1) {
+        if (effect?.id) {
             const replace = effect.replace
             effect = this.EffectManage.effectsMap[effect.id]
             if (replace) {
@@ -632,6 +650,14 @@ export class BattleManager {
         if (effect.attr === 'hp' && effect.target === 'target' && sourceId && targetId /* && target !== 'global' */) {
             this.compute_damage(sourceId, targetId, value)
         }
+        if (effect?.multiplier && self) {
+            let { damage } = this.settle_damage(self, target, {
+                element: effect.element || self.element || "",
+                damageType: effect.damageType,
+                multiplier: effect.multiplier,
+            })
+            this.settle_damage_role(self, target, damage, effect.not_lethal)
+        }
     }
     //计算贡献
     compute_damage(sourceId: string | number, targetId: string | number, value: number) {
@@ -658,16 +684,16 @@ export class BattleManager {
             hp: stats.hp + stats.strength * 1.5,                    // 力量影响生命上限
             hp_re: stats.hp_re + stats.strength * 0.02,            // 力量影响生命回复
             // 攻击相关
-            attack: stats.attack + stats.strength * 0.2,            // 法术攻击加成
-            defense: stats.defense + stats.strength * 0.1,           // 力量影响防御
+            attack: stats.attack + stats.strength * 0.1,
+            defense: stats.defense + stats.strength * 0.1,
             // 敏捷相关
             speed: stats.speed + stats.agility * 0.2,               // 敏捷影响速度
             evasion: stats.evasion + stats.agility * 0.015,        // 敏捷影响闪避
             crit_rate: stats.crit_rate + stats.agility * 0.02,     // 敏捷影响暴击率
             crit_dmg: stats.crit_dmg + stats.agility * 0.05,       // 敏捷影响暴击伤害
             // 智力相关
-            mp: stats.mp + stats.intelligence * 1,        // 智力影响能量值
-            mp_re: stats.mp_re + stats.intelligence * 0.03, // 智力影响能量回复
+            mp: stats.mp + stats.intelligence * 0.05,        // 智力影响能量值
+            mp_re: stats.mp_re + stats.intelligence * 0.01, // 智力影响能量回复
             elem_bonus: stats.elem_bonus + stats.intelligence * 0.05,   // 智力影响元素伤害
             // 抗性相关
             fire_res: stats.fire_res + stats.strength * 0.02,      // 力量影响火抗
@@ -704,148 +730,66 @@ export class BattleManager {
         //叠加BUFF属性
         this.BuffManage.settle_buff(character)
     }
-    // 结算攻击
-    char_attack(self: Character, target: Character, skill: Skill) {
-        if (skill.scopeType === 'ALL') console.log(target, skill.name)
-        //削减当前数值 ?  除了boss可以删掉
+    settle_damage(self, target, { element, damageType, multiplier }) {
         let damage = 0
-        let isEvaded = false
         let isCrit = false
         isCrit = Math.random() * 100 <= self.ability.crit_rate;
-        //计算伤害
-        if (skill.damageType === 'physical') {
-            damage = self.imm_ability.attack * (Number(skill.multiplier)) / 100
+        if (damageType === 'physical') {
+            damage = self.imm_ability.attack * (Number(multiplier)) / 100
             damage = char_attack_physical(self, target, damage)
         } else {
-            damage = self.imm_ability.elem_bonus * (Number(skill.multiplier)) / 100
+            damage = self.imm_ability.elem_bonus * (Number(multiplier)) / 100
             damage = char_attack_magic(self, target, damage)
         }
-        //元素适应性加成
-        if (skill.element === self.element) {
+        if (element === self.element) {
             damage *= 1.1
         }
-        const ElementalRelations = {
-            fire: {
-                ice: 1.5,
-                wind: 1.2,
-                water: 0.7,
-                grass: 1.5,
-                thunder: 1,
-                dark: 1,
-                light: 1,
-                default: 1
-            },
-            ice: {
-                water: 1.2,
-                thunder: 0.7,
-                wind: 1.5,
-                fire: 0.7,
-                grass: 1.2,
-                dark: 1,
-                light: 1,
-                default: 1
-            },
-            thunder: {
-                water: 1.5,
-                ice: 1.5,
-                wind: 0.7,
-                fire: 1,
-                grass: 0.7,
-                dark: 1.2,
-                light: 0.7,
-                default: 1
-            },
-            wind: {
-                thunder: 1.5,
-                fire: 0.7,
-                ice: 0.7,
-                water: 1.2,
-                grass: 1.2,
-                dark: 1,
-                light: 1,
-                default: 1
-            },
-            water: {
-                fire: 1.5,
-                thunder: 0.7,
-                ice: 1,
-                wind: 1,
-                grass: 0.7,
-                dark: 1,
-                light: 1.2,
-                default: 1
-            },
-            grass: {
-                water: 1.5,
-                thunder: 1.5,
-                fire: 0.7,
-                ice: 0.7,
-                wind: 1,
-                dark: 0.7,
-                light: 1.2,
-                default: 1
-            },
-            dark: {
-                light: 1.5,
-                grass: 1.5,
-                thunder: 0.7,
-                fire: 1,
-                ice: 1,
-                wind: 1,
-                water: 1,
-                default: 1
-            },
-            light: {
-                dark: 1.5,
-                thunder: 1.5,
-                water: 0.7,
-                grass: 0.7,
-                fire: 1,
-                ice: 1,
-                wind: 1,
-                default: 1
-            },
-            default: {
-                fire: 1,
-                ice: 1,
-                thunder: 1,
-                wind: 1,
-                water: 1,
-                grass: 1,
-                dark: 1,
-                light: 1,
-                default: 1
-            }
-        } as const;
-        const elementType = skill.type === "NORMAL_ATTACK" ? self.element : skill.element
-        const elementalBonus = ElementalRelations[skill.element] && ElementalRelations[elementType][target.element] || 1;
+        const elementalBonus = ElementalRelations[element] && ElementalRelations[element][target.element] || 1;
         damage *= elementalBonus;
-        // 暴击判定
         if (isCrit) {
             damage *= self.imm_ability.crit_dmg / 100;
         }
+        damage = Math.round(damage)
+        return {
+            elementalBonus,
+            isCrit,
+            damage,
+        }
+    }
+    settle_damage_role(self, target, damage, not_lethal = false) {
+        target.status.hp -= damage || 0
+        if (target.status.hp <= 0) target.status.hp = not_lethal ? 1 : 0
+        this.compute_damage(self.id, target.id, damage || 0)
+        return target.status
+    }
+    // 结算攻击
+    char_attack(self: Character, target: Character, skill: Skill) {
+        //削减当前数值 ?  除了boss可以删掉
+        let { damage, elementalBonus, isCrit } = this.settle_damage(self, target, {
+            element: skill.type === "NORMAL_ATTACK" ? self.element : skill.element,
+            damageType: skill.damageType,
+            multiplier: skill.multiplier,
+        })
         //闪避概率
+        let isEvaded = false
         if (skill.type === "NORMAL_ATTACK") {
             const r = randomInt(0, 100)
             if (r <= target.imm_ability?.evasion) {
                 isEvaded = true
-                damage = 0 // ! 闪避 damage归0
+                damage = 0
             }
         }
-
         !isEvaded && skill.buffs?.forEach(buff => {
-            this.BuffManage.add_buff(buff.type === "target" ? target : self, buff.id)
+            this.BuffManage.add_buff(self, buff.type === "target" ? target : self, buff.id)
         })
-        damage = Math.round(damage)
-        target.status.hp -= damage || 0
         skill.effects?.forEach(effect => {
             if (effect.target === 'global') {
-                this.exec_effect(this.data, effect)
+                this.exec_effect(this.data, effect, self)
             } else {
-                this.exec_effect(target || target, effect)
+                this.exec_effect(target || target, effect, self)
             }
         })
-        if (target.status.hp <= 0) target.status.hp = skill.not_lethal ? 1 : 0
+        const { hp } = this.settle_damage_role(self, target, damage, skill.not_lethal)
         //记录
         const at = BattleActionSchema.parse({
             logs_type: 'tatakai',
@@ -866,6 +810,7 @@ export class BattleManager {
             effectType: skill.effectType,
             timestamp: Date.now(),
             isEvaded,
+            result: hp <= 0 ? "kill" : "none",
             self: {
                 type: self.type || 2,
                 name: self.name,
@@ -880,9 +825,10 @@ export class BattleManager {
         this.RecordManager.fixedPush(target as any, 'at', at, true)
         this.RecordManager.fixedPush(self as any, 'at', at, true)
         this.RecordManager.fixedPush(this.RecordManager.logsDataSchma, 'tatakai', at)
-        this.compute_damage(self.id, target.id, damage || 0)
+
         return damage
     }
+
     // 角色行动完成
     finishAction(character: Character) {
         this.actionGauge.resetGauge(character.id);
@@ -930,10 +876,8 @@ export class BattleManager {
     }
     //回合开始
     startTurn() {
-        this.cooldownManager.updateCooldowns();
         this.init_target_array()
         this.roles.forEach(i => {
-            this.calculateFinalStats(i)
             i.beTarget = []
             i.target?.position?.index && this.targetArray[i.target?.type]?.push(i.target.type === "1" ? getMirrorPosition(i.target.position.index) : i.target.position.index)
             // this.set_role_status(i)
@@ -959,7 +903,7 @@ export class BattleManager {
         this.EventManager.trigger_random_event(this.battle_data.round)
         // 结算人物数据
         this.roles.forEach(char => {
-            this.auto_gain_exp(char)
+            // this.auto_gain_exp(char)
             //结算status
             this.set_role_status(char)
         })

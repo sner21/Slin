@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { ElementType } from '..';
 import { Effect } from '@tauri-apps/api/window';
-import { AbilitySchema, EffectSimple } from '../char/attr';
+import { AbilitySchema, baseDamageSchma, EffectSimple } from '../char/attr';
+
 
 // Buff/Debuff 类型
 export const BuffType = z.enum([
@@ -46,7 +47,7 @@ export const BuffType = z.enum([
 export const BuffDurationType = z.enum([
     'TURNS',             // 回合数
     'PERMANENT',         // 永久
-    'OVERLAY'   ,          // 叠加
+    'OVERLAY',          // 叠加
     'PERMANENT-OVERLAY'             // 永久叠加
 ]);
 
@@ -66,8 +67,8 @@ export const BuffSchema = z.object({
     currentStacks: z.number().default(1), //叠加数
     //
     isDebuff: z.boolean().default(false),
-    imm_ability:z.record(AbilitySchema.keyof(),z.any()).optional() ,
-});
+    imm_ability: z.record(AbilitySchema.keyof(), z.any()).optional(),
+}).merge(baseDamageSchma);
 
 // Buff/Debuff 中英文对照
 export const BuffTypeNames = {

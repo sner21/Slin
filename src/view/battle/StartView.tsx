@@ -9,6 +9,7 @@ import { BattleManager } from "../../common/tatakai";
 import ConPanel from "./ConPanel";
 import AarryCon from "../../components/battle/AarryCon";
 import { getMirrorPosition } from "../../common";
+import { isNumber } from "lodash-es";
 
 const MenuContainer = styled.div`
   ${tw`w-full h-[100vh] flex items-center justify-center`}
@@ -107,14 +108,18 @@ const StartView: FC = () => {
 
     const confirmArr = (v1, v2) => {
         if (battleManager.current) {
+            Object.keys(v1).forEach(type => {
+                Object.keys(v1[type]).forEach(k => {
+                    v1[type][k].position = {}
+                })
+            })
             Object.keys(v2).forEach(type => {
                 Object.keys(v2[type]).forEach(k => {
                     const role = v2[type][k]
                     if (!role.id) return
                     if (!battleManager.current.roles_group[role.id].position) battleManager.current.roles_group[role.id].position = {}
-                    const index = type == "1" ? getMirrorPosition(role.index) : role.index
+                    const index = (type == "1" ? getMirrorPosition(role.index) : role.index)
                     battleManager.current.roles_group[role.id].position.index = index
-
                 })
             })
             battleManager.current.update_cur()

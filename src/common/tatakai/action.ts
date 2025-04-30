@@ -19,13 +19,13 @@ export class ActionGauge {
         const gauges: number[] = []
         characters.forEach(char => {
             if (char.state === 1) return
-            gauges.push(char.imm_ability.speed)
+            gauges.push(char.imm_ability.speed )
             const currentGauge = this.gauges.get(char.id) || 0;
-            const increment = char.imm_ability.speed;
+            const increment = char.imm_ability.speed  ;
             const newGauge = currentGauge + increment;
             this.gauges.set(char.id, newGauge);
         });
-        this.MAX_GAUGE = Math.max(...gauges) * 2;
+        this.MAX_GAUGE = Math.max(...gauges) * 10;
     }
 
 
