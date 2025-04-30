@@ -50,6 +50,7 @@ const StartView: FC = () => {
     const [update, setUpdate] = useState(0)
     const [arrConOpen, setArrConOpen] = useState(false)
     const [loadMode, setLoadMode] = useState(false)
+    const [battleInit, setInitBattle] = useState(false)
     const startViewData = useThrottledProxyRef({
         mode: ''
     }).current || {}
@@ -106,9 +107,6 @@ const StartView: FC = () => {
 
     const confirmArr = (v1, v2) => {
         if (battleManager.current) {
-            // battleManager.current.characters = v1[0]
-            // battleManager.current.enemy = v1[1]
-            // battleManager.current.update_roles()
             Object.keys(v2).forEach(type => {
                 Object.keys(v2[type]).forEach(k => {
                     const role = v2[type][k]
@@ -116,17 +114,13 @@ const StartView: FC = () => {
                     if (!battleManager.current.roles_group[role.id].position) battleManager.current.roles_group[role.id].position = {}
                     const index = type == "1" ? getMirrorPosition(role.index) : role.index
                     battleManager.current.roles_group[role.id].position.index = index
-                    // if (type == "1") {
-                    //     battleManager.current.enemy.find(i => i.id === role.id).position.index = index
-                    // } else {
-                    //     battleManager.current.characters.find(i => i.id === role.id).position.index = index
-                    // }
+
                 })
             })
-
             battleManager.current.update_cur()
             battleManager.current.update_array()
             setArrConOpen(false)
+            setInitBattle(true)
         }
     }
     const changeTime = (v: number | null) => {
@@ -164,27 +158,28 @@ const StartView: FC = () => {
                         <span>初始回合时间 </span>
                         <InputNumber size="large" style={{ background: 'transparent' }} value={data.current.globalConfig.time} onChange={v => changeTime(v)}></InputNumber>
                     </div>
-
                     <BackCon ></BackCon>
                 </MenuContent>}
                 {startViewData.mode === 'battle' &&
                     <BattleCon
+                        key={slotId}
                         AarryCon={
-                            arrConOpen && <AarryCon roleAarryData={battleManager.current?.roleAarry} onConfirm={confirmArr} roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>
+                            arrConOpen &&
+                            <AarryCon roleAarryData={battleManager.current?.roleAarry} onConfirm={confirmArr} roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>
                         }
                         arrConOpen={arrConOpen}
+                        setArrConOpen={setArrConOpen}
                         battleManageData={battleManager}
                         controlPanel={
-                            ({ openShop }) => (<ConPanel
-                                AarryCon={
-                                    <AarryCon onConfirm={confirmArr} roles={[battleManager.current?.characters, battleManager.current?.enemy]}></AarryCon>
-                                }
-                                openShop={openShop}
-                                battleManager={battleManager}
-                                startViewData={startViewData}
-                                dataCon={data}
-                                setArrConOpen={() => setArrConOpen(!arrConOpen)}
-                                refreshBet={refreshBet}></ConPanel>)
+                            ({ openShop }) => (
+                                <ConPanel
+                                    openShop={openShop}
+                                    load={load}
+                                    battleManager={battleManager}
+                                    startViewData={startViewData}
+                                    dataCon={data}
+                                    setArrConOpen={() => setArrConOpen(!arrConOpen)}
+                                    refreshBet={refreshBet}></ConPanel>)
                         }
                         startViewData={startViewData}
                         dataCon={data}

@@ -1,6 +1,6 @@
 import { Skill, targetTypeEnum } from '../types';
 import { get_svg_uri } from '../..';
-export const ELEMENTAL_SKILL: Array< Skill> = [
+export const ELEMENTAL_SKILL: Array<Skill> = [
     {
         id: 'hutao_skill',
         name: '蝶引来生',
@@ -41,11 +41,22 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         level: 1,
         element: 'fire',
         damageType: 'physical'
-    },{
+    }, {
         id: 'shinoa_skill',
         name: '神里流·冰华',
         type: 'ELEMENTAL_SKILL',
-        desc: '召唤冰霜之矛攻击敌人，有几率冻结目标',
+        desc: '\${name}召唤冰霜之矛攻击敌人，有20%冻结目标',
+        effects: [
+            {
+                isBuff: true,
+                path: "status",
+                target: 'target',
+                attr: "dizz",
+                value: 1,
+                operator: "max",
+                probability: 20,
+            },
+        ],
         scopeType: 'SINGLE',
         effectType: 'DAMAGE',
         multiplier: 120,
@@ -59,32 +70,58 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         name: '烈火突袭',
         type: 'ELEMENTAL_SKILL',
         desc: '',
-        targetType: targetTypeEnum.ALLY,
+        targetType: targetTypeEnum.ENEMY,
         scopeType: 'SINGLE',
         effectType: 'BUFF',
-        multiplier: 160,
-        cooldown: 4,
+        multiplier: 200,
+        cooldown: 6,
         level: 1,
-        element: 'water',
+        element: 'fire',
         damageType: 'magic'
-    },{
+    }, 
+    {
+        id: 'zy_skill',
+        name: '轰鸣长江之业火战船',
+        type: 'ELEMENTAL_SKILL',
+        desc: '由稍小型的楼船与Archer所持弓组成的宝具。楼船为宝具的副产物，攻击核心为弓箭。射出的箭矢命中后将会爆炸。赤壁之战中肩负重要使命的火船化作的武器。与其说是逸闻的具象……不如说是逸闻化为了兵器。',
+        targetType: targetTypeEnum.ENEMY,
+        scopeType: 'MULTI',
+        effectType: 'BUFF',
+        multiplier: 200,
+        cooldown: 10,
+        level: 1,
+        element: 'fire',
+        damageType: 'magic'
+    }, 
+    {
         id: 'red_flame',
         name: '赤焰漩涡',
         type: 'ELEMENTAL_SKILL',
         desc: '',
-        targetType: targetTypeEnum.ALLY,
+        targetType: targetTypeEnum.ENEMY,
         scopeType: 'SINGLE',
         effectType: 'BUFF',
-        multiplier: 160,
-        cooldown: 4,
+        multiplier: 240,
+        cooldown: 8,
         level: 1,
-        element: 'water',
+        element: 'fire',
         damageType: 'magic'
     }, {
         id: 'eula_skill',
         name: '安神秘法',
         type: 'ELEMENTAL_SKILL',
         desc: '挥动炽热的魂灵，造成大范围火元素伤害。命中敌人时，基于\${name}的生命值上限，恢复\${name}的生命值',
+        effects: [
+            {
+                isBuff: true,
+                path: "status",
+                target: 'target',
+                attr: "hp",
+                value: 1,
+                operator: "multiply",
+                probability: 20,
+            },
+        ],
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 150,
@@ -92,28 +129,45 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         level: 1,
         element: 'fire',
         damageType: 'physical'
-    },{
+    }, {
         id: 'makima_skill',
         name: '支配之链',
         type: 'ELEMENTAL_SKILL',
         desc: '操控敌人，使其暂时失去行动能力',
+        effects: [
+            {
+                isBuff: true,
+                path: "status",
+                target: 'target',
+                attr: "dizz",
+                value: 1,
+                operator: "max",
+                probability: 20,
+            },
+        ],
         scopeType: 'SINGLE',
         effectType: 'DEBUFF',
         multiplier: 130,
         cooldown: 4,
         level: 1,
-        element: 'fire',
+        element: 'dark',
         damageType: 'magic'
-    },{
+    }, {
         id: 'raiden_skill',
         name: '神变·恶曜开眼',
         type: 'ELEMENTAL_SKILL',
         desc: '召唤雷电之眼，为队友攻击附加雷元素伤害',
+        buffs: [
+            {
+                id: "神变·恶曜开眼",
+                type: "target",
+            }
+        ],
         targetType: targetTypeEnum.ALLY,
         scopeType: 'ALL',
         effectType: 'BUFF',
-        multiplier: 140,
-        cooldown: 3,
+        multiplier: 0,
+        cooldown: 10,
         level: 1,
         element: 'thunder',
         damageType: 'magic'
@@ -129,12 +183,18 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         level: 1,
         element: 'thunder',
         damageType: 'physical'
-    },{
+    }, {
         id: 'ai_skill',
         name: '乱气流',
         type: 'ELEMENTAL_SKILL',
         desc: '快速移动并造成风元素伤害，提升速度',
         targetType: targetTypeEnum.SELF,
+        buffs: [
+            {
+                id: "乱气流",
+                type: "self",
+            }
+        ],
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 130,
@@ -142,11 +202,17 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         level: 1,
         element: 'wind',
         damageType: 'physical'
-    },{
+    }, {
         id: 'lancelot_skill',
         name: '疾风突刺',
         type: 'ELEMENTAL_SKILL',
         desc: '高速突进攻击敌人，提升暴击率',
+        buffs: [
+            {
+                id: "暴击率提升",
+                type: "self",
+            }
+        ],
         scopeType: 'SINGLE',
         effectType: 'DAMAGE',
         multiplier: 170,
@@ -155,18 +221,19 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         element: 'wind',
         critRateBonus: 15,
         damageType: 'physical'
-    },{
+    }, 
+    {
         id: 'issei_skill',
-        name: '不动明王咒',
-        type: 'ELEMENTAL_SKILL',
-        desc: '释放强大的火焰斩击,提升自身攻击力',
-        scopeType: 'MULTI',
+        name: '罪钥',
+        type: 'ELEMENTAL_BURST',
+        desc: '释放强大的黑焰剑气,对敌人造成多段伤害',
+        scopeType: 'ALL',
         effectType: 'DAMAGE',
         multiplier: 180,
-        cooldown: 3,
+        cooldown: 10,
         level: 1,
         element: 'dark',
-        critRateBonus: 15,
+        critDmgBonus: 50,
         damageType: 'physical'
     },{
         id: 'mitsuba_skill',
@@ -181,11 +248,17 @@ export const ELEMENTAL_SKILL: Array< Skill> = [
         element: 'wind',
         elemBonusBonus: 20,
         damageType: 'physical'
-    },{
+    }, {
         id: 'themis_skill',
         name: '天秤制裁',
         type: 'ELEMENTAL_SKILL',
         desc: '释放神圣之力,对敌人造成伤害并降低防御',
+        buffs: [
+            {
+                id: "防御降低",
+                type: "self",
+            }
+        ],
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 160,

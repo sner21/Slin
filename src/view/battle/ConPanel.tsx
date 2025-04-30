@@ -26,7 +26,7 @@ type props = {
   setArrConOpen?: (arg1: boolean) => any
 }
 
-const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet, setArrConOpen, openShop }) => {
+const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet, setArrConOpen, openShop, load }) => {
   const modeEnum = useRef([
     { value: 'panel', label: '面板' },
     // { value: 'shop', label: '商店' },
@@ -122,10 +122,10 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
     setSaveData(dataCon.current.save_data)
   };
 
-  const handleLoad = (slotId: string) => {
-    dataCon.current?.load(slotId);
-    // battleManager.current = new BattleManager(dataCon.current);
-  };
+  // const handleLoad = (slotId: string) => {
+  //   dataCon.current?.load(slotId);
+  //   // battleManager.current = new BattleManager(dataCon.current);
+  // };
   return (
     <div className='flex-1 flex flex-col gap-2 py-3'>
       <div className='flex items-center'>
@@ -282,7 +282,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         open={loadModalOpen}
         onClose={() => setLoadModalOpen(false)}
         mode="load"
-        onConfirm={handleLoad}
+        onConfirm={load}
         dataCon={dataCon}
       />
 

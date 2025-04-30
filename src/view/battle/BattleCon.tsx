@@ -36,7 +36,7 @@ animation: breathe 2s ease-in-out infinite;
 `;
 
 
-function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageData, AarryCon, arrConOpen }) {
+function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageData, AarryCon, arrConOpen, setArrConOpen }) {
     const coldData = useRef<Map<number, SkillCooldown[]>>();
     const data = useThrottledProxyRef(dataCon.current);
     let battleManager = useThrottledProxyRef<BattleManager>(battleManageData.current);
@@ -46,9 +46,12 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
         carry: {}
     })
     useEffect(() => {
-        // battleManager.current = battleManageData.current
+        battleManager.current = battleManageData.current
         battleManageData.current.load_plugins_init().then(() => {
             battleManageData.current.start_round()
+            if (!(battleManageData.current.cur_characters.length && battleManageData.current.cur_enemy.length)) {
+                setArrConOpen(true)
+            }
         })
         console.log(battleManager.current, ' battleManager.current', data)
     }, [])
@@ -193,15 +196,15 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
     const levelColorClass = (level: number) => {
         switch (level) {
             case 1:
-                return 'gray'; // 普通
+                return 'gray'; 
             case 2:
-                return 'green'; // 优秀
+                return 'green'; 
             case 3:
-                return 'blue'; // 稀有
+                return 'blue'; 
             case 4:
-                return 'purple'; // 史诗
+                return 'purple'; 
             case 5:
-                return 'orange'; // 传说
+                return 'orange'; 
             default:
                 return 'gray';
         }
@@ -299,7 +302,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                         </div>
                     </div>
                     {/* 队伍 */}
-                    {arrConOpen && <div className="  flex-1  z-6 w-full relativ overflow-x-hiddene" style={{ background: "url(/ArrayBg.jpg)" }}>
+                    {arrConOpen && <div className="  flex-1  z-6 w-full relative overflow-x-hidden" style={{ background: "url(/ArrayBg.jpg)" }}>
                         {AarryCon}
                     </div>}
                     <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>
@@ -364,7 +367,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                         return (
                                                             <div key={index} className="text-xs text-gray-300">
                                                                 <Popover className="w-auto  inline" content={template(buff.desc)(item)} trigger="hover">
-                                                                    {buff?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}
+                                                                    {buff?.name} {item.buff[key]?.count > 1 && item.buff[key]?.count}   {item.buff[key]?.duration}
                                                                 </Popover>
                                                             </div>
 

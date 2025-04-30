@@ -159,7 +159,7 @@ export class DataCon {
                 battle_data: save.battle_data_info[k].battle_data,
                 cooldowns: new Map(Object.entries(save.battle_data_info[k].cooldowns)),
             })
-
+        console.log(device, 123,save,loadMode)
         this.battle_data_info = battleManagerGroup
         this.globalConfig.autoload = device
         // this.data.current.cooldownManager.updateCooldowns();

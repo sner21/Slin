@@ -13,7 +13,7 @@ export const EventEffectType = z.enum([
     "splice",
     "equal",
     "multiply",
-
+    "max"
 ]);
 export const CompareOperator = z.enum([
     'EQ',  // 等于 (Equal)

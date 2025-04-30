@@ -1,4 +1,5 @@
-import shinoa from "../../assets/65555.jpg?url";
+// import shinoa from "../../assets/65555.jpg?url";
+import shinoa from "../../assets/img/shinoa.jpg?url";
 import mui from "../../assets/20191117175619_qgnij.jpg?url";
 import hutao from "../../assets/20221018182444_c011a.thumb.1000_0.jpg?url";
 import makima from "../../assets/20220921002233_d070d.jpg?url";
@@ -7,8 +8,15 @@ import ai from "../../assets/bYS8xEdzULxapXw.thumb.1000_0.png?url";
 import issei from "../../assets/issei.png?url";
 import gaosupopo from "../../assets/gaosupopo.png?url";
 import huang from "../../assets/huang.png?url";
-import mitsuba from "../../assets/mitsuba.jpg?url";
+// import mitsuba from "../../assets/mitsuba.jpg?url";
+import mitsuba from "../../assets/img/mitsuba.jpg?url";
 import themis from "../../assets/themis.jpg?url";
+import by2 from "../../assets/img/by2.png?url";
+import kll from "../../assets/img/kll.png?url";
+import zy from "../../assets/img/zy.png?url";
+import zty from "../../assets/img/zty.png?url";
+import ctzs from "../../assets/img/ctzs.png?url";
+import ctct from "../../assets/img/ctct.png?url";
 import { z } from 'zod';
 import { Data, DataSchema, Character, CharacterSchema } from "./types";
 import { SkillTypeMap } from "../skill";
@@ -75,59 +83,61 @@ export const ElementNameCN = {
 // 使用 Zod 验证的数据
 export const bb: Character[] = z.array(CharacterSchema).parse([
   {
-    name: "煌雷龙",
-    id: "0",
-    type: "1",
-    avatar: huang,
-    at: [],
-    element: "thunder", // 角色元素属性
-    ability: {
-      // 基础属性
-      hp: 220, // 生命上限
-      shield: 0,  // 护盾
-      attack: 20,    // 攻击力
-      defense: 2,  // 防御力
-      evasion: 8, // 闪避率
-      crit_rate: 15,  // 暴击率
-      crit_dmg: 150, // 暴击伤害
-      speed: 110,   // 速度(影响行动顺序)
-      mp: 100,   // 能量值(释放大招所需)
-      penetration: 10, // 护甲穿透
-      // 元素相关
-      lifesteal: 5, //  生命偷取(%)
-      elem_mastery: 80,  // 元素精通
-      elem_bonus: 15,    // 元素伤害加成(%)
-      // 抗性相关
-      magic_res: 0,  // 总抗性
-      fire_res: 0,  // 火元素抗性
-      ice_res: 15,    // 冰元素抗性
-      lightning_res: 5,  // 雷元素抗性
-      // 特殊属性
-      rage_bonus: 20,  // 怒气伤害加成
-      healing_bonus: 0,  // 治疗加成
-      shield_strength: 0, // 护盾强度
-      strength: 8,    // 中等力量
-      agility: 12,    // 较高敏捷
-      intelligence: 10, // 
-    },
+    name: "周瑜",
+    id: '12',
     position: {
-      index: 4
+      index: 0
     },
-    grow: {
-      level: 1,
-      rarity: 5, 
-      strength: 1,
-      agility: 1,
-      intelligence: 1,
-    },
-    skill: [],
+    avatar: zy,
+    salu: '盈月之仪',
+    gender: "2",
+    element: "fire",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    normal_name: "火矢",
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.zy_skill.id,
+      SkillTypeMap.ELEMENTAL_BURST.zy_burst.id
+    ],
+    ability: {
+      hp: 140,
+      hp_re: 7,
+      shield: 0,
+      attack: 25,
+      defense: 2,
+      evasion: 6,
+      crit_rate: 20,
+      crit_dmg: 180,
+      speed: 105,
+      mp: 90,
+      penetration: 15,
+      lifesteal: 8,
+      element: "fire",
+      elem_mastery: 100,
+      elem_bonus: 20,
+      magic_res: 0,
+      fire_res: 20,
+      ice_res: 0,
+      lightning_res: 0,
+      rage_bonus: 25,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 14,
+      agility: 12,
+      intelligence: 8,
+    },
+    ac: [],
+    at: [],
+    blood: 100,
+    ee: 0,
   },
   {
     name: "高速婆婆",
     id: "turbo_bachan",
     type: "1",
     avatar: gaosupopo,
+    position: {
+      index: 2
+    },
     at: [],
     element: "fire", // 角色元素属性
     ability: {
@@ -159,21 +169,214 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       agility: 12,    // 较高敏捷
       intelligence: 10, // 
     },
+    salu: '六甲山的妖怪',
     grow: {
       level: 1,
-      rarity: 5, 
+      rarity: 1,
       strength: 1,
       agility: 1,
       intelligence: 1,
     },
-    skill: [],
+    skill: [
+      "attack_flame", "red_flame"
+    ],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    ee: 0,
+  },
+  {
+    name: "克鲁鲁·采佩西",
+    id: '11',
+    position: {
+      index: 6
+    },
+    avatar: kll,
+    salu: '第三位始祖',
+    gender: "2",
+    element: "dark",
+    normal: SkillTypeMap.NORMAL_ATTACK.magic_normal.id,
+    normal_name: "血刃",
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
+      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
+    ],
+    ability: {
+      hp: 140,
+      hp_re: 7,
+      shield: 0,
+      attack: 25,
+      defense: 2,
+      evasion: 6,
+      crit_rate: 20,
+      crit_dmg: 180,
+      speed: 105,
+      mp: 90,
+      penetration: 15,
+      lifesteal: 8,
+      element: "fire",
+      elem_mastery: 100,
+      elem_bonus: 20,
+      magic_res: 0,
+      fire_res: 20,
+      ice_res: 0,
+      lightning_res: 0,
+      rage_bonus: 25,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 14,
+      agility: 12,
+      intelligence: 8,
+    },
+    ac: [],
+    at: [],
+    blood: 100,
+    ee: 0,
+  },
+  {
+    name: "煌雷龙",
+    id: "0",
+    type: "1",
+    avatar: huang,
+    at: [],
+    salu: ' 天堑沙原霸主',
+    element: "thunder", // 角色元素属性
+    ability: {
+      // 基础属性
+      hp: 220, // 生命上限
+      shield: 0,  // 护盾
+      attack: 20,    // 攻击力
+      defense: 2,  // 防御力
+      evasion: 8, // 闪避率
+      crit_rate: 15,  // 暴击率
+      crit_dmg: 150, // 暴击伤害
+      speed: 110,   // 速度(影响行动顺序)
+      mp: 100,   // 能量值(释放大招所需)
+      penetration: 10, // 护甲穿透
+      // 元素相关
+      lifesteal: 5, //  生命偷取(%)
+      elem_mastery: 80,  // 元素精通
+      elem_bonus: 15,    // 元素伤害加成(%)
+      // 抗性相关
+      magic_res: 0,  // 总抗性
+      fire_res: 0,  // 火元素抗性
+      ice_res: 15,    // 冰元素抗性
+      lightning_res: 5,  // 雷元素抗性
+      // 特殊属性
+      rage_bonus: 20,  // 怒气伤害加成
+      healing_bonus: 0,  // 治疗加成
+      shield_strength: 0, // 护盾强度
+      strength: 8,    // 中等力量
+      agility: 12,    // 较高敏捷
+      intelligence: 10, // 
+    },
+    position: {
+      index: 5
+    },
+    grow: {
+      level: 1,
+      rarity: 1,
+      strength: 1,
+      agility: 1,
+      intelligence: 1,
+    },
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
+      SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
+    ],
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+  },
+  {
+    name: "玛奇玛",
+    id: '4',
+    avatar: makima,
+    salu: '支配恶魔',
+    gender: "2",
+    element: "fire",
+    type: "1",
+    ac: [],
+    at: [],
+
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.makima_skill.id,
+      SkillTypeMap.ELEMENTAL_BURST.tohka_skill.id
+    ],
+    ability: {
+      hp: 200,
+      shield: 60,
+      attack: 20,
+      defense: 3,
+      evasion: 2,
+      crit_rate: 8,
+      crit_dmg: 130,
+      speed: 85,
+      mp: 110,
+      penetration: 5,
+      lifesteal: 10,
+      element: "fire",
+      elem_mastery: 40,
+      elem_bonus: 10,
+      magic_res: 0,
+      fire_res: 15,
+      ice_res: 15,
+      lightning_res: 15,
+      rage_bonus: 15,
+      healing_bonus: 10,
+      shield_strength: 25,
+      strength: 10,
+      agility: 6,
+      intelligence: 14,
+    },
+    blood: 100,
     ee: 0,
   }
 ]);
-// 使用 Zod 验证初始数据
 
 export const initialData = DataSchema.parse([
+  {
+    name: "一濑红莲",
+    id: '7',
+    avatar: issei,
+    element: "dark",
+    salu: '帝之月',
+    position: {
+      index: 5
+    },
+    ac: [],
+    at: [],
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.issei_skill.id,
+      SkillTypeMap.ELEMENTAL_BURST.issei_burst.id
+    ],
+    ability: {
+      hp: 170,
+      shield: 0,
+      attack: 24,
+      defense: 4,
+      evasion: 5,
+      crit_rate: 15,
+      crit_dmg: 170,
+      speed: 105,
+      mp: 120,
+      penetration: 15,
+      lifesteal: 5,
+      element: "fire",
+      elem_mastery: 85,
+      elem_bonus: 18,
+      magic_res: 10,
+      fire_res: 25,
+      ice_res: 0,
+      lightning_res: 5,
+      rage_bonus: 20,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 14,
+      agility: 10,
+      intelligence: 8,
+    },
+    blood: 100,
+    ee: 0,
+  },
   {
     name: "胡桃",
     id: '3',
@@ -186,6 +389,55 @@ export const initialData = DataSchema.parse([
     element: "fire", // 修正元素属性为火
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     normal_name: "往生秘传枪法",
+    skill: [
+      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
+      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
+    ],
+    ability: {
+      hp: 140,
+      hp_re: 7,
+      shield: 0,
+      attack: 25,
+      defense: 2,
+      evasion: 6,
+      crit_rate: 20,
+      crit_dmg: 180,
+      speed: 105,
+      mp: 90,
+      penetration: 15,
+      lifesteal: 8,
+      element: "fire",
+      elem_mastery: 100,
+      elem_bonus: 20,
+      magic_res: 0,
+      fire_res: 20,
+      ice_res: 0,
+      lightning_res: 0,
+      rage_bonus: 25,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 14,
+      agility: 12,
+      intelligence: 8,
+    },
+    ac: [],
+    at: [],
+    blood: 100,
+    ee: 0,
+  },
+
+  {
+    name: "百夜米迦尔",
+    id: '10',
+    position: {
+      index: 2
+    },
+    avatar: by2,
+    salu: '吸血鬼都市防卫队',
+    gender: "2",
+    element: "light",
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    normal_name: "夜刃突袭",
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
       SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
@@ -273,6 +525,94 @@ export const initialData = DataSchema.parse([
     ee: 0,
   },
   {
+    name: "冲田总司",
+    id: 'ctzs',
+    avatar: ctzs,
+    salu: '新选组一番组长',
+    element: "wind",
+    ac: [],
+    at: [],
+    position: {
+      index: 0
+    },
+    normal_name: "天然理心流·三段突刺",
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    skill: [  //天然理心流·鸢飞戾天  鬼子·散 神罗八百万 天翔散段突 无装剑 天魔反·无间 天然理心流奥义·三段突刺
+      // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
+      // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
+    ],
+    ability: {
+      hp: 160,
+      shield: 0,
+      attack: 22,
+      defense: 4,
+      evasion: 5,
+      crit_rate: 12,
+      crit_dmg: 160,
+      speed: 95,
+      mp: 130,
+      penetration: 10,
+      lifesteal: 0,
+      elem_mastery: 90,
+      elem_bonus: 20,
+      magic_res: 15,
+      fire_res: 5,
+      ice_res: 5,
+      lightning_res: 20,
+      rage_bonus: 15,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 8,
+      agility: 8,
+      intelligence: 14,
+    },
+    blood: 100,
+    ee: 0,
+  },
+  {
+    name: "斋藤一",
+    id: 'zty',
+    avatar: zty,
+    salu: '新选组三番组长',
+    element: "water",
+    ac: [],
+    at: [],
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    normal_name: "居合术",
+    skill: [  // 无外流、一刀流
+      // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
+      // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
+    ],
+    ability: {
+      hp: 160,
+      shield: 0,
+      attack: 22,
+      defense: 4,
+      evasion: 5,
+      crit_rate: 12,
+      crit_dmg: 160,
+      speed: 95,
+      mp: 130,
+      penetration: 10,
+      lifesteal: 0,
+      element: "thunder",
+      elem_mastery: 90,
+      elem_bonus: 20,
+      magic_res: 15,
+      fire_res: 5,
+      ice_res: 5,
+      lightning_res: 20,
+      rage_bonus: 15,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 8,
+      agility: 8,
+      intelligence: 14,
+    },
+    blood: 100,
+    ee: 0,
+  },
+  {
     name: "宝多六花",
     id: '2',
     avatar: mui,
@@ -285,9 +625,6 @@ export const initialData = DataSchema.parse([
     skill: [
       SkillTypeMap.ELEMENTAL_BURST.shinoa_burst.id,
     ],
-    position: {
-      index: 4
-    },
     ability: {
       hp: 180,
       shield: 40,
@@ -319,56 +656,16 @@ export const initialData = DataSchema.parse([
     ee: 0,
   },
   {
-    name: "玛奇玛",
-    id: '4',
-    avatar: makima,
-    salu: '支配恶魔',
-    gender: "2",
-    element: "fire",
-    ac: [],
-    at: [],
-    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
-    skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.makima_skill.id,
-      SkillTypeMap.ELEMENTAL_BURST.tohka_skill.id
-    ],
-    ability: {
-      hp: 200,
-      shield: 60,
-      attack: 20,
-      defense: 3,
-      evasion: 2,
-      crit_rate: 8,
-      crit_dmg: 130,
-      speed: 85,
-      mp: 110,
-      penetration: 5,
-      lifesteal: 10,
-      element: "fire",
-      elem_mastery: 40,
-      elem_bonus: 10,
-      magic_res: 0,
-      fire_res: 15,
-      ice_res: 15,
-      lightning_res: 15,
-      rage_bonus: 15,
-      healing_bonus: 10,
-      shield_strength: 25,
-      strength: 10,
-      agility: 6,
-      intelligence: 14,
-    },
-    blood: 100,
-    ee: 0,
-  },
-  {
-    name: "雷电将军",
+    name: "雷电影",
     id: '5',
     avatar: leidian,
     salu: '尘世七执政',
     element: "thunder",
     gender: "2",
     at: [],
+    position: {
+      index: 4
+    },
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.raiden_skill.id,
@@ -399,6 +696,48 @@ export const initialData = DataSchema.parse([
       strength: 12,
       agility: 10,
       intelligence: 12,
+    },
+    blood: 100,
+    ee: 0,
+  },
+  {
+    name: "冲田总司",
+    id: 'ctct',
+    avatar: ctct,
+    salu: '终末魔神',
+    element: "water",
+    ac: [],
+    at: [],  // 无边  极地 不断 绝剑·无穹三段 炼狱剑
+    normal_name: "无边",
+    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
+    skill: [
+      // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
+      // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
+    ],
+    ability: {
+      hp: 160,
+      shield: 0,
+      attack: 22,
+      defense: 4,
+      evasion: 5,
+      crit_rate: 12,
+      crit_dmg: 160,
+      speed: 95,
+      mp: 130,
+      penetration: 10,
+      lifesteal: 0,
+      elem_mastery: 90,
+      elem_bonus: 20,
+      magic_res: 15,
+      fire_res: 5,
+      ice_res: 5,
+      lightning_res: 20,
+      rage_bonus: 15,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 8,
+      agility: 8,
+      intelligence: 14,
     },
     blood: 100,
     ee: 0,
@@ -445,52 +784,10 @@ export const initialData = DataSchema.parse([
     ee: 0,
   },
   {
-    name: "一濑红莲",
-    id: '7',
-    avatar: issei,
-    element: "dark",
-    salu: '帝之月',
-    ac: [],
-    at: [],
-    normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
-    skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.issei_skill.id,
-      SkillTypeMap.ELEMENTAL_BURST.issei_burst.id
-    ],
-    ability: {
-      hp: 170,
-      shield: 0,
-      attack: 24,
-      defense: 4,
-      evasion: 5,
-      crit_rate: 15,
-      crit_dmg: 170,
-      speed: 105,
-      mp: 120,
-      penetration: 15,
-      lifesteal: 5,
-      element: "fire",
-      elem_mastery: 85,
-      elem_bonus: 18,
-      magic_res: 10,
-      fire_res: 25,
-      ice_res: 0,
-      lightning_res: 5,
-      rage_bonus: 20,
-      healing_bonus: 0,
-      shield_strength: 0,
-      strength: 14,
-      agility: 10,
-      intelligence: 8,
-    },
-    blood: 100,
-    ee: 0,
-  },
-  {
     name: "三宫三叶",
     id: '8',
     avatar: mitsuba,
-    salu: '鬼月组',
+    salu: '月鬼组',
     element: "wind",
     gender: "2",
     at: [],
@@ -499,6 +796,7 @@ export const initialData = DataSchema.parse([
       SkillTypeMap.ELEMENTAL_SKILL.mitsuba_skill.id,
       SkillTypeMap.ELEMENTAL_BURST.mitsuba_burst.id
     ],
+    position: { index: 3 },
     ability: {
       hp: 140,
       shield: 0,
@@ -570,5 +868,6 @@ export const initialData = DataSchema.parse([
     blood: 100,
     ee: 0,
   }
+
 ]);
 

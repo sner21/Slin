@@ -1,4 +1,4 @@
-import { Skill } from '../types';
+import { Skill, targetTypeEnum } from '../types';
 export const ELEMENTAL_BURST: Array<Skill> = [
     {
         id: 'shinoa_burst',
@@ -9,20 +9,41 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         effectType: 'DAMAGE',
         multiplier: 380,
         cost: { mp: 80 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'ice',
         damageType: 'magic'
-    }, {
+    },
+    {
+        id: 'zy_burst',
+        name: '赤壁战祸·地狱摇篮',
+        type: 'ELEMENTAL_BURST',
+        desc: '赤壁之战的具象。通过与固有结界相似但不尽相同的大魔术，将周围一带化作熊熊燃烧的赤壁战船。在自身的魔力或敌人性命其中一方耗尽之前，可自由自在地操纵烈火与爆炸，持续对敌人造成严重伤害，宛如人间炼狱。发动时，还可将与战斗无关之人弹出范围。',
+        scopeType: 'ALL',
+        effectType: 'DAMAGE',
+        multiplier: 380,
+        cost: { mp: 80 },
+        cooldown: 30,
+        level: 1,
+        element: 'fire',
+        damageType: 'magic'
+    },
+    {
         id: 'ayaka_skill',
         name: '神里流·霜灭',
         type: 'ELEMENTAL_SKILL',
         desc: '释放冰元素斩击，对敌人造成冰元素伤害',
-        scopeType: 'MULTI',
+        buffs: [
+            {
+                id: "神里流·霜灭",
+                type: "target",
+            }
+        ],
+        scopeType: 'ALL',
         effectType: 'DAMAGE',
         multiplier: 180,
         cost: {},
-        cooldown: 3,
+        cooldown: 30,
         level: 1,
         element: 'ice',
         damageType: 'magic'
@@ -34,8 +55,7 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         scopeType: 'ALL',
         effectType: 'DAMAGE',
         multiplier: 420,
-        cost: { mp: 80 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'fire',
         critDmgBonus: 50,
@@ -45,11 +65,11 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         name: '奥义·梦想真说',
         type: 'ELEMENTAL_BURST',
         desc: '汇聚万千真言，竭尽诸愿百眼之愿力，斩出粉碎一切诅咒的梦想一刀，造成雷元素范围伤害',
-        scopeType: 'SINGLE',
+        scopeType: 'ALL',
         effectType: 'BUFF',
         multiplier: 380,
         cost: { mp: 90 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'thunder',
         damageType: 'physical'
@@ -62,34 +82,42 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         effectType: 'DAMAGE',
         multiplier: 340,
         cost: { mp: 70 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'wind',
         damageType: 'magic'
-    }, {
+    },
+    {
         id: 'issei_burst',
-        name: '罪钥',
-        type: 'ELEMENTAL_BURST',
-        desc: '释放强大的火焰剑气,对敌人造成多段伤害',
-        scopeType: 'ALL',
+        name: '不动明王咒',
+        type: 'ELEMENTAL_SKILL',
+        cost: { mp: 80 },
+        desc: '使用咒术符，并通过咏唱来发动效果的法术，一濑红莲对战百夜米迦尔时曾使用过的爆炸型咒术',
+        buffs: [
+            {
+                id: "不动明王咒",
+                type: "self",
+            }
+        ],
+        scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 400,
-        cost: { mp: 80 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'dark',
-        critDmgBonus: 50,
-        damageType: 'physical'
+        critRateBonus: 15,
+        damageType: 'magic'
     }, {
         id: 'mitsuba_burst',
         name: '疾风之翼',
         type: 'ELEMENTAL_BURST',
         desc: '展开风之翼,大幅提升速度和闪避',
-        scopeType: 'SINGLE',
+        targetType: targetTypeEnum.ALLY,
+        scopeType: 'ALL',
         effectType: 'BUFF',
         multiplier: 300,
         cost: { mp: 70 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'wind',
         damageType: 'physical'
@@ -102,7 +130,7 @@ export const ELEMENTAL_BURST: Array<Skill> = [
         effectType: 'DAMAGE',
         multiplier: 380,
         cost: { mp: 75 },
-        cooldown: 5,
+        cooldown: 30,
         level: 1,
         element: 'thunder',
         critDmgBonus: 40,

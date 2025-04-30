@@ -42,8 +42,8 @@ export class BattleManager {
     RecordManager
     ItemsManager
     enemy: Character[] = []
-    cur_enemy: Character[] = []
     characters: Character[];
+    cur_enemy: Character[] = []
     cur_characters: Character[] = [];
     roles: Character[] = [];
     data: Ref<Character[]>;
@@ -53,7 +53,7 @@ export class BattleManager {
         cur_time: 0,
         pause: false,
         round: 0,
-        // time: 1000,
+        time: 3000,
         cur_boss_id: '',
         battle_round: 1,
         game_mode: "0"
@@ -91,7 +91,7 @@ export class BattleManager {
             this.battle_data = { ...this.init_battle_data }
         }
         this.update_array()
-        this.update_cur()
+        this.battle_data.round !== 0 && this.update_cur()
 
         // this.battle_data.cur_boss_id = this.cur_enemy[0].id
         // this.load_plugins_init().then(() => {
@@ -474,8 +474,8 @@ export class BattleManager {
         return target;
     }
     update_cur() {
-        this.cur_enemy = this.enemy.filter(i => i.position?.index)
-        this.cur_characters = this.characters.filter(i => i.position?.index)
+        this.cur_enemy = this.enemy.filter(i => isNumber(i.position?.index))
+        this.cur_characters = this.characters.filter(i => isNumber(i.position?.index))
         // this.update_array()
     }
     update_roles() {
@@ -503,6 +503,7 @@ export class BattleManager {
     }
     //战斗
     battle_turn() {
+        if (!(this.cur_characters.length && this.cur_enemy.length)) return
         this.startTurn()
         // 获取当前回合可行动的角色  技能还是会冷却
         const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy].filter(i => !i.status?.dizz));
@@ -557,7 +558,7 @@ export class BattleManager {
             case targetTypeEnum.SELF: return char
             //TODO 暂时随机
             // case targetTypeEnum.ALLY: return this.cur_characters[randomInt(0, this.cur_characters.length - 1)]
-            case targetTypeEnum.ALLY: return this.get_target(char, this.cur_characters)
+            case targetTypeEnum.ALLY: return this.get_target(char, this.cur_characters.filter(i => i.id !== char.id))[randomInt(0, this.cur_characters.length - 1)]
         }
     }
     //检查并更新cost 获取当前一轮要释放的技能
@@ -581,6 +582,7 @@ export class BattleManager {
                 effect = assignIn(effect, replace)
             }
         }
+        if (effect.probability < randomInt(0, 100)) return
         let { path, find, operator, attr, value, sourceId, targetId } = effect as z.infer<typeof EffectsSchema>
         let data = path ? get(target, path) : target
         if (find) {
@@ -592,7 +594,12 @@ export class BattleManager {
         }
         switch (operator) {
             case "increase": {
+                !data[attr] && (data[attr] = 0)
                 data[attr] += value
+                break
+            }
+            case "max": {
+                data[attr] = Math.max(value, data[attr])
                 break
             }
             case "decrease": {
@@ -699,6 +706,7 @@ export class BattleManager {
     }
     // 结算攻击
     char_attack(self: Character, target: Character, skill: Skill) {
+        if (skill.scopeType === 'ALL') console.log(target, skill.name)
         //削减当前数值 ?  除了boss可以删掉
         let damage = 0
         let isEvaded = false
@@ -903,7 +911,20 @@ export class BattleManager {
             }
         }
         //使用技能
-        this.char_attack(character, this.get_skill_target(skill, character, bb), skill)
+        //TODO  aoe
+
+        if (skill.scopeType === "ALL") {
+            // const target = this.get_skill_target(skill, character, bb)
+            if (bb.type == "0") {
+                this.cur_characters.filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+            } else {
+                this.cur_enemy.filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+            }
+
+        } else {
+            this.char_attack(character, this.get_skill_target(skill, character, bb), skill)
+        }
+
         // 添加冷却
         this.cooldownManager.startCooldown(character.id, skillId, skill.cooldown);
     }
@@ -944,7 +965,7 @@ export class BattleManager {
         })
         this.trim_attr(this.roles)
         this.check_enemy()
-        this.update_cur()
+        // this.update_cur()
         this.globalConfig.autosave && this.data.save()
         this.battle_data.round++
 

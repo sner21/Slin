@@ -58,7 +58,17 @@ export const elementColors = ElementColors.parse({
     dark: '#9966FF',  //#9966FF rgb(71 24 228)
     light: '#FFE666'
 })
-
+export const elementNames = ElementColors.parse({
+    fire: '火',
+    ice: '冰',
+    thunder: '雷',
+    wind: '风',
+    water: '水',
+    // default: '#CCCCCC',
+    grass: '草',
+    dark: '暗',  //#9966FF rgb(71 24 228)
+    light: '光'
+})
 export const changeColor = (ov: number, nw: number): string => {
     if (ov === nw) return 'white'
     if (ov < nw) return 'red'

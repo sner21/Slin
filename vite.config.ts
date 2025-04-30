@@ -15,9 +15,7 @@ export default defineConfig(async () => ({
     minify: true,
     rollupOptions: {
       external: (id: string) => {
-        console.log(process.env.BUILD_PLUGINS,222);
         if (!process.env.BUILD_PLUGINS) {
-          console.log(1111);
           return path.normalize(id).includes('/plugins/')
         }
         return false;

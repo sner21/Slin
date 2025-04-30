@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Skill } from '../common/skill/types';
 import type { Character } from '../common/char/types';
-import { elementColors } from '../common';
+import { elementColors, elementNames } from '../common';
 import { Popover } from 'antd';
 import { template } from 'lodash-es';
+import { ScopeTypeNames, SkillTypeNames } from '../common/skill';
 
 interface SkillItemProps {
     skill: Skill;
@@ -44,7 +45,14 @@ const SkillItem: React.FC<SkillItemProps> = ({
     };
 
     return (
-        <Popover className="w-full w-full flex p-0" content={template(skill.desc)(item)}  trigger="hover">
+        <Popover className="w-full w-full flex p-0 " trigger="hover" content={<div className='flex flex-col'>
+            {skill.desc && <div className='max-w-xl mb-6'>
+                {template(skill.desc)(item)}
+            </div>}
+            <div className=''>
+                {skill.multiplier > 0 && <span>倍率 : {skill.multiplier}</span>} 属性 : {elementNames[skill.element] || skill.element} 伤害类型 : {SkillTypeNames[skill.damageType] || skill.damageType} 范围 : {ScopeTypeNames[skill.scopeType] || skill.scopeType} 类别 : {SkillTypeNames[skill.type] || skill.type}
+            </div>
+        </div>} >
             <div
                 className={`
                 flex items-center w-full   gap-2  p-1 box-border relative rd-md overflow-hidden

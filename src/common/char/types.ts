@@ -105,7 +105,7 @@ export const CharacterSaveSchema = z.object({
 })
 //需要用户设置的
 export const CharacterSchema = z.object({}).merge(CharacterSaveSchema).merge(CharacterStatusSchema).merge(CharacterDisplaySchema).transform(data => {
-  (data.type === "1" && (data.display.frame_type = "logs"))
+  (!data.skill?.length && (data.display.frame_type = "logs"))
   if (!data.status) {
     data.status = StatusSchema.parse({ ...cloneDeep(data.ability) });
     data.status.reborn = 0;

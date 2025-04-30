@@ -74,7 +74,9 @@ export const SkillTypeNames = {
     NORMAL_ATTACK: '普通攻击',
     ELEMENTAL_SKILL: '元素战技',
     ELEMENTAL_BURST: '元素爆发',
-    PASSIVE: '被动技能'
+    PASSIVE: '被动技能',
+    physical: '物理',
+    magic: '魔法',
 } as const;
 
 export type Skill = z.infer<typeof Skill>;

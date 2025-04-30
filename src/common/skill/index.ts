@@ -19,9 +19,8 @@ export const SkillTypeMap: Record<string, Record<string, Skill>> = z.record(z.re
     ELEMENTAL_BURST:keyBy(ELEMENTAL_BURST,'id'),
 });
 
-export const SkillTypeNames = {
-    NORMAL_ATTACK: '普通攻击',
-    ELEMENTAL_SKILL: '元素战技',
-    ELEMENTAL_BURST: '元素爆发',
-    PASSIVE: '被动技能'
+export const ScopeTypeNames = {
+    ALL: '全体',
+    MULTI: 'AOE',
+    SINGLE: '单体',
 } as const;

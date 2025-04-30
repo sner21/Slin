@@ -43,10 +43,12 @@ box-sizing:border-box;
   }
 }
 `;
+
 const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
     const [roleAarry, setRoleAarry] = useState(roleAarryData || {});
     const [roleData, setRoleData] = useState(roles || []);
     const [roleFlat, setRoleFlat] = useState([]);
+    const [p, setP] = useState(null);
     const [curRole, setCurRole] = useState<{
         type?: string,
         id?: string,
@@ -62,36 +64,17 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         data: null,
     })
     const handleConfirm = () => {
-        console.log('roleAarry', roleAarry)
         onConfirm(roleData, roleAarry)
-
     }
-    // useEffect(() => {
-    //     const a = {}
-    //     roleData.forEach((i, k) => {
-    //         i.forEach(role => {
-    //             if (!roleAarry[k]) roleAarry[k] = {}
-    //             if (role.position?.index) {
-    //                 if (!a[k]) a[k] = {}
-    //                 const index = k === 1 ? getMirrorPosition(role.position.index) : role.position.index
-    //                 a[k][index] = {
-    //                     id: role.id,
-    //                     type: k,
-    //                     avatar: role.avatar,
-    //                     data: role.data,
-    //                     index: index,
-    //                 }
-    //             }
-    //         })
-    //     });
-    //     setRoleAarry(a)
-    // }, [])
     const setPo = (role: { type?: string; id: any; }, index: number, type: string) => {
+        setP(null)
         if (curRole.id && type !== curRole.type) return
         if (!role) selectRole(role, type, index)
         if (!curRole.id) {
             const device = roleData[type].findIndex(i => i.id === role.id)
             device >= 0 && selectRole(role, type, device, index)
+            console.log(p, 333)
+            setP(role)
         }
         // if (!curRole.id) return setRoleAarry({
         //     ...roleAarry,
@@ -100,7 +83,6 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         //         [index]: {},
         //     }
         // })
-
         if (curRole.id) {
             const a = {}
             roleAarry[type] && Object.keys(roleAarry[type]).forEach((key) => {
@@ -135,6 +117,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
 
     }
     const selectRole = (role: never, key: string, device: number, index: number) => {
+        setP(null)
         const r = {
             type: key,
             id: role.id,
@@ -156,9 +139,10 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
             setRoleData(list)
             const a = {}
             Object.keys(roleAarry[curRole.type]).forEach((key) => {
-                console.log(roleAarry[curRole.type][key], curRole, 22)
                 if (roleAarry[curRole.type][key].id === curRole.id) {
+                    console.log(roleAarry[curRole.type][key], curRole, 22)
                     a[curRole.type] = {
+                        ...roleAarry[curRole.type],
                         [key]: {}
                     }
                 }
@@ -167,7 +151,21 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                 ...roleAarry,
                 ...a,
             })
-
+        } else if (p) {
+            const a = {}
+            Object.keys(roleAarry[curRole.type]).forEach((key) => {
+                if (roleAarry[curRole.type][key].id === curRole.id) {
+                    console.log(roleAarry[curRole.type][key], curRole, 22)
+                    a[curRole.type] = {
+                        ...roleAarry[curRole.type],
+                        [key]: {}
+                    }
+                }
+            })
+            setRoleAarry({
+                ...roleAarry,
+                ...a,
+            })
         }
         setCurRole({})
     }
@@ -176,7 +174,10 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
     return (
         <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box", }} onClick={() => setCurRole({})}>
             <div>
-                <div className='text-center h-20  items-center justify-center'>
+                <div className=' text-center   items-center justify-center mt-2'>
+                    {/* <div>前排单位有30%概率直接攻击后排</div>
+                    <div>当找不到理想目标时会随机选择</div>
+                    <div>现在暂时可以将单位直接调整到对方</div> */}
                     <ReactMarkdown>
                         {`
 前排单位有30%概率直接攻击后排
@@ -188,13 +189,13 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                     </ReactMarkdown>
                 </div>
             </div>
-            <div className='w-full  flex flex-1' >
+            <div className='w-full  flex flex-1 ' >
                 {
                     roleData.map((item, key) => (
                         <div className='flex gap-4 h-full flex-1 items-center justify-around' style={{ flexDirection: key ? "row-reverse" : "" }}>
-                            <BreatheDiv className='flex flex-col gap-2 rd-md' style={{ "animation": curRole.id && curRole.type !== key ? "breathe 2s ease-in-out infinite" : "" }}>
+                            <BreatheDiv className='flex flex-col gap-2 rd-md' style={{ "animation": curRole.id && (curRole.type !== key || p) ? "breathe 2s ease-in-out infinite" : "" }}>
                                 <span>角色数： {item.length}</span>
-                                <div className='grid grid-cols-4 grid-rows-6 w-80 h-120 gap-0' onClick={(e) => switchRole(e, key)}>
+                                <div className='grid grid-cols-4 grid-rows-5 w-80 h-100 gap-0' onClick={(e) => switchRole(e, key)}>
                                     {item?.map((role, index) => (
                                         <div className='flex justify-center items-center aspect-square rd-full  border-box p-2 cursor-pointer border-1 border-solid border-transparent'
                                             onClick={(e) => (e.stopPropagation(), selectRole(role, key, index))} >
@@ -209,7 +210,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                             <div>
                                 <div className='grid grid-cols-3 grid-rows-3 w-90 h-90 gap-4 p-8 rd-xl' onClick={(e) => (e.stopPropagation())} style={{ "animation": curRole.id && curRole.type === key ? "breathe 2s ease-in-out infinite" : "" }}>
                                     {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                                        <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className=' flex justify-center hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-1 border-solid  rd-full'
+                                        <div style={{ filter: `drop-shadow(2px 4px 12px black)` }} className=' flex justify-center hover:border-amber-500 items-center cursor-pointer aspect-square  border-white border-5 border-solid  rd-full'
                                             onClick={(e) => (e.stopPropagation(), setPo(curRole.id ? curRole : roleAarry[key][i], i, key))} >
                                             {roleAarry[key] && roleAarry[key][i] && roleAarry[key][i].id && <img style={{ ["object-fit"]: "cover", filter: `drop-shadow(2px 4px 12px black)` }} src={roleAarry[key][i].avatar} draggable={false} className='w-full h-full  rd-full' />}
                                         </div>
@@ -220,8 +221,8 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                     ))
                 }
             </div>
-            <div className='text-center h-16'>
-                <span className='text-lg cursor-pointer hover:color-amber' onClick={() => handleConfirm()}>确定阵容</span>
+            <div className='flex justify-center  text-center h-16  mb-6'>
+                <div className='flex justify-center items-center   w-100 text-2xl cursor-pointer hover:color-amber  hover:border-amber border-dashed' onClick={() => handleConfirm()}>确定阵容</div>
             </div>
 
 
