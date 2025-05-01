@@ -121,9 +121,9 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,
-      agility: 12,
-      intelligence: 8,
+      strength: 8,
+      agility: 18,
+      intelligence: 12,
     },
     ac: [],
     at: [],
@@ -196,8 +196,9 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
     normal: SkillTypeMap.NORMAL_ATTACK.magic_normal.id,
     normal_name: "血刃",
     skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
-      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
+      SkillTypeMap.ELEMENTAL_SKILL.makima_skill.id,
+      // SkillTypeMap.ELEMENTAL_BURST.tohka_skill.id
+      "天魔反·无间"
     ],
     ability: {
       hp: 140,
@@ -239,12 +240,13 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
     at: [],
     salu: ' 天堑沙原霸主',
     element: "thunder", // 角色元素属性
+    normal_name:"落雷",
     ability: {
       // 基础属性
-      hp: 220, // 生命上限
+      hp: 260, // 生命上限
       shield: 0,  // 护盾
-      attack: 20,    // 攻击力
-      defense: 2,  // 防御力
+      attack: 9,    // 攻击力
+      defense: 17,  // 防御力
       evasion: 8, // 闪避率
       crit_rate: 15,  // 暴击率
       crit_dmg: 150, // 暴击伤害
@@ -264,9 +266,9 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       rage_bonus: 20,  // 怒气伤害加成
       healing_bonus: 0,  // 治疗加成
       shield_strength: 0, // 护盾强度
-      strength: 8,    // 中等力量
-      agility: 12,    // 较高敏捷
-      intelligence: 10, // 
+      strength: 20,    // 中等力量
+      agility: 7,    // 较高敏捷
+      intelligence: 6, // 
     },
     position: {
       index: 5
@@ -349,10 +351,10 @@ export const initialData = DataSchema.parse([
       SkillTypeMap.ELEMENTAL_BURST.issei_burst.id
     ],
     ability: {
-      hp: 170,
+      hp: 200,
       shield: 0,
-      attack: 24,
-      defense: 4,
+      attack: 16,
+      defense: 10,
       evasion: 5,
       crit_rate: 15,
       crit_dmg: 170,
@@ -370,8 +372,8 @@ export const initialData = DataSchema.parse([
       rage_bonus: 20,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,
-      agility: 10,
+      strength: 16,
+      agility: 11,
       intelligence: 8,
     },
     blood: 100,
@@ -394,11 +396,11 @@ export const initialData = DataSchema.parse([
       SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
     ],
     ability: {
-      hp: 140,
+      hp: 120,
       hp_re: 7,
       shield: 0,
-      attack: 25,
-      defense: 2,
+      attack: 22,
+      defense: 4,
       evasion: 6,
       crit_rate: 20,
       crit_dmg: 180,
@@ -416,9 +418,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,
-      agility: 12,
-      intelligence: 8,
+      strength: 9,
+      agility: 16,
+      intelligence: 9,
     },
     ac: [],
     at: [],
@@ -439,15 +441,15 @@ export const initialData = DataSchema.parse([
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     normal_name: "夜刃突袭",
     skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
-      SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
+      "天翔散段突","神罗八百万"
+
     ],
     ability: {
-      hp: 140,
+      hp: 170,
       hp_re: 7,
       shield: 0,
-      attack: 25,
-      defense: 2,
+      attack: 17,
+      defense: 7,
       evasion: 6,
       crit_rate: 20,
       crit_dmg: 180,
@@ -496,7 +498,7 @@ export const initialData = DataSchema.parse([
       hp: 160, // 生命上限
       shield: 0,  // 护盾
       attack: 18,    // 攻击力
-      defense: 2,  // 防御力
+      defense: 10,  // 防御力
       evasion: 8, // 闪避率
       crit_rate: 15,  // 暴击率
       crit_dmg: 150, // 暴击伤害
@@ -537,15 +539,17 @@ export const initialData = DataSchema.parse([
     },
     normal_name: "天然理心流·三段突刺",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
-    skill: [  //天然理心流·鸢飞戾天  鬼子·散 神罗八百万 天翔散段突 无装剑 天魔反·无间 天然理心流奥义·三段突刺
+    skill: [  //  鬼子·散  无装剑 天
+      "鸢飞戾天",
+      "天然理心流奥义",
       // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
       // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
     ],
     ability: {
       hp: 160,
       shield: 0,
-      attack: 22,
-      defense: 4,
+      attack: 16,
+      defense: 8,
       evasion: 5,
       crit_rate: 12,
       crit_dmg: 160,
@@ -562,9 +566,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 8,
-      agility: 8,
-      intelligence: 14,
+      strength: 9,
+      agility: 12,
+      intelligence: 6,
     },
     blood: 100,
     ee: 0,
@@ -580,14 +584,16 @@ export const initialData = DataSchema.parse([
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     normal_name: "居合术",
     skill: [  // 无外流、一刀流
+      "无外流",
+      "一刀流",
       // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
       // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
     ],
     ability: {
       hp: 160,
       shield: 0,
-      attack: 22,
-      defense: 4,
+      attack: 9,
+      defense: 15,
       evasion: 5,
       crit_rate: 12,
       crit_dmg: 160,
@@ -605,9 +611,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 8,
+      strength: 14,
       agility: 8,
-      intelligence: 14,
+      intelligence: 8,
     },
     blood: 100,
     ee: 0,
@@ -669,13 +675,13 @@ export const initialData = DataSchema.parse([
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.raiden_skill.id,
-      SkillTypeMap.ELEMENTAL_SKILL.keqing_skill.id
+      "raiden_burst"
     ],
     ability: {
       hp: 180,
       shield: 30,
-      attack: 22,
-      defense: 5,
+      attack: 14,
+      defense: 11,
       evasion: 3,
       crit_rate: 12,
       crit_dmg: 160,
@@ -694,8 +700,8 @@ export const initialData = DataSchema.parse([
       healing_bonus: 0,
       shield_strength: 10,
       strength: 12,
-      agility: 10,
-      intelligence: 12,
+      agility: 9,
+      intelligence: 10,
     },
     blood: 100,
     ee: 0,
@@ -707,12 +713,11 @@ export const initialData = DataSchema.parse([
     salu: '终末魔神',
     element: "water",
     ac: [],
-    at: [],  // 无边  极地 不断 绝剑·无穹三段 炼狱剑
+    at: [],  //   极地 不断  炼狱剑
     normal_name: "无边",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
-      // SkillTypeMap.ELEMENTAL_SKILL.themis_skill.id,
-      // SkillTypeMap.ELEMENTAL_BURST.themis_burst.id
+       "不断","绝剑·无穹三段"
     ],
     ability: {
       hp: 160,
@@ -735,9 +740,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 8,
-      agility: 8,
-      intelligence: 14,
+      strength: 10,
+      agility: 12,
+      intelligence: 8,
     },
     blood: 100,
     ee: 0,
@@ -776,9 +781,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 10,
       healing_bonus: 15,
       shield_strength: 5,
-      strength: 8,
-      agility: 16,
-      intelligence: 10,
+      strength: 4,
+      agility: 7,
+      intelligence: 16,
     },
     blood: 100,
     ee: 0,
@@ -798,10 +803,10 @@ export const initialData = DataSchema.parse([
     ],
     position: { index: 3 },
     ability: {
-      hp: 140,
+      hp: 180,
       shield: 0,
-      attack: 18,
-      defense: 3,
+      attack: 13,
+      defense: 13,
       evasion: 12,
       crit_rate: 10,
       crit_dmg: 150,
@@ -819,9 +824,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 10,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 6,
-      agility: 16,
-      intelligence: 10,
+      strength: 13,
+      agility: 9,
+      intelligence: 7,
     },
     blood: 100,
     ee: 0,
@@ -842,8 +847,8 @@ export const initialData = DataSchema.parse([
     ability: {
       hp: 160,
       shield: 0,
-      attack: 22,
-      defense: 4,
+      attack: 14,
+      defense: 12,
       evasion: 5,
       crit_rate: 12,
       crit_dmg: 160,

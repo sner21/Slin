@@ -1,4 +1,7 @@
-export const effectsInit = [
+import { effectsSchema } from "../../char/attr"
+
+
+export const effectsInit: effectsSchema = [
     {
         id: "initial",
         name: "initial",
@@ -18,6 +21,17 @@ export const effectsInit = [
                 value: 100
             }
         ]
+    },
+    {
+        id: "dizz",
+        name: "dizz",
+        desc: "dizz",
+        isBuff: true,
+        path: "status",
+        target: 'target',
+        attr: "dizz",
+        value: 1,
+        operator: "equal",
     },
 ]
 export const conditionsInit = [

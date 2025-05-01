@@ -191,25 +191,45 @@ export class BattleManager {
         this.load_plugins_role(data.role || [])
     }
     start_round() {
+        const time = 1000
         if (!this.battle_data.pause) {
             // 清理已存在的定时器
             if (this.round_timer) {
-                clearInterval(this.round_timer)
+                clearInterval(this.round_timer);
+                this.round_timer = null;
             }
-            
-            // 立即执行一次战斗回合
-            this.battle_turn()
-            this.battle_data.cur_time = 0
-            
-            // 设置定时循环
-            this.round_timer = setInterval(() => {
-                if (this.battle_data.pause) {
-                    clearInterval(this.round_timer)
-                    return
-                }
-                this.battle_turn()
-                this.battle_data.cur_time = 0
-            }, this.battle_data.time)
+
+            const scheduleNextTurn = () => {
+                // 计算下一次行动的时间
+                // const nextActionTime = this.actionGauge.getNextActionTime([...this.cur_characters, ...this.cur_enemy]);
+
+                // let time
+                // if (nextActionTime < 1000) {
+                //     if (nextActionTime < 200) {
+                //         time = nextActionTime
+                //     } else {
+                //         time = nextActionTime / 2
+                //     }
+                // } else {
+                //     time = 1000
+                // }
+                // console.log(time, nextActionTime)
+                // 设置下一次触发的定时器
+                this.round_timer = setTimeout(() => {
+                    this.battle_turn(time);
+                    this.battle_data.cur_time = 0;
+
+                    // 如果游戏没有暂停，继续安排下一次触发
+                    if (!this.battle_data.pause) {
+                        scheduleNextTurn();
+                    }
+                }, time);
+            };
+
+            // 立即执行一次战斗回合并开始调度
+            this.battle_turn();
+            this.battle_data.cur_time = 0;
+            scheduleNextTurn();
         }
     }
     get_boss(filterId: string = '') {
@@ -375,11 +395,6 @@ export class BattleManager {
 
 
         }
-        if (char.state === 0) {
-            // 处理所有角色的回复
-            char.status.hp = Math.min(char.status.hp! + char.imm_ability.hp_re, char.imm_ability.hp)
-            char.status.mp = Math.min(char.status.mp! + char.imm_ability.mp_re, char.imm_ability.mp)
-        }
     }
     //随机选择1个攻击目标
     random_attack_select(data: any[], count = 0) {
@@ -482,14 +497,15 @@ export class BattleManager {
     }
     update_cur() {
         this.cur_characters = this.characters.filter(i => {
+            this.calculateFinalStats(i)
             i.type = "0"
             return isNumber(i.position?.index)
         })
         this.cur_enemy = this.enemy.filter(i => {
+            this.calculateFinalStats(i)
             i.type = "1"
             return isNumber(i.position?.index)
         })
-
         // this.update_array()
     }
     update_roles() {
@@ -516,11 +532,10 @@ export class BattleManager {
         });
     }
     //战斗
-    battle_turn() {
+    battle_turn(time = 500) {
         if (!(this.cur_characters.length && this.cur_enemy.length)) return
-
         // 获取当前回合可行动的角色  技能还是会冷却
-        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy])/* .filter(i => !i.status?.dizz)) */
+        const actionOrder = this.getActionOrder([...this.cur_characters, ...this.cur_enemy], time)/* .filter(i => !i.status?.dizz)) */
         const actionOrderId = actionOrder.map(i => i.id)
 
         // console.log("可以行动的角色", actionOrderId)
@@ -528,7 +543,15 @@ export class BattleManager {
         this.startTurn()
         for (const key in actionOrder) {
             const i = actionOrder[key]
-            this.calculateFinalStats(i)
+            this.BuffManage.settle_buff(i)
+            for (let key in i.imm_ability) {
+                i.imm_ability[key] = Math.round((i.imm_ability[key] || 0));
+            }
+            if (i.state === 0) {
+                // 处理行动角色的回复
+                i.status.hp = Math.min(i.status.hp! + i.imm_ability.hp_re, i.imm_ability.hp)
+                i.status.mp = Math.min(i.status.mp! + i.imm_ability.mp_re, i.imm_ability.mp)
+            }
             this.cooldownManager.updateCooldownsRole(i.id);
             //被控制还是会执行的
             if (isNumber(i.status?.find_gap) && actionOrderId.includes(i.id)) {
@@ -543,12 +566,12 @@ export class BattleManager {
     handle_target(i: Character) {
         if (!i.status) return
         //索敌
-        if (i.ability.find_gap === i.status.find_gap || Number(i.target?.state) === 1) {
-            i.target = this.get_target(i, i.type === "1" ? this.cur_characters : this.cur_enemy)
-            i.status.find_gap = 0
-        } else {
-            i.status.find_gap = (i.status.find_gap || 0) + 1
-        }
+        // if (i.ability.find_gap === i.status.find_gap || Number(i.target?.state) === 1) {
+        i.target = this.get_target(i, i.type === "1" ? this.cur_characters : this.cur_enemy)
+        // i.status.find_gap = 0
+        // } else {
+        // i.status.find_gap = (i.status.find_gap || 0) + 1
+        // }
         if (!i.target) {
             return
         }
@@ -557,14 +580,14 @@ export class BattleManager {
             type: i.type,
             name: i.name
         })
-        this.useSkill(i, i.target, i.normal)
+
         this.get_round_ack(i, i.target)
         this.finishAction(i);
     }
     // 获取当前回合可行动的角色
-    getActionOrder(characters: Character[]): Character[] {
+    getActionOrder(characters: Character[], time): Character[] {
         // 更新所有角色的行动条
-        this.actionGauge.updateGauges(characters);
+        this.actionGauge.updateGauges(characters, time);
         // 获取可以行动的角色
         const readyCharacters = this.actionGauge.getReadyCharacters(characters);
         // 按速度排序
@@ -581,9 +604,9 @@ export class BattleManager {
     }
     //检查并更新cost 获取当前一轮要释放的技能
     get_round_ack(char: Character, bb: Character) {
-        char.skill?.forEach(id => {
-            this.useSkill(char, bb, id)
-        })
+        !char.skill?.some(id => {
+            return this.useSkill(char, bb, id)
+        }) && this.useSkill(char, char.target, char.normal)
     }
     // 计算所有角色最终属性的函数
     calculateFinalStatsAll(type = 'all') {
@@ -680,11 +703,10 @@ export class BattleManager {
         // 计算派生属性
         stats = {
             ...stats,
+            attack: stats.attack + (stats.strength + stats.agility + stats.intelligence) * 0.01,
             // 生命相关
             hp: stats.hp + stats.strength * 1.5,                    // 力量影响生命上限
             hp_re: stats.hp_re + stats.strength * 0.02,            // 力量影响生命回复
-            // 攻击相关
-            attack: stats.attack + stats.strength * 0.1,
             defense: stats.defense + stats.strength * 0.1,
             // 敏捷相关
             speed: stats.speed + stats.agility * 0.2,               // 敏捷影响速度
@@ -728,7 +750,7 @@ export class BattleManager {
         }
         character.imm_ability = stats
         //叠加BUFF属性
-        this.BuffManage.settle_buff(character)
+
     }
     settle_damage(self, target, { element, damageType, multiplier }) {
         let damage = 0
@@ -838,12 +860,12 @@ export class BattleManager {
         const skill: Skill = SkillMap[skillId];
 
         if (!skill) {
-            throw new Error('技能不存在');
+            return false
         }
         // 检查技能是否在冷却中
         if (this.cooldownManager.isOnCooldown(character.id, skillId)) {
             this.cooldownManager.getRemainingCooldown(character.id, skillId);
-            return
+            return false
             // throw new Error(`技能冷却中，还需${remainingTurns}回合`);
         }
         // 检查cost
@@ -861,10 +883,10 @@ export class BattleManager {
 
         if (skill.scopeType === "ALL") {
             // const target = this.get_skill_target(skill, character, bb)
-            if (bb.type == "0") {
-                this.cur_characters.filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+            if (bb.type === "0") {
+                (skill.targetType === "ALLY" ? this.cur_enemy : this.cur_characters).filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
             } else {
-                this.cur_enemy.filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+                (skill.targetType === "ALLY" ? this.cur_characters : this.cur_enemy).filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
             }
 
         } else {
@@ -873,6 +895,7 @@ export class BattleManager {
 
         // 添加冷却
         this.cooldownManager.startCooldown(character.id, skillId, skill.cooldown);
+        return true
     }
     //回合开始
     startTurn() {
@@ -881,8 +904,9 @@ export class BattleManager {
             i.beTarget = []
             i.target?.position?.index && this.targetArray[i.target?.type]?.push(i.target.type === "1" ? getMirrorPosition(i.target.position.index) : i.target.position.index)
             // this.set_role_status(i)
+            this.calculateFinalStats(i)
+            this.trim_attr_role(i)
         })
-        this.trim_attr(this.roles)
 
     }
     check_enemy() {
@@ -920,6 +944,10 @@ export class BattleManager {
             role.status.hp = Math.max(Math.min(role.status.hp, role.imm_ability.hp), 0)
             role.status.mp = Math.max(Math.min(role.status.mp, role.imm_ability.mp), 0)
         })
+    }
+    trim_attr_role(role: Character) {
+        role.status.hp = Math.max(Math.min(role.status.hp, role.imm_ability.hp), 0)
+        role.status.mp = Math.max(Math.min(role.status.mp, role.imm_ability.mp), 0)
     }
     // 角色总事件
     total_event(char: Character) {

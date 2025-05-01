@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from 'uuid';
 import RecordCon from "../../components/record/RecordCon";
 import ItemCon from "../../components/ItemCon";
 import ActionBar from "../../components/battle/ActionBar";
+import cloneDeep from 'lodash-es/cloneDeep';
 const BreatheDiv = styled.div`
 ${tw`flex justify-center flex-col items-center`}
 animation: breathe 2s ease-in-out infinite;
@@ -118,7 +119,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                         <div className="flex justify-between ">
                             {controlPanel({ openShop: shopRef.current && shopRef.current.openShop })}
                             <div className="flex-2/4 gap-2 flex  border-2 border-l-solid border-l-amber "  /* style={{borderLeft:'2px solid rgb(251 191 36 / 75%)'}} */>
-                                <div className="w-160  gap-6 border-r-amber border-2 border-r-solid hidden lg:flex">
+                                <div className="w-160  gap-6 border-r-amber border-2 border-r-solid flex">
                                     {/* 战斗阵型图 */}
                                     {[battleManager.current.cur_characters, battleManager.current.cur_enemy].map((item, key) => (<div key={key} className='grid grid-cols-3 grid-rows-3 w-40 h-40 gap-4 p-4' onClick={(e) => (e.stopPropagation())} >
                                         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
@@ -160,18 +161,18 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                     {arrConOpen && <div className="  flex-1  z-6 w-full relative overflow-x-hidden" style={{ background: "url(/ArrayBg.jpg)" }}>
                         {AarryCon}
                     </div>}
-                    <div className="overflow-x-hidden  w-full relative" style={{ height: arrConOpen ? "0" : "" }}>
+                    <div className="overflow-x-hidden  w-full relative " style={{ height: arrConOpen ? "0" : "" }}>
 
                         <div className="flex flex-col gap-4 flex-1 overflow-y-auto overflow-x-hidden p-4  w-full relative">
-                            <ActionBar battleManager={battleManager}></ActionBar>
+                            {<ActionBar battleManager={battleManager}></ActionBar>}
                             <div className=" flex flex-row  justify-between  w-full w-99% py-8 gap-8 2xl:gap-0">
                                 {[battleManager.current?.cur_characters, battleManager.current?.cur_enemy].map((i, roleType) => (<div className="flex gap-8 flex-col flex-3/4">
                                     {i && Object.values(i).map((item, index) => (
                                         <div key={index} className=" ">
                                             <div className="flex items-center h-[220px]  gap-8 flex-row items-center h-full flex-wrap " style={{ flexDirection: roleType === 0 ? 'row-reverse' : '' }}>
                                                 {/* 角色头像 */}
-                                                <div className="relative h-full  hidden 2xl:block flex-1 max-w-[260px] items-center" style={{ direction: 'rtl' }}>
-                                                    <div>
+                                                <div className="relative h-full  hidden 2xl:block flex-1 max-w-[300px] items-center" style={{ direction: 'rtl' }}>
+                                                    <div className="">
                                                         <img
                                                             onClick={() => (setCurRole(item))}
                                                             className="w-46 h-46  aspect-square flex-1 rounded-full box-border"
@@ -199,7 +200,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                         <div className="mb-2">{template(buff.desc)(item)}</div>
                                                                         <div>{buff.isDebuff ? "DEBUFF" : "BUFF"} &#160;剩余时间 : {item.buff[key]?.duration} &#160;层数 : {item.buff[key]?.count}</div>
                                                                     </div>} trigger="hover">
-                                                                        <span>{item.buff[key]?.count > 1 && item.type === "0" && item.buff[key]?.count} <span className="">{buff?.name}</span> {item.buff[key]?.count > 1 && item.type === "1" && item.buff[key]?.count}</span>   {/*  {item.buff[key]?.duration} */}
+                                                                        <span className="line-height-normal">{item.buff[key]?.count > 1 && item.type === "0" && item.buff[key]?.count} <span className="">{buff?.name}</span> {item.buff[key]?.count > 1 && item.type === "1" && item.buff[key]?.count}</span>   {/*  {item.buff[key]?.duration} */}
                                                                     </Popover>
                                                                 </div>
                                                             )
