@@ -14,7 +14,8 @@ export const ItemBaseSchema = z.object({
     rarity: z.number().min(1).max(5).default(1),
     buffs: z.array(z.object({
         id: z.string(),
-        type: z.enum(['self', 'target']).default('target')
+        type: z.enum(['self', 'target']).default('target'),
+        name: z.string().optional(),
     })).optional(),
     // expiration  //保质期
 })

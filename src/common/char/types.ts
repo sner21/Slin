@@ -54,6 +54,7 @@ export const CharacterSaveSchema = z.object({
   name: z.string().default(""),
   salu: z.string().max(8).optional(), //称号
   type: CharacterType, //1 boss 0人物 2部队
+  ability: AbilitySchema.merge(BaseStatSchema).default({}),
   avatar: z.string().describe('( url )').optional(),
   buff: CarryBuffSchema.default({}),
   count: z.number().min(0).default(1), // 角色拥有数量
@@ -85,7 +86,6 @@ export const CharacterSaveSchema = z.object({
       MISC_2: z.string().optional()
     }).default({}),
   }).default({}),
-  ability: AbilitySchema.merge(BaseStatSchema).default({}),
   normal: z.string().default(SkillTypeMap.NORMAL_ATTACK.physical_normal.id),
   normal_name: z.string().optional(),
   skill: z.array(z.string()).max(8).optional(),

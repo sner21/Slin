@@ -80,7 +80,7 @@ export class CooldownManager {
     }
     // 指定角色的所有冷却
     resetCharacterCooldowns(char: Character) {
-        this.cooldowns.set(char.id, char.skill.map(skillId => ({ remainingTurns: SkillMap[skillId].cooldown, skillId: skillId })));
+        this.cooldowns.set(char.id, char.skill.map(skillId => ({ remainingTurns: SkillMap[skillId]?.cooldown || 100, skillId: skillId })));
     }
     // 重置所有冷却
     resetAllCooldowns() {

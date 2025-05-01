@@ -84,12 +84,12 @@ export const costTypeSchema = z.object({
 
 export const AbilitySchema = z.object({
     // 基础属性
-    hp: z.number().default(100),
+    hp: z.number().default(150),
     mp: z.number().default(100),
-    attack: z.number().default(1),
-    defense: z.number().default(1),
-    crit_rate: z.number().default(0), //暴击率
-    crit_dmg: z.number().default(100),//暴伤
+    attack: z.number().default(15),
+    defense: z.number().default(15),
+    crit_rate: z.number().default(10), //暴击率
+    crit_dmg: z.number().default(50),//暴伤
     evasion: z.number().default(0),
     speed: z.number().default(50),
     shield: z.number().default(1),
@@ -121,6 +121,7 @@ export const CarryBuffSchema = z.record(z.object({
     id: z.string(),
     duration: z.number().optional(),
     count: z.number().default(1),
+    name:z.string().optional(),
     self: z.object({
         type: z.number(),
         name: z.string(),

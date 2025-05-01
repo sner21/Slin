@@ -1,4 +1,4 @@
-import { Skill, targetTypeEnum } from '../types';
+import { Skill, targetTypeEnum, targetType } from '../types';
 import { get_svg_uri } from '../..';
 export const ELEMENTAL_SKILL: Array<Skill> = [
     {
@@ -6,7 +6,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         name: '蝶引来生',
         type: 'ELEMENTAL_SKILL',
         uri: get_svg_uri(10, import.meta.url),
-        desc: '\${name}消耗30%生命值，获得彼岸蝶舞状态',
+        desc: ' \${name}消耗30%生命值，获得彼岸蝶舞状态，只有永不间断的烈焰可以洗净世间的不净之物。',
         scopeType: 'SINGLE',
         effectType: 'BUFF',
         targetType: targetTypeEnum.SELF,
@@ -71,7 +71,11 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         id: '鸢飞戾天',
         name: '天然理心流·鸢飞戾天',
         type: 'ELEMENTAL_SKILL',
-        desc: '',
+        desc: '提升\${name}的速度',
+        buffs: [{
+            id: "鸢飞戾天",
+            type: "self"
+        }],
         targetType: targetTypeEnum.ENEMY,
         scopeType: 'SINGLE',
         effectType: 'BUFF',
@@ -79,21 +83,24 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         cooldown: 2,
         level: 1,
         element: 'wind',
-        damageType: 'magic'
+        damageType: 'physical'
     },
     {
         id: '无外流',
         name: '无外流',
         type: 'ELEMENTAL_SKILL',
-        desc: '',
+        buffs: [
+            { id: "无外流", type: "self" },
+        ],
+        desc: "\${name}提升防御40%,每回合恢复生命值10%，无外流是日本古流剑术的重要流派之一，以实战性和独特的技法著称。",
         targetType: targetTypeEnum.ENEMY,
         scopeType: 'SINGLE',
         effectType: 'BUFF',
-        multiplier: 170,
-        cooldown: 2,
+        multiplier: 130,
+        cooldown: 3,
         level: 1,
         element: 'thunder',
-        damageType: 'magic'
+        damageType: 'physical'
     },
     {
         id: '鬼子·散',
@@ -109,20 +116,23 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         element: 'dark',
         damageType: 'magic'
     },
-
     {
-        id: '天翔散段突',
-        name: '天翔散段突',
+        id: '天翔散段',
+        name: '天翔散段',
         type: 'ELEMENTAL_SKILL',
-        desc: '',
+        desc: '提升\${name}的暴击率/暴击伤害,并造成持续伤害',
         targetType: targetTypeEnum.ENEMY,
+        buffs: [
+            { id: "天翔", type: "self" },
+            { id: "散段", type: "target" },
+        ],
         scopeType: 'SINGLE',
         effectType: 'BUFF',
         multiplier: 190,
         cooldown: 2,
         level: 1,
         element: 'light',
-        damageType: 'magic'
+        damageType: 'physical'
     },
     {
         id: '不断',
@@ -139,7 +149,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         cooldown: 3,
         level: 1,
         element: 'water',
-        damageType: 'magic'
+        damageType: 'physical'
     },
     {
         id: 'attack_flame',
@@ -153,7 +163,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         cooldown: 3,
         level: 1,
         element: 'fire',
-        damageType: 'magic'
+        damageType: 'physical'
     },
     {
         id: 'zy_skill',
@@ -187,7 +197,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         cooldown: 8,
         level: 1,
         element: 'fire',
-        damageType: 'magic'
+        damageType: 'physical'
     }, {
         id: 'eula_skill',
         name: '安神秘法',
@@ -238,7 +248,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         id: 'raiden_skill',
         name: '神变·恶曜开眼',
         type: 'ELEMENTAL_SKILL',
-        desc: '召唤雷电之眼，为队友攻击附加雷元素伤害',
+        desc: '雷电将军展开净土的一角,对周围的敌人造成雷元素伤害，为队伍中附近的所有角色授以雷罚恶曜之眼，为队友攻击附加雷元素伤害',
         buffs: [
             {
                 id: "神变·恶曜开眼",
@@ -309,9 +319,10 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         name: '罪钥',
         type: 'ELEMENTAL_BURST',
         desc: '释放强大的黑焰剑气,对敌人造成多段伤害',
+        buffs: [{ id: "罪钥", type: "target" }],
         scopeType: 'SINGLE',
         effectType: 'DAMAGE',
-        multiplier: 260,
+        multiplier: 230,
         cooldown: 3,
         level: 1,
         element: 'dark',
@@ -321,7 +332,10 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         id: 'mitsuba_skill',
         name: '巨斧头',
         type: 'ELEMENTAL_SKILL',
-        desc: '快速移动并造成范围风元素伤害',
+        desc: '快速移动并造成范围风元素伤害,降低目标防御',
+        buffs: [
+            { id: "防御降低", type: "target" },
+        ],
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
         multiplier: 150,
@@ -343,7 +357,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         ],
         scopeType: 'MULTI',
         effectType: 'DAMAGE',
-        multiplier: 160,
+        multiplier: 50,
         cooldown: 3,
         level: 1,
         element: 'thunder',

@@ -10,7 +10,7 @@ import { BuffSchema } from "./type";
 export function BuffManage(dataCon) {
     const buff_data = z.array(BuffSchema).parse(buff_init)
     const buff_map = keyBy(buff_data, 'id')
-    const add_buff = (self: Character, role: Character, id: string) => {
+    const add_buff = (self: Character, role: Character, { id, name, duration, count = 0 }) => {
         const buff = buff_map[id]
         if (!buff) {
             return
@@ -23,11 +23,12 @@ export function BuffManage(dataCon) {
         //     })
         //     dataCon.settle_damage_role(self, role, damage, buff.not_lethal)
         // }
-        if (!role.buff[id]) {
+        if (!role.buff[id] || (id === buff.id && (duration >= role.buff[id].duration || count >= role.buff[id].count))) {
             role.buff[id] = {
                 id: buff.id,
-                duration: buff.duration,
-                count: 0,
+                duration: duration || buff.duration,
+                count: (role.buff[id]?.count || 0) + count,
+                name: name || buff.name,
                 self: {
                     type: Number(self.type),
                     name: self.name,
@@ -37,17 +38,17 @@ export function BuffManage(dataCon) {
         }
         switch (buff.durationType) {
             case 'OVERLAY': {
-                role.buff[id].count += 1
-                role.buff[id].duration = buff.duration
+                role.buff[id].count += 1 + count
+                role.buff[id].duration = duration || buff.duration
                 break
             }
             case 'PERMANENT-OVERLAY': {
-                role.buff[id].count += 1
+                role.buff[id].count += 1 + count
                 break
             }
             case 'TURNS': {
                 role.buff[id].count = 1
-                role.buff[id].duration = buff.duration
+                role.buff[id].duration = duration || buff.duration
                 break
             }
             case 'PERMANENT': {
@@ -62,7 +63,8 @@ export function BuffManage(dataCon) {
             buff_map[i.id] = assignIn(buff_map[i.id], i)
         })
     }
-    const settle_buff = (role: Character) => {
+    /* buff数值 */
+    const calculateBuffStats = (role: Character) => {
         Object.keys(role.buff || {}).forEach(k => {
             const i = role.buff[k]
             const buff = buff_map[i.id]
@@ -74,15 +76,23 @@ export function BuffManage(dataCon) {
                     role.imm_ability[key] = Math.round((role.imm_ability[key] || 0) + (buff.imm_ability[key] || 0) * i.count);
                 })
             }
+        })
+    }
+    const settle_buff = (role) => {
+        Object.keys(role.buff || {}).forEach(k => {
+            const i = role.buff[k]
+            const buff = buff_map[i.id]
+            if (!buff) {
+                return
+            }
             if (buff.multiplier) {
-           
                 const self = dataCon.roles_group[i.self.id]
                 let { damage } = dataCon.settle_damage(self, role, {
                     element: buff.element || self.element,
                     damageType: buff.damageType,
                     multiplier: buff.multiplier * i.count,
                 })
-                dataCon.settle_damage_role(self, role, damage, buff.not_lethal||true)
+                dataCon.settle_damage_role(self, role, damage, buff.not_lethal || true)
             }
             buff.effects.forEach(effect => {
                 dataCon.exec_effect(role, effect, null, i.count)
@@ -95,9 +105,11 @@ export function BuffManage(dataCon) {
                 }
             }
         })
+
     }
     return {
         settle_buff,
+        calculateBuffStats,
         buff_map,
         buff_data,
         add_buff,

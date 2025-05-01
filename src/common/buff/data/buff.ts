@@ -22,16 +22,35 @@ export const buff_init: Buff = [
         isDebuff: true,
     },
     {
+        id: "罪钥",
+        name: "罪钥",
+        desc: "对\${name}造成0.2倍率伤害",
+        multiplier: 20,
+        damageType: "magic",
+        durationType: "OVERLAY",
+        duration: 3,
+        isDebuff: true,
+    },
+    {
         id: "不动明王咒",
         name: "不动明王咒",
-        desc: "提升\${name}攻击力30%",
-        effects: [{
+        desc: "提升\${name}攻击力和防御力30%",
+        effects: [
+            {
             target: 'self',
             path: 'status',
             attr: 'attack',
             value: 30,
             operator: 'multiply',
-        }],
+        },
+        {
+            target: 'self',
+            path: 'status',
+            attr: 'defense',
+            value: 30,
+            operator: 'multiply',
+        },
+    ],
         durationType: "TURNS",
         duration: 6,
         isDebuff: false,
@@ -76,9 +95,62 @@ export const buff_init: Buff = [
         isDebuff: false,
     },
     {
+        id: "天翔",
+        name: "天翔",
+        desc: "提高\${name}的暴击和暴击率",
+        effects: [
+            {
+                id: "暴击伤害提升",
+            },
+            {
+                id: "暴击率提升",
+            }
+        ],
+        durationType: "TURNS",
+        duration: 4,
+        isDebuff: false,
+    },
+    {
+        id: "散段",
+        name: "散段",
+        desc: "对\${name}造成0.1倍率持续伤害",
+        multiplier: 10,
+        effects: [
+            {
+                id: "暴击伤害提升",
+            },
+            {
+                id: "暴击率提升",
+            }
+        ],
+        durationType: "OVERLAY",
+        duration: 5,
+        isDebuff: true,
+    },
+    {
+        id: "神罗八百万",
+        name: "神罗八百万",
+        desc: "对\${name}造成0.3倍率持续伤害",
+        multiplier: 30,
+        durationType: "OVERLAY",
+        duration: 11,
+        isDebuff: true,
+    },
+    {
+        id: "鸢飞戾天",
+        name: "鸢飞戾天",
+        desc: "提高\${name}的速度",
+        effects: [{
+            id: "速度提升"
+        }],
+        durationType: "TURNS",
+        duration: 4,
+        isDebuff: false,
+    },
+    {
         id: "神变·恶曜开眼",
         name: "神变·恶曜开眼",
-        desc: "提高\${name}的20%攻击力并恢复MP",
+        desc: "提高\${name}的20%攻击力并恢复HP",
         effects: [{
             target: 'self',
             path: 'imm_ability',
@@ -88,13 +160,13 @@ export const buff_init: Buff = [
         }, {
             target: 'self',
             path: 'status',
-            attr: 'mp',
-            value: 40,
-            operator: 'increase',
+            attr: 'hp',
+            value: 1.1,
+            operator: 'multiply',
         }
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 4,
         isDebuff: false,
     },
     {
@@ -111,7 +183,24 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 3,
+        isDebuff: false,
+    },
+    {
+        id: "防御提升",
+        name: "防御提升",
+        desc: "提升\${name}防御40%",
+        effects: [{
+            isBuff: true,
+            path: "imm_ability",
+            target: 'self',
+            attr: "defense",
+            value: 1.4,
+            operator: "multiply",
+        },
+        ],
+        durationType: "TURNS",
+        duration: 3,
         isDebuff: false,
     },
     {
@@ -128,7 +217,7 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 4,
         isDebuff: false,
     },
     {
@@ -145,7 +234,7 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 3,
         isDebuff: false,
     },
     {
@@ -162,7 +251,7 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 4,
         isDebuff: false,
     },
     {
@@ -179,7 +268,7 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 3,
         isDebuff: false,
     },
     {
@@ -196,7 +285,7 @@ export const buff_init: Buff = [
         },
         ],
         durationType: "TURNS",
-        duration: 6,
+        duration: 3,
         isDebuff: false,
     },
     {
@@ -211,7 +300,7 @@ export const buff_init: Buff = [
             operator: 'multiply',
         }],
         durationType: "TURNS",
-        duration: 2,
+        duration: 3,
         isDebuff: true,
     },
     {
@@ -226,22 +315,55 @@ export const buff_init: Buff = [
             operator: 'multiply',
         }],
         durationType: "TURNS",
-        duration: 2,
+        duration: 3,
         isDebuff: true,
     },
     {
-        id: "regeneration",
+        id: "无外流",
+        name: "无外流",
+        desc: "\${name}提升防御40%,每回合恢复生命值10%",
+        effects: [{
+            id: "防御提升",
+            value: 1.4,
+        }, {
+            id: "生命回复",
+            value: 1.1,
+        }
+        ],
+        durationType: "TURNS",
+        duration: 4,
+        isDebuff: false,
+    },
+    {
+        id: "防御提升",
+        name: "防御提升",
+        desc: "提升\${name}防御40%",
+        effects: [{
+            isBuff: true,
+            path: "imm_ability",
+            target: 'self',
+            attr: "defense",
+            value: 1.4,
+            operator: "multiply",
+        },
+        ],
+        durationType: "TURNS",
+        duration: 3,
+        isDebuff: false,
+    },
+    {
+        id: "生命恢复",
         name: "生命恢复",
         desc: "每回合恢复生命值",
         effects: [{
             target: 'self',
             path: 'status',
             attr: 'hp',
-            value: 8,
-            operator: 'increase',
+            value: 1.1,
+            operator: 'multiply',
         }],
         durationType: "TURNS",
-        duration: 5,
+        duration: 3,
         isDebuff: false,
     }
 ]

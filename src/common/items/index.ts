@@ -45,8 +45,8 @@ export function ItemsManager(zenkio: InstanceType<typeof BattleManager>) {
                 zenkio.exec_effect(role, effect, role)
             })
             item.buffs?.forEach(buff => {
-                //TODO 判断是target
-                zenkio.BuffManage.add_buff(role, buff.id)
+                //TODO 判断是target  对自己使用
+                zenkio.BuffManage.add_buff(role, role, buff)
             })
             role.carry.items[index].count -= 1
             if (role.carry.items[index].count <= 0) {

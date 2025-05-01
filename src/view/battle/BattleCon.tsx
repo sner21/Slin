@@ -200,16 +200,14 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                         <div className="mb-2">{template(buff.desc)(item)}</div>
                                                                         <div>{buff.isDebuff ? "DEBUFF" : "BUFF"} &#160;剩余时间 : {item.buff[key]?.duration} &#160;层数 : {item.buff[key]?.count}</div>
                                                                     </div>} trigger="hover">
-                                                                        <span className="line-height-normal">{item.buff[key]?.count > 1 && item.type === "0" && item.buff[key]?.count} <span className="">{buff?.name}</span> {item.buff[key]?.count > 1 && item.type === "1" && item.buff[key]?.count}</span>   {/*  {item.buff[key]?.duration} */}
+                                                                        <span className="line-height-normal">{item.buff[key]?.count > 1 && item.type === "0" && item.buff[key]?.count} <span className="">{item.buff[key]?.name || buff?.name}</span> {item.buff[key]?.count > 1 && item.type === "1" && item.buff[key]?.count}</span>   {/*  {item.buff[key]?.duration} */}
                                                                     </Popover>
                                                                 </div>
                                                             )
                                                         })}
                                                     </div>
-
                                                     {/* </div> */}
                                                 </div>
-
                                                 {/* 角色状态 */}
                                                 <div className="flex flex-col h-full justify-center flex-wrap w-60  gap-1  text-gray-300 text-sm HealthBar">
                                                     <div className="relative w-full mb-1">

@@ -48,9 +48,18 @@ const SkillItem: React.FC<SkillItemProps> = ({
         <Popover className="w-full w-full flex p-0 " trigger="hover" content={<div className='flex flex-col'>
             {skill.desc && <div className='max-w-xl mb-6'>
                 {template(skill.desc)(item)}
+
             </div>}
-            <div className=''>
-                {skill.multiplier > 0 && <span>倍率 : {skill.multiplier}</span>} 属性 : {elementNames[skill.element] || skill.element} 冷却回合 : {elementNames[skill.cooldown] || skill.cooldown} 伤害类型 : {SkillTypeNames[skill.damageType] || skill.damageType} 范围 : {ScopeTypeNames[skill.scopeType] || skill.scopeType} 类别 : {SkillTypeNames[skill.type] || skill.type}
+            <div className='mb-2'>
+                {skill.buffs?.length && skill.buffs.map(buff => (
+                    <div>
+                        {buff?.name || battleManager.BuffManage.buff_map[buff.id]?.name}{<span>({battleManager.BuffManage.buff_map[buff.id].isDebuff?"DEBUFF":"BUFF"})</span>} : {template(battleManager.BuffManage.buff_map[buff.id]?.desc)({name:"目标"})}
+                    </div>
+                ))
+                }
+            </div>
+            <div >
+                {skill.multiplier > 0 && <span>倍率 : {(skill.multiplier / 100).toFixed(2)}</span>} 属性 : {elementNames[skill.element] || skill.element} 冷却回合 : {elementNames[skill.cooldown] || skill.cooldown} 伤害类型 : {SkillTypeNames[skill.damageType] || skill.damageType} 范围 : {ScopeTypeNames[skill.scopeType] || skill.scopeType} 类别 : {SkillTypeNames[skill.type] || skill.type}
             </div>
         </div>} >
             <div
@@ -77,7 +86,7 @@ const SkillItem: React.FC<SkillItemProps> = ({
                     style={{ filter: `drop-shadow(2px 4px 6px black) ` }}
                 />
                 <b
-                    className="ml-0.25 text-xs indent-0 break-all  truncate text-nowrap" 
+                    className="ml-0.25 text-xs indent-0 break-all  truncate text-nowrap"
                     style={{ color: elementColors[skill.element] }}
                 >
                     {skill?.name || ''}

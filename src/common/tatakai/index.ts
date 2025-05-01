@@ -317,7 +317,7 @@ export class BattleManager {
         const baseCurrency = Math.floor(char.grow.level * 5)
 
         // 稀有度加成，转换为百分比整数计算
-        const rarityBonus = 90 + char.grow.rarity * 10  // 90% - 140%
+        const rarityBonus = 9 + char.grow.rarity * 10  // 90% - 140%
 
         // 队伍人数修正，转换为百分比整数计算
         const teamSizePenalty = Math.floor(100 / (1 + Math.log10(team.length)))
@@ -548,7 +548,6 @@ export class BattleManager {
                 i.imm_ability[key] = Math.round((i.imm_ability[key] || 0));
             }
             if (i.state === 0) {
-                // 处理行动角色的回复
                 i.status.hp = Math.min(i.status.hp! + i.imm_ability.hp_re, i.imm_ability.hp)
                 i.status.mp = Math.min(i.status.mp! + i.imm_ability.mp_re, i.imm_ability.mp)
             }
@@ -737,7 +736,7 @@ export class BattleManager {
                 }
             });
         }
-
+        this.BuffManage.calculateBuffStats(character)
         for (let key in stats) {
             stats[key] = Math.round((stats[key] || 0));
         }
@@ -769,7 +768,7 @@ export class BattleManager {
         const elementalBonus = ElementalRelations[element] && ElementalRelations[element][target.element] || 1;
         damage *= elementalBonus;
         if (isCrit) {
-            damage *= self.imm_ability.crit_dmg / 100;
+            damage *= (Math.max(self.imm_ability.crit_dmg - 100, 0)) / 100;
         }
         damage = Math.round(damage)
         return {
@@ -802,7 +801,7 @@ export class BattleManager {
             }
         }
         !isEvaded && skill.buffs?.forEach(buff => {
-            this.BuffManage.add_buff(self, buff.type === "target" ? target : self, buff.id)
+            this.BuffManage.add_buff(self, buff.type === "target" ? target : self, buff)
         })
         skill.effects?.forEach(effect => {
             if (effect.target === 'global') {
@@ -884,9 +883,9 @@ export class BattleManager {
         if (skill.scopeType === "ALL") {
             // const target = this.get_skill_target(skill, character, bb)
             if (bb.type === "0") {
-                (skill.targetType === "ALLY" ? this.cur_enemy : this.cur_characters).filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+                (skill.targetType === "ALLY" ? this.cur_enemy : this.cur_characters).filter(i => i.state !== 1).forEach(i => this.char_attack(character, i, skill))
             } else {
-                (skill.targetType === "ALLY" ? this.cur_characters : this.cur_enemy).filter(i => i.id !== character.id).forEach(i => this.char_attack(character, i, skill))
+                (skill.targetType === "ALLY" ? this.cur_characters : this.cur_enemy).filter(i => i.state !== 1).forEach(i => this.char_attack(character, i, skill))
             }
 
         } else {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { baseDamageSchma, costTypeSchema, EffectSimple } from '../char/attr';
-import {  get_svg_uri } from '..';
+import { get_svg_uri } from '..';
 
 // 技能效果类型
 export const EffectType = z.enum([
@@ -49,7 +49,8 @@ export const Skill = z.object({
     cost: costTypeSchema,
     buffs: z.array(z.object({
         id: z.string(),
-        type: z.enum(['self', 'target']).default('target')
+        type: z.enum(['self', 'target']).default('target'),
+        name: z.string().optional()
     })).optional(),
     // 冷却时间（回合数）
     cooldown: z.number(),
