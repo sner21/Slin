@@ -88,3 +88,61 @@ tr,
 th {
     background: transparent !important;
 }
+
+.before .text-div>.text {
+    cursor: default !important;
+}
+
+.before .text-div>.text:nth-last-child(1) {
+    font-size: 22px;
+    z-index: 3;
+    padding: 0 10px 0 10px;
+    position: relative;
+    display: flex;
+    width: 240px;
+    align-items: center;
+    justify-content: center;
+    line-height: 40px !important;
+    margin-top: 10px;
+}
+
+.before .text-div>.text:nth-last-child(1)>span {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 60px;
+}
+
+.before .text-div>.text:nth-last-child(1)>span::after {
+    content: "";
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 20%;
+    border: 1px solid #ababab;
+    border-top: none;
+    transition: border-color 0.15s, height 0.15s;
+}
+
+.before .text-div>.text:nth-last-child(1)>span:before {
+    content: "";
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 20%;
+    border: 1px solid #ababab;
+    border-bottom: none;
+    transition: border-color 0.15s, height 0.15s;
+}
+
+.before .text-div>.text:nth-last-child(1):hover div {
+    color: rgb(251 191 36);
+}
+
+.before .text-div>.text:nth-last-child(1):hover ::after,
+.before .text-div>.text:nth-last-child(1):hover ::before {
+    border-color: rgb(251 191 36);
+    height: 50%;
+}

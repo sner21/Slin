@@ -92,10 +92,10 @@ export const CustomP: React.FC<ShopEditorProps> = ({
     };
     return (
         <>
-            <span onClick={() => (modalInfo.current.title = '编辑物品', setCharacterEditorOpen(true))}>编辑物品</span>
-            <span onClick={() => (modalInfo.current.title = '编辑事件', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑事件</span>
-            <span onClick={() => (modalInfo.current.title = '编辑技能', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑技能</span>
-            <span onClick={() => (modalInfo.current.title = '编辑装备', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑装备</span>
+            <span className='text-nowrap' onClick={() => (modalInfo.current.title = '编辑物品', setCharacterEditorOpen(true))}>编辑物品</span>
+            <span className='text-nowrap' onClick={() => (modalInfo.current.title = '编辑事件', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑事件</span>
+            <span className='text-nowrap' onClick={() => (modalInfo.current.title = '编辑技能', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑技能</span>
+            <span className='text-nowrap' onClick={() => (modalInfo.current.title = '编辑装备', setCharacterEditorOpen(true))} style={{textDecoration: "line-through"}}>编辑装备</span>
 
             <Modal
                 title={

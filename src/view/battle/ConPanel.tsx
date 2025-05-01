@@ -11,9 +11,9 @@ import { CharacterSelector } from '../../components/CharacterSelector';
 import { cloneDeep } from 'lodash-es';
 import type { DraggableData, DraggableEvent } from 'react-draggable';
 import Draggable from 'react-draggable';
-import { CustomP } from '../../components/ConPanel/CustomP';
 import { useThrottledProxyRef } from '../../hook';
 import HelpModal from './HelpModal';
+import { CustomP } from '../../components/ConPanel/CustomP';
 
 
 type props = {
@@ -139,7 +139,7 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
         {mode == 'panel' && <div className="flex gap-4 flex-1">
           {/* 战斗管理器控制部分 */}
           {/* <div>{battleManager.current.battle_data.round}</div> */}
-          <span onClick={() => setArrConOpen && setArrConOpen(true)}>队伍</span>
+          <span onClick={() => setArrConOpen && setArrConOpen(true)} className='text-nowrap'>队伍</span>
           <span onClick={() => openShop && openShop("")}>商店</span>
           {!pause ? <span onClick={() => (battleManager.current.pause_round(), setPause(true))}>暂停</span> : <span onClick={() =>
             !battleManager.current.round_timer ||
@@ -153,13 +153,13 @@ const ConPanel: FC<props> = ({ battleManager, dataCon, startViewData, refreshBet
           {/* 战斗管理器控制部分 */}
           <span onClick={() => setSaveModalOpen(true)}>存档</span>
           <span onClick={() => setLoadModalOpen(true)}>读档</span>
-          <span onClick={() => (dataCon.current.save_global_config({
+          <span className='text-nowrap' onClick={() => (dataCon.current.save_global_config({
             autosave: !dataCon.current.globalConfig.autosave
           }), setUpdate(update + 1))}>{dataCon.current.globalConfig.autosave ? "关闭" : "开启"}自动存档</span>
-          <span onClick={() => startViewData.mode = ''}>主菜单</span>
+          <span onClick={() => startViewData.mode = ''} className='text-nowrap'>主菜单</span>
         </div>}
         {mode == 'custom' && <div className="flex gap-4 flex-1">
-          <span onClick={() => setCharacterEditorOpen(true)}>编辑角色</span>
+          <span onClick={() => setCharacterEditorOpen(true)} className='text-nowrap'>编辑角色</span>
           <CustomP battleManager={battleManager}></CustomP>
           <Modal
             title={

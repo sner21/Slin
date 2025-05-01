@@ -99,16 +99,16 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       SkillTypeMap.ELEMENTAL_BURST.zy_burst.id
     ],
     ability: {
-      hp: 120,
-      hp_re: 7,
+      hp: 100,
+      hp_re: 5,
       shield: 0,
       attack: 25,
-      elem_bonus: 22,
-      defense: 2,
+      elem_bonus: 23,
+      defense: 0,
       evasion: 6,
       crit_rate: 15,
-      crit_dmg: 70,
-      speed: 57,
+      crit_dmg: 55,
+      speed: 54,
       mp: 90,
       penetration: 15,
       lifesteal: 8,
@@ -121,9 +121,9 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 8,
+      strength: 3,
       agility: 18,
-      intelligence: 14,
+      intelligence: 18,
     },
     ac: [],
     at: [],
@@ -198,7 +198,7 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.makima_skill.id,
       // SkillTypeMap.ELEMENTAL_BURST.tohka_skill.id
-      "天魔反·无间"
+      "神罗八百万"
     ],
     ability: {
       hp: 140,
@@ -433,7 +433,7 @@ export const initialData = DataSchema.parse([
     gender: "2",
     element: "fire",
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
-    normal_name: "往生秘传枪法",
+    normal_name: "往生秘传枪法(普通)",
     skill: [
       SkillTypeMap.ELEMENTAL_SKILL.hutao_skill.id,
       SkillTypeMap.ELEMENTAL_SKILL.eula_skill.id
@@ -483,7 +483,7 @@ export const initialData = DataSchema.parse([
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     normal_name: "夜刃突袭",
     skill: [
-      "天翔散段", "神罗八百万"
+      "南天十字", "天魔反·无间"
     ],
     ability: {
       hp: 170,
@@ -534,29 +534,29 @@ export const initialData = DataSchema.parse([
     },
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     ability: {
-      hp: 160, 
+      hp: 160,
       shield: 0,
-      attack: 18,    
-      defense: 10,  
+      attack: 18,
+      defense: 10,
       evasion: 8,
       crit_rate: 10,
       crit_dmg: 50,
-      speed: 50, 
-      mp: 100,  
-      penetration: 10, 
-      lifesteal: 5, 
-      elem_mastery: 80,  
-      elem_bonus: 15,  
-      magic_res: 0, 
-      fire_res: 0,  
-      ice_res: 15,   
-      lightning_res: 5, 
-      rage_bonus: 20,  
-      healing_bonus: 0,  
-      shield_strength: 0, 
-      strength: 8,    
-      agility: 12,    
-      intelligence: 10, 
+      speed: 50,
+      mp: 100,
+      penetration: 10,
+      lifesteal: 5,
+      elem_mastery: 80,
+      elem_bonus: 15,
+      magic_res: 0,
+      fire_res: 0,
+      ice_res: 15,
+      lightning_res: 5,
+      rage_bonus: 20,
+      healing_bonus: 0,
+      shield_strength: 0,
+      strength: 8,
+      agility: 12,
+      intelligence: 10,
     },
     blood: 100,
     ee: 0,
@@ -583,7 +583,7 @@ export const initialData = DataSchema.parse([
     ability: {
       hp: 160,
       shield: 0,
-      attack: 16,
+      attack: 17,
       defense: 8,
       evasion: 5,
       crit_rate: 10,
@@ -788,8 +788,8 @@ export const initialData = DataSchema.parse([
     at: [],
     normal: SkillTypeMap.NORMAL_ATTACK.physical_normal.id,
     skill: [
-      SkillTypeMap.ELEMENTAL_SKILL.mitsuba_skill.id,
-      SkillTypeMap.ELEMENTAL_BURST.mitsuba_burst.id
+      '一骑当千',
+      '巨斧头'
     ],
     position: { index: 6 },
     ability: {

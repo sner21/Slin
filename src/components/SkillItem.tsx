@@ -52,7 +52,7 @@ const SkillItem: React.FC<SkillItemProps> = ({
             </div>}
             <div className='mb-2'>
                 {skill.buffs?.length && skill.buffs.map(buff => (
-                    <div>
+                    <div key={buff.id}>
                         {buff?.name || battleManager.BuffManage.buff_map[buff.id]?.name}{<span>({battleManager.BuffManage.buff_map[buff.id].isDebuff?"DEBUFF":"BUFF"})</span>} : {template(battleManager.BuffManage.buff_map[buff.id]?.desc)({name:"目标"})}
                     </div>
                 ))

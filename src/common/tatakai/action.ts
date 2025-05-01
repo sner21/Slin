@@ -51,7 +51,6 @@ export class ActionGauge {
             const newGauge = currentGauge + increment;
             this.gauges.set(char.id, newGauge);
         });
-        console.log(Math.max(...gauges) * 14 * 500 / time, 11)
         this.MAX_GAUGE = Math.max(...gauges) * 14 * 500 / time;
     }
 

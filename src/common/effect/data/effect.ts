@@ -41,7 +41,7 @@ export const effectsInit: effectsSchema = [
         path: "status",
         target: 'target',
         attr: "crit_rate",
-        value: 1.1,
+        value: 1.2,
         operator: "multiply",
     },
     {
@@ -52,7 +52,7 @@ export const effectsInit: effectsSchema = [
         path: "status",
         target: 'target',
         attr: "crit_rate",
-        value: 1.2,
+        value: 1.4,
         operator: "multiply",
     },
     {

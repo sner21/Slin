@@ -45,7 +45,7 @@ const RecordCon: FC<Props> = ({
                                 {<span style={{ display: at.elementalBonus !== 1 ? "" : "none" }}> * {at.elementalBonus}</span>}
                                 &#160;-&gt;  <span style={{ color: at.isCrit ? "yellow" : "" }}> {at.isEvaded ? "被闪避" : (at.effectType === 'HEAL' ? -at.damage.hp : at.damage.hp)}</span>
                                 {/* 施加BUFF */}
-                                {at.buffs?.length && <span>{at.buffs.map((buff) => <span>&#160;-&gt; {battleManager.current.BuffManage.buff_map[buff.id].isDebuff ? "DEBUFF" : "BUFF"} -&gt;&#160;{buff.name || battleManager.current.BuffManage.buff_map[buff.id]?.name}</span>)}</span>}
+                                {at.buffs?.length && <span>{at.buffs.map((buff) => <span key={buff.id}>&#160;-&gt; {battleManager.current.BuffManage.buff_map[buff.id].isDebuff ? "DEBUFF" : "BUFF"} -&gt;&#160;{buff.name || battleManager.current.BuffManage.buff_map[buff.id]?.name}</span>)}</span>}
                                 {/* 击杀 */}
                                 {at.result === "kill" && <span>&#160;-&gt; 击败</span>}
                             </span>

@@ -156,7 +156,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
             Object.keys(roleAarry[curRole.type]).forEach((key) => {
                 if (roleAarry[curRole.type][key].id === curRole.id) {
                     // roleAarry[curRole.type][key].index = null
-                    console.log(roleAarry[curRole.type][key],roleAarry, curRole, 22)
+                    console.log(roleAarry[curRole.type][key], roleAarry, curRole, 22)
                     a[curRole.type] = {
                         ...roleAarry[curRole.type],
                         [key]: {}
@@ -174,7 +174,7 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
 
 
     return (
-        <div className=' flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box", }} onClick={() => setCurRole({})}>
+        <div className='before  flex flex-col h-full left-0 h-full top-0  z-6 ' style={{ ["box-sizing"]: "border-box", }} onClick={() => setCurRole({})}>
             <div>
                 <div className=' text-center   items-center justify-center mt-2'>
                     {/* <div>前排单位有30%概率直接攻击后排</div>
@@ -223,12 +223,16 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
                     ))
                 }
             </div>
-            <div className='flex justify-center  text-center h-16  mb-6'>
-                <div className='flex justify-center items-center   w-100 text-2xl cursor-pointer hover:color-amber  hover:border-amber border-dashed' onClick={() => handleConfirm()}>确定阵容</div>
+            <div className='flex justify-center  text-center h-16  mb-6 text-div cursor-pointer ' onClick={() => handleConfirm()}>
+                <div className="text page-text "><div className='absolute' >  确定阵容</div><span></span> </div>
             </div>
 
+            {/* <div className='flex justify-center  text-center h-16  mb-6 text-div'>
+                <div className='flex justify-center items-center   w-100 text-2xl cursor-pointer  text' onClick={() => handleConfirm()}>确定阵容</div>
+            </div> */}
 
-        </div>
+            {/* hover:color-amber  hover:border-amber border-dashed */}
+        </div >
     );
 };
 

@@ -166,7 +166,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                         <div className="flex flex-col gap-4 flex-1 overflow-y-auto overflow-x-hidden p-4  w-full relative">
                             {<ActionBar battleManager={battleManager}></ActionBar>}
                             <div className=" flex flex-row  justify-between  w-full w-99% py-8 gap-8 2xl:gap-0">
-                                {[battleManager.current?.cur_characters, battleManager.current?.cur_enemy].map((i, roleType) => (<div className="flex gap-8 flex-col flex-3/4">
+                                {[battleManager.current?.cur_characters, battleManager.current?.cur_enemy].map((i, roleType) => (<div key={roleType} className="flex gap-8 flex-col flex-3/4">
                                     {i && Object.values(i).map((item, index) => (
                                         <div key={index} className=" ">
                                             <div className="flex items-center h-[220px]  gap-8 flex-row items-center h-full flex-wrap " style={{ flexDirection: roleType === 0 ? 'row-reverse' : '' }}>

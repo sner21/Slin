@@ -6,7 +6,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         name: '蝶引来生',
         type: 'ELEMENTAL_SKILL',
         uri: get_svg_uri(10, import.meta.url),
-        desc: ' \${name}消耗30%生命值，获得彼岸蝶舞状态，只有永不间断的烈焰可以洗净世间的不净之物。',
+        desc: ' \${name}消耗40%生命值，获得彼岸蝶舞状态，只有永不间断的烈焰可以洗净世间的不净之物。',
         scopeType: 'SINGLE',
         effectType: 'BUFF',
         targetType: targetTypeEnum.SELF,
@@ -18,13 +18,20 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
                 type: "self",
             }
         ],
+        // {
+        //     path: "",
+        //     target: 'self',
+        //     attr: "normal",
+        //     value: '往生秘传枪法(重击)',
+        //     operator: "equal",
+        // },
         effects: [
             {
                 isBuff: true,
                 path: "status",
                 target: 'self',
                 attr: "hp",
-                value: 0.7,
+                value: 0.6,
                 operator: "multiply",
                 // conditions:[
                 //     {
@@ -35,6 +42,19 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
                 //         value: 100
                 //     }
                 // ]
+            }, {
+                path: "",
+                target: 'self',
+                attr: "normal",
+                value: '往生秘传枪法(重击)',
+                operator: "equal",
+            },
+            {
+                path: "",
+                target: 'self',
+                attr: "normal_name",
+                value: '往生秘传枪法(重击)',
+                operator: "equal",
             },
         ],
         cooldown: 4,
@@ -117,14 +137,57 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         damageType: 'magic'
     },
     {
-        id: '天翔散段',
-        name: '天翔散段',
+        id: '一骑当千',
+        name: '一骑当千',
         type: 'ELEMENTAL_SKILL',
-        desc: '提升\${name}的暴击率/暴击伤害,并造成持续伤害',
+        buffs: [{ id: "一骑当千", type: "self" }],
+        desc: '',
+        targetType: targetTypeEnum.ENEMY,
+        scopeType: 'SINGLE',
+        effectType: 'BUFF',
+        multiplier: 160,
+        cooldown: 3,
+        level: 1,
+        element: 'wind',
+        damageType: 'magic'
+    },
+    {
+        id: '双剑乱舞',
+        name: '双剑乱舞',
+        type: 'ELEMENTAL_SKILL',
+        desc: '',
+        targetType: targetTypeEnum.ENEMY,
+        scopeType: 'SINGLE',
+        effectType: 'BUFF',
+        multiplier: 220,
+        cooldown: 3,
+        level: 1,
+        element: 'dark',
+        damageType: 'magic'
+    },
+    {
+        id: '曲水流',
+        name: '曲水流',
+        type: 'ELEMENTAL_SKILL',
+        desc: '',
+        targetType: targetTypeEnum.ENEMY,
+        scopeType: 'SINGLE',
+        effectType: 'BUFF',
+        multiplier: 220,
+        cooldown: 3,
+        level: 1,
+        element: 'dark',
+        damageType: 'magic'
+    },
+    {
+        id: '南天十字',
+        name: '南天十字',
+        type: 'ELEMENTAL_SKILL',
+        desc: '南十字座，南天星座之一，是全天88个星座中最小的星座，位于半人马座与苍蝇座之间的银河内。星座中主要的亮星组成一个“十”字形，从这个“十”字形的一竖向下方一直划下去，在北回归线以南的地方皆可看到整个星座',
         targetType: targetTypeEnum.ENEMY,
         buffs: [
-            { id: "天翔", type: "self" },
-            { id: "散段", type: "target" },
+            { id: "南天", type: "self" },
+            { id: "十字", type: "target" },
         ],
         scopeType: 'SINGLE',
         effectType: 'BUFF',
@@ -216,7 +279,7 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         ],
         scopeType: 'ALL',
         effectType: 'DAMAGE',
-        multiplier: 300,
+        multiplier: 260,
         cooldown: 10,
         level: 1,
         element: 'fire',
@@ -327,22 +390,6 @@ export const ELEMENTAL_SKILL: Array<Skill> = [
         level: 1,
         element: 'dark',
         critDmgBonus: 50,
-        damageType: 'physical'
-    }, {
-        id: 'mitsuba_skill',
-        name: '巨斧头',
-        type: 'ELEMENTAL_SKILL',
-        desc: '快速移动并造成范围风元素伤害,降低目标防御',
-        buffs: [
-            { id: "防御降低", type: "target" },
-        ],
-        scopeType: 'MULTI',
-        effectType: 'DAMAGE',
-        multiplier: 150,
-        cooldown: 3,
-        level: 1,
-        element: 'wind',
-        elemBonusBonus: 20,
         damageType: 'physical'
     }, {
         id: 'themis_skill',

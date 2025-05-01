@@ -63,20 +63,21 @@ export function BuffManage(dataCon) {
             buff_map[i.id] = assignIn(buff_map[i.id], i)
         })
     }
-    /* buff数值 */
-    const calculateBuffStats = (role: Character) => {
+    const clear_buff = (role) => {
         Object.keys(role.buff || {}).forEach(k => {
             const i = role.buff[k]
             const buff = buff_map[i.id]
             if (!buff) {
                 return
             }
-            if (buff.imm_ability) {
-                Object.keys(buff.imm_ability).forEach(key => {
-                    role.imm_ability[key] = Math.round((role.imm_ability[key] || 0) + (buff.imm_ability[key] || 0) * i.count);
+
+            if (buff.cancelEffects?.length) {
+                buff.cancelEffects.forEach(effect => {
+                    dataCon.exec_effect(role, effect, null, i.count)
                 })
             }
         })
+        role.buff = {}
     }
     const settle_buff = (role) => {
         Object.keys(role.buff || {}).forEach(k => {
@@ -102,6 +103,11 @@ export function BuffManage(dataCon) {
                 if (i.duration <= 0) {
                     i.count && (i.count -= 1)
                     !i.count && Reflect.deleteProperty(role.buff!, i.id)
+                    if (buff.cancelEffects?.length) {
+                        buff.cancelEffects.forEach(effect => {
+                            dataCon.exec_effect(role, effect, null, i.count)
+                        })
+                    }
                 }
             }
         })
@@ -109,11 +115,11 @@ export function BuffManage(dataCon) {
     }
     return {
         settle_buff,
-        calculateBuffStats,
         buff_map,
         buff_data,
         add_buff,
-        load_plugins_buff
+        load_plugins_buff,
+        clear_buff
     }
 }
 // Buff示例

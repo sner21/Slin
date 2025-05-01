@@ -90,6 +90,8 @@ export const AbilitySchema = z.object({
     defense: z.number().default(15),
     crit_rate: z.number().default(10), //暴击率
     crit_dmg: z.number().default(50),//暴伤
+    elem_bonus: z.number().default(0),
+    elem_res: z.number().default(15),
     evasion: z.number().default(0),
     speed: z.number().default(50),
     shield: z.number().default(1),
@@ -101,14 +103,12 @@ export const AbilitySchema = z.object({
     cooldown_re: z.number().default(0), // 冷却缩减
     life_count: z.number().default(1),
     // 元素属性
-    elem_mastery: z.number().optional(),
-    elem_bonus: z.number().default(0),
+    // elem_mastery: z.number().optional(),
 
     // 抗性属性
-    fire_res: z.number().default(0),
-    ice_res: z.number().default(0),
-    lightning_res: z.number().default(0),
-
+    // fire_res: z.number().default(0),
+    // ice_res: z.number().default(0),
+    // lightning_res: z.number().default(0),
     // 特殊属性
     rage_bonus: z.number().default(0),
     shield_strength: z.number().default(0),
@@ -121,7 +121,7 @@ export const CarryBuffSchema = z.record(z.object({
     id: z.string(),
     duration: z.number().optional(),
     count: z.number().default(1),
-    name:z.string().optional(),
+    name: z.string().optional(),
     self: z.object({
         type: z.number(),
         name: z.string(),

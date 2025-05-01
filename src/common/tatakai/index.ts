@@ -384,7 +384,7 @@ export class BattleManager {
             char.status.hp = 0
             char.status.mp = 0
             char.state = 1
-            char.buff = {}
+            this.BuffManage.clear_buff(char)
             this.actionGauge.gauges.set(char.id, 0)
             this.cooldownManager.resetCharacterCooldowns(char)
             //cooldownManager  actionGauge
@@ -629,6 +629,7 @@ export class BattleManager {
             data = data.find((i: any) => i[find.attr] === find.value)
         }
         if (!data) return console.log(target + "没有属性" + path, data);
+        let oldValue = value
         if (typeof value === "number") {
             value = value * count
         }
@@ -639,7 +640,7 @@ export class BattleManager {
                 break
             }
             case "max": {
-                data[attr] = Math.max(value, data[attr])
+                data[attr] = Math.max((value || 0), data[attr])
                 break
             }
             case "decrease": {
@@ -664,7 +665,7 @@ export class BattleManager {
                 break
             }
             case "multiply": {
-                data[attr] *= value
+                data[attr] = data[attr] * oldValue ** count
                 break
             }
 
@@ -736,7 +737,18 @@ export class BattleManager {
                 }
             });
         }
-        this.BuffManage.calculateBuffStats(character)
+        Object.keys(character.buff || {}).forEach(k => {
+            const i = character.buff[k]
+            const buff = this.BuffManage.buff_map[i.id]
+            if (!buff) {
+                return
+            }
+            if (buff.imm_ability) {
+                Object.keys(buff.imm_ability).forEach(key => {
+                    stats[key] = Math.round((stats[key] || 0) * (buff.imm_ability[key] ** i.count || 0));
+                })
+            }
+        })
         for (let key in stats) {
             stats[key] = Math.round((stats[key] || 0));
         }
@@ -754,7 +766,7 @@ export class BattleManager {
     settle_damage(self, target, { element, damageType, multiplier }) {
         let damage = 0
         let isCrit = false
-        isCrit = Math.random() * 100 <= self.ability.crit_rate;
+        isCrit = Math.random() * 100 <= self.imm_ability.crit_rate;
         if (damageType === 'physical') {
             damage = self.imm_ability.attack * (Number(multiplier)) / 100
             damage = char_attack_physical(self, target, damage)
@@ -992,8 +1004,8 @@ export function char_attack_physical(self: Character, target: Character | BB, da
 // 魔法伤害计算
 export function char_attack_magic(self: Character, target: Character | BB, damage: number) {
     // 护甲穿透
-    const effectiveDefense = Math.max(0, target.imm_ability.defense * (1 - self.imm_ability.penetration / 100));
-    const defense = target.imm_ability.defense - effectiveDefense
+    const effectiveDefense = Math.max(0, target.imm_ability.elem_res * (1 - self.imm_ability.penetration / 100));
+    const defense = target.imm_ability.elem_res - effectiveDefense
     const defenseRatio = defense / (defense + 100);
     damage *= (1 - defenseRatio);
     // 元素伤害加成
