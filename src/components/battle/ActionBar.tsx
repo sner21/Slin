@@ -10,17 +10,17 @@ interface Props {
 const ActionBar: FC<Props> = ({
     battleManager,
 }) => {
+
     const barRef = useRef<HTMLDivElement>(null);
     const [barWidth, setBarWidth] = useState(0)
+    const handleResize = () => {
+        if (barRef.current) {
+            const width = barRef.current.offsetWidth;
+            setBarWidth(width)
+        }
+    };
     useEffect(() => {
-        const handleResize = () => {
-            if (barRef.current) {
-                const width = barRef.current.offsetWidth;
-                setBarWidth(width)
-            }
-        };
         window.addEventListener('resize', handleResize);
-        // 初始时也获取一次
         handleResize();
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -28,7 +28,7 @@ const ActionBar: FC<Props> = ({
     }, []);
 
     return (
-        <div className="w-96% flex items-center justify-center gap-6 " >
+        <div className="w-96% flex items-center justify-center gap-6 " onResize={handleResize}>
             {/* 行动条 */}
             <div>回合：{battleManager.current.battle_data.round}</div>
             <div>轮数：{battleManager.current.battle_data.battle_round}</div>

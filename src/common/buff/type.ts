@@ -63,8 +63,8 @@ export const BuffSchema = z.object({
     durationType: BuffDurationType.default('TURNS'),
     duration: z.number().optional(),
     // 叠加相关
-    maxStacks: z.number().optional(),  //最大叠加
-    currentStacks: z.number().default(1), //叠加数
+    maxStacks: z.number().default(10),  //最大叠加
+    // currentStacks: z.number().default(1), //叠加数
     //
     isDebuff: z.boolean().default(false),
     imm_ability: z.record(AbilitySchema.keyof(), z.any()).optional(),

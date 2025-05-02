@@ -122,8 +122,8 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       healing_bonus: 0,
       shield_strength: 0,
       strength: 3,
-      agility: 18,
-      intelligence: 18,
+      agility: 14,
+      intelligence: 14,
     },
     ac: [],
     at: [],
@@ -144,8 +144,8 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       // 基础属性
       hp: 120, // 生命上限
       shield: 0,  // 护盾
-      attack: 20,    // 攻击力
-      defense: 2,  // 防御力
+      attack: 18,    // 攻击力
+      defense: 4,  // 防御力
       evasion: 8, // 闪避率
       crit_rate: 10, // 暴击率
       crit_dmg: 50,
@@ -164,10 +164,10 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       // 特殊属性
       rage_bonus: 20,  // 怒气伤害加成
       healing_bonus: 0,  // 治疗加成
-      shield_strength: 0, // 护盾强度
-      strength: 8,    // 中等力量
-      agility: 12,    // 较高敏捷
-      intelligence: 10, // 
+      shield_strength: 0, 
+      strength: 8,    
+      agility: 15,    
+      intelligence: 7, 
     },
     salu: '六甲山的妖怪',
     grow: {
@@ -223,9 +223,9 @@ export const bb: Character[] = z.array(CharacterSchema).parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 14,
-      agility: 12,
-      intelligence: 8,
+      strength: 6,
+      agility: 8,
+      intelligence: 16,
     },
     ac: [],
     at: [],
@@ -460,9 +460,9 @@ export const initialData = DataSchema.parse([
       rage_bonus: 25,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 9,
-      agility: 16,
-      intelligence: 9,
+      strength: 6,
+      agility: 15,
+      intelligence: 8,
     },
     ac: [],
     at: [],
@@ -583,12 +583,12 @@ export const initialData = DataSchema.parse([
     ability: {
       hp: 160,
       shield: 0,
-      attack: 17,
+      attack: 16,
       defense: 8,
       evasion: 5,
       crit_rate: 10,
       crit_dmg: 50,
-      speed: 63,
+      speed: 61,
       mp: 130,
       penetration: 10,
       lifesteal: 0,
@@ -601,8 +601,8 @@ export const initialData = DataSchema.parse([
       rage_bonus: 15,
       healing_bonus: 0,
       shield_strength: 0,
-      strength: 9,
-      agility: 14,
+      strength: 8,
+      agility: 15,
       intelligence: 6,
     },
     blood: 100,

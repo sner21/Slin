@@ -16,6 +16,7 @@ export const ItemBaseSchema = z.object({
         id: z.string(),
         type: z.enum(['self', 'target']).default('target'),
         name: z.string().optional(),
+        count: z.number().default(0)
     })).optional(),
     // expiration  //保质期
 })

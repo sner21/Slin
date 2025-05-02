@@ -306,7 +306,7 @@ function App({ dataCon, startViewData, refreshBet, controlPanel, battleManageDat
                                                                         {({ at }) => (
                                                                             at.skillId !== 'default' && (
                                                                                 <span key={`char-attack-${at.id}-${at.timestamp}`}>
-                                                                                    {at.self.name} &gt; {at.target.name} &gt; <span>{SkillMap[at.skillId]?.name || ""}</span> &gt; {at.damage.hp}
+                                                                                    {at.self.name} &gt; {at.target.name} &gt; <span>{SkillMap[at.skillId]?.type === "NORMAL_ATTACK" ? battleManager.current.roles_group[at.self.id]?.normal_name || SkillMap[at.skillId]?.name : SkillMap[at.skillId]?.name || ""}</span> &gt; {at.damage.hp}
                                                                                 </span>
                                                                             )
                                                                         )}

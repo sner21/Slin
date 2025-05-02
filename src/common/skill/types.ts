@@ -50,7 +50,8 @@ export const Skill = z.object({
     buffs: z.array(z.object({
         id: z.string(),
         type: z.enum(['self', 'target']).default('target'),
-        name: z.string().optional()
+        name: z.string().optional(),
+        count: z.number().default(0)
     })).optional(),
     // 冷却时间（回合数）
     cooldown: z.number(),

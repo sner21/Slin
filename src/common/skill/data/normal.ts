@@ -30,7 +30,7 @@ export const NORMAL_ATTACK: Array<Skill> = [
     {
         id: '往生秘传枪法(重击)',
         name: '往生秘传枪法(重击)',
-        type: 'NORMAL_ATTACK',
+        type: 'ELEMENTAL_SKILL',
         desc: '重击会为命中的敌人施加血梅香效果。',
         buffs: [{
             id: "血梅香", type: "target"

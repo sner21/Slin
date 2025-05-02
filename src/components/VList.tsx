@@ -223,7 +223,7 @@ const VList: React.FC<VListProps> = ({
                 {visibleData.map((item,index) => (
                     <div
                         key={index}
-                        className="w-full"
+                        className="w-full indent-0"
                         ref={(el) => handleItemResize(item, el)}
                     >
                         {children({ at: item })}

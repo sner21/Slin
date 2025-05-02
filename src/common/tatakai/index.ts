@@ -703,27 +703,25 @@ export class BattleManager {
         // 计算派生属性
         stats = {
             ...stats,
-            attack: stats.attack + (stats.strength + stats.agility + stats.intelligence) * 0.01,
+
             // 生命相关
             hp: stats.hp + stats.strength * 1.5,                    // 力量影响生命上限
             hp_re: stats.hp_re + stats.strength * 0.02,            // 力量影响生命回复
             defense: stats.defense + stats.strength * 0.1,
+
             // 敏捷相关
-            speed: stats.speed + stats.agility * 0.2,               // 敏捷影响速度
+            attack: stats.attack + stats.strength * 0.03,
             evasion: stats.evasion + stats.agility * 0.015,        // 敏捷影响闪避
-            crit_rate: stats.crit_rate + stats.agility * 0.02,     // 敏捷影响暴击率
-            crit_dmg: stats.crit_dmg + stats.agility * 0.05,       // 敏捷影响暴击伤害
+            speed: stats.speed + stats.agility * 0.2,
             // 智力相关
             mp: stats.mp + stats.intelligence * 0.05,        // 智力影响能量值
             mp_re: stats.mp_re + stats.intelligence * 0.01, // 智力影响能量回复
+            elem_res: stats.elem_res + stats.intelligence * 0.1,
             elem_bonus: stats.elem_bonus + stats.intelligence * 0.05,   // 智力影响元素伤害
-            // 抗性相关
-            fire_res: stats.fire_res + stats.strength * 0.02,      // 力量影响火抗
-            ice_res: stats.ice_res + stats.strength * 0.02,        // 力量影响冰抗
-            lightning_res: stats.lightning_res + stats.strength * 0.02, // 力量影响雷抗
-            // 特殊加成
-            healing_bonus: stats.healing_bonus + stats.intelligence * 0.05, // 智力影响治疗加成
-            shield_strength: stats.shield_strength + stats.strength * 0.03  // 力量影响护盾强度
+
+            crit_rate: stats.crit_rate + (stats.agility + stats.intelligence) * 0.01,
+            crit_dmg: stats.crit_dmg + (stats.agility + stats.intelligence) * 0.025,
+            // shield_strength: stats.shield_strength + stats.strength * 0.03  // 力量影响护盾强度
         };
         // 叠加装备属性
         if (character.carry.equipments) {
@@ -763,7 +761,7 @@ export class BattleManager {
         //叠加BUFF属性
 
     }
-    settle_damage(self, target, { element, damageType, multiplier }) {
+    settle_damage(self, target, { element, damageType, multiplier, name }) {
         let damage = 0
         let isCrit = false
         isCrit = Math.random() * 100 <= self.imm_ability.crit_rate;
@@ -780,9 +778,12 @@ export class BattleManager {
         const elementalBonus = ElementalRelations[element] && ElementalRelations[element][target.element] || 1;
         damage *= elementalBonus;
         if (isCrit) {
-            damage *= (Math.max(self.imm_ability.crit_dmg - 100, 0)) / 100;
+            damage *= (Math.max(self.imm_ability.crit_dmg, 0) + 100) / 100;
         }
         damage = Math.round(damage)
+        if (name === "天魔反·无间") {
+            console.log(damage, elementalBonus, isCrit, (Math.max(self.imm_ability.crit_dmg, 0)) / 100);
+        }
         return {
             elementalBonus,
             isCrit,
@@ -797,19 +798,12 @@ export class BattleManager {
     }
     // 结算攻击
     char_attack(self: Character, target: Character, skill: Skill) {
-        //削减当前数值 ?  除了boss可以删掉
-        let { damage, elementalBonus, isCrit } = this.settle_damage(self, target, {
-            element: skill.type === "NORMAL_ATTACK" ? self.element : skill.element,
-            damageType: skill.damageType,
-            multiplier: skill.multiplier,
-        })
         //闪避概率
         let isEvaded = false
         if (skill.type === "NORMAL_ATTACK") {
             const r = randomInt(0, 100)
             if (r <= target.imm_ability?.evasion) {
                 isEvaded = true
-                damage = 0
             }
         }
         !isEvaded && skill.buffs?.forEach(buff => {
@@ -822,6 +816,16 @@ export class BattleManager {
                 this.exec_effect(target || target, effect, self)
             }
         })
+        this.calculateFinalStats(self)
+        this.calculateFinalStats(target)
+        let { damage, elementalBonus, isCrit } = this.settle_damage(self, target, {
+            element: skill.type === "NORMAL_ATTACK" ? self.element : skill.element,
+            damageType: skill.damageType,
+            multiplier: skill.multiplier,
+            name: skill.name
+        })
+
+        if (isEvaded) damage = 0
         const { hp } = this.settle_damage_role(self, target, damage, skill.not_lethal)
         //记录
         const at = BattleActionSchema.parse({
@@ -875,10 +879,13 @@ export class BattleManager {
         }
         // 检查技能是否在冷却中
         if (this.cooldownManager.isOnCooldown(character.id, skillId)) {
-            this.cooldownManager.getRemainingCooldown(character.id, skillId);
+            // this.cooldownManager.getRemainingCooldown(character.id, skillId);
             return false
             // throw new Error(`技能冷却中，还需${remainingTurns}回合`);
         }
+        this.cooldownManager.startCooldown(character.id, skillId, skill.cooldown);
+
+        if (skill.name === "天魔反·无间") console.log(skill.cooldown, 3333);
         // 检查cost
         if (skill.cost) {
             for (const key in skill.cost) {
@@ -891,7 +898,7 @@ export class BattleManager {
         }
         //使用技能
         //TODO  aoe
-
+        if (skill.name === "天魔反·无间") console.log(skill.cooldown, 5555555);
         if (skill.scopeType === "ALL") {
             // const target = this.get_skill_target(skill, character, bb)
             if (bb.type === "0") {
@@ -904,8 +911,9 @@ export class BattleManager {
             this.char_attack(character, this.get_skill_target(skill, character, bb), skill)
         }
 
+        if (skill.name === "天魔反·无间") console.log(skill.cooldown, 6666);
+
         // 添加冷却
-        this.cooldownManager.startCooldown(character.id, skillId, skill.cooldown);
         return true
     }
     //回合开始

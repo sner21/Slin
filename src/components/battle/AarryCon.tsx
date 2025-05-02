@@ -134,13 +134,13 @@ const AarryCon: FC = ({ roles, onConfirm, roleAarryData }) => {
         if (!curRole.id) return
         if (type !== curRole.type) {
             const list = [...roleData]
+            const data = roleData[curRole.type][curRole.device]
             list[curRole.type].splice(curRole.device, 1)
-            list[type].push({ ...curRole.data, type: type + "" })
+            list[type].push({ ...data, type: type + "" })
             setRoleData(list)
             const a = {}
             Object.keys(roleAarry[curRole.type]).forEach((key) => {
                 if (roleAarry[curRole.type][key].id === curRole.id) {
-                    console.log(roleAarry[curRole.type][key], curRole, 22)
                     a[curRole.type] = {
                         ...roleAarry[curRole.type],
                         [key]: {}

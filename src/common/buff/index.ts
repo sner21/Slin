@@ -36,14 +36,15 @@ export function BuffManage(dataCon) {
                 }
             }
         }
+
         switch (buff.durationType) {
             case 'OVERLAY': {
-                role.buff[id].count += 1 + count
+                role.buff[id].count = Math.min(buff.maxStacks, role.buff[id].count + 1 + count)
                 role.buff[id].duration = duration || buff.duration
                 break
             }
             case 'PERMANENT-OVERLAY': {
-                role.buff[id].count += 1 + count
+                role.buff[id].count = Math.min(buff.maxStacks, role.buff[id].count + 1 + count)
                 break
             }
             case 'TURNS': {
@@ -101,8 +102,8 @@ export function BuffManage(dataCon) {
             if (buff.durationType === "TURNS" || buff.durationType === "OVERLAY" && i.duration) {
                 i.duration = i.duration - 1
                 if (i.duration <= 0) {
-                    i.count && (i.count -= 1)
-                    !i.count && Reflect.deleteProperty(role.buff!, i.id)
+                    i.count && (i.count -= 1);
+                    (!i.count || i.duration) && Reflect.deleteProperty(role.buff!, i.id)
                     if (buff.cancelEffects?.length) {
                         buff.cancelEffects.forEach(effect => {
                             dataCon.exec_effect(role, effect, null, i.count)
