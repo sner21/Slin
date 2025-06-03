@@ -9,6 +9,13 @@
 
 因为前期自己也不完全清楚想做成什么样子，所以部分代码有些许混乱（改来改去的）
 
+# 试玩地址
+
+https://shinoa.ai
+
+![image](https://github.com/user-attachments/assets/cb53a1a9-28a7-4e4a-950f-c42aa5e36c9c)
+
+
 # 机制说明
 
 [机制说明](./Help.md)
