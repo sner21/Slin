@@ -12,8 +12,10 @@
 # 试玩地址
 
 https://shinoa.ai
-
+https://meta-zeta-beige.vercel.app/   (备用)
 ![image](https://github.com/user-attachments/assets/cb53a1a9-28a7-4e4a-950f-c42aa5e36c9c)
+
+
 
 
 # 机制说明
